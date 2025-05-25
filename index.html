@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mumatec Task Manager</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- App Shell -->
+    <div class="app-container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <div class="app-logo">
+                    <div class="logo-icon">📋</div>
+                    <div class="logo-text">Mumatec Tasking</div>
+                </div>
+                <div class="user-info">
+                    <div class="user-avatar">👤</div>
+                    <div class="user-details">
+                        <div class="user-name">Team Member</div>
+                        <div class="user-role">Mumatec Hosting</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-item active" data-view="dashboard">
+                        <span class="nav-icon">🏠</span>
+                        <span class="nav-label">Dashboard</span>
+                        <span class="nav-count" id="dashboardCount">0</span>
+                    </div>
+                    <div class="nav-item" data-view="today">
+                        <span class="nav-icon">📅</span>
+                        <span class="nav-label">Today</span>
+                        <span class="nav-count" id="todayCount">0</span>
+                    </div>
+                    <div class="nav-item" data-view="upcoming">
+                        <span class="nav-icon">⏰</span>
+                        <span class="nav-label">Upcoming</span>
+                        <span class="nav-count" id="upcomingCount">0</span>
+                    </div>
+                    <div class="nav-item" data-view="completed">
+                        <span class="nav-icon">✅</span>
+                        <span class="nav-label">Completed</span>
+                        <span class="nav-count" id="completedNavCount">0</span>
+                    </div>
+                </div>
+
+                <div class="nav-divider"></div>
+
+                <div class="nav-section">
+                    <div class="nav-section-title">Projects</div>
+                    <div class="nav-item" data-filter="Work">
+                        <span class="nav-icon">💼</span>
+                        <span class="nav-label">Work</span>
+                        <span class="nav-count" id="workCount">0</span>
+                    </div>
+                    <div class="nav-item" data-filter="Personal">
+                        <span class="nav-icon">🏠</span>
+                        <span class="nav-label">Personal</span>
+                        <span class="nav-count" id="personalCount">0</span>
+                    </div>
+                    <div class="nav-item" data-filter="Development">
+                        <span class="nav-icon">💻</span>
+                        <span class="nav-label">Development</span>
+                        <span class="nav-count" id="devCount">0</span>
+                    </div>
+                </div>
+
+                <div class="nav-divider"></div>
+
+                <div class="nav-section">
+                    <div class="nav-item" onclick="todoApp.openQuickCapture()">
+                        <span class="nav-icon">⚡</span>
+                        <span class="nav-label">Quick Capture</span>
+                    </div>
+                    <div class="nav-item" onclick="todoApp.exportToCSV()">
+                        <span class="nav-icon">📤</span>
+                        <span class="nav-label">Export Data</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sidebar-footer">
+                <div class="productivity-ring">
+                    <svg class="ring-progress" width="60" height="60">
+                        <circle cx="30" cy="30" r="25" fill="none" stroke="#f0f0f0" stroke-width="4"/>
+                        <circle cx="30" cy="30" r="25" fill="none" stroke="#007AFF" stroke-width="4" 
+                                stroke-dasharray="157" stroke-dashoffset="157" 
+                                transform="rotate(-90 30 30)" id="progressRing"/>
+                    </svg>
+                    <div class="ring-content">
+                        <span id="productivityPercent">0%</span>
+                    </div>
+                </div>
+                <div class="productivity-text">Today's Progress</div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Top Bar -->
+            <div class="top-bar">
+                <div class="top-bar-left">
+                    <h1 class="page-title" id="pageTitle">Dashboard</h1>
+                    <div class="page-subtitle" id="pageSubtitle">Welcome back! You have tasks to complete.</div>
+                </div>
+
+                <div class="top-bar-center">
+                    <div class="search-container">
+                        <input type="text" class="search-input" id="searchInput" placeholder="Search tasks...">
+                        <span class="search-icon">🔍</span>
+                    </div>
+                </div>
+
+                <div class="top-bar-right">
+                    <button class="action-btn secondary" onclick="document.getElementById('csvImport').click()">
+                        <span>📥</span> Import
+                    </button>
+                    <button class="action-btn primary" onclick="todoApp.openAddTaskModal()">
+                        <span>➕</span> New Task
+                    </button>
+                    <div class="view-controls">
+                        <button class="view-btn active" data-view="kanban">📋</button>
+                        <button class="view-btn" data-view="list">📄</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Content Area -->
+            <div class="content-area">
+                <!-- Dashboard View -->
+                <div class="view-container active" id="dashboardView">
+                    <!-- Quick Stats -->
+                    <div class="quick-stats">
+                        <div class="stat-card">
+                            <div class="stat-icon">📋</div>
+                            <div class="stat-content">
+                                <div class="stat-number" id="totalTasks">0</div>
+                                <div class="stat-label">Total Tasks</div>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">✅</div>
+                            <div class="stat-content">
+                                <div class="stat-number" id="completedTasks">0</div>
+                                <div class="stat-label">Completed</div>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">⏳</div>
+                            <div class="stat-content">
+                                <div class="stat-number" id="pendingTasks">0</div>
+                                <div class="stat-label">In Progress</div>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">🔥</div>
+                            <div class="stat-content">
+                                <div class="stat-number" id="streakDays">0</div>
+                                <div class="stat-label">Day Streak</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Main Dashboard Content -->
+                    <div class="dashboard-grid">
+                        <!-- Kanban Board -->
+                        <div class="kanban-container">
+                            <div class="kanban-column" data-status="todo">
+                                <div class="column-header">
+                                    <div class="column-title">To Do</div>
+                                    <div class="column-count" id="todoCount">0</div>
+                                </div>
+                                <div class="column-content" id="todoBoard">
+                                    <div class="add-task-card" onclick="todoApp.openAddTaskModal('todo')">
+                                        <span class="add-icon">➕</span>
+                                        <span>Add task</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="kanban-column" data-status="inprogress">
+                                <div class="column-header">
+                                    <div class="column-title">In Progress</div>
+                                    <div class="column-count" id="inprogressCount">0</div>
+                                </div>
+                                <div class="column-content" id="inprogressBoard">
+                                    <div class="add-task-card" onclick="todoApp.openAddTaskModal('inprogress')">
+                                        <span class="add-icon">➕</span>
+                                        <span>Add task</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="kanban-column" data-status="completed">
+                                <div class="column-header">
+                                    <div class="column-title">Completed</div>
+                                    <div class="column-count" id="completedCount">0</div>
+                                </div>
+                                <div class="column-content" id="completedBoard">
+                                    <div class="add-task-card" onclick="todoApp.openAddTaskModal('completed')">
+                                        <span class="add-icon">➕</span>
+                                        <span>Add task</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Insights Panel -->
+                        <div class="insights-panel">
+                            <div class="panel-header">
+                                <h3>📊 Insights</h3>
+                                <button class="panel-action">⋯</button>
+                            </div>
+                            <div class="insights-grid">
+                                <div class="insight-metric">
+                                    <div class="metric-label">This Week</div>
+                                    <div class="metric-value" id="weeklyCompleted">0</div>
+                                    <div class="metric-change positive" id="weeklyChange">+0%</div>
+                                </div>
+                                <div class="insight-metric">
+                                    <div class="metric-label">Average Daily</div>
+                                    <div class="metric-value" id="dailyAverage">0</div>
+                                    <div class="metric-trend">📈</div>
+                                </div>
+                                <div class="insight-metric">
+                                    <div class="metric-label">Most Productive</div>
+                                    <div class="metric-value" id="bestDay">Mon</div>
+                                    <div class="metric-trend">⭐</div>
+                                </div>
+                                <div class="insight-metric">
+                                    <div class="metric-label">Focus Score</div>
+                                    <div class="metric-value" id="focusScore">95%</div>
+                                    <div class="metric-trend">🎯</div>
+                                </div>
+                            </div>
+                            
+                            <div class="weekly-chart">
+                                <div class="chart-header">Weekly Activity</div>
+                                <div class="chart-bars" id="weeklyChart"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Other Views (Today, Upcoming, etc.) -->
+                <div class="view-container" id="todayView">
+                    <div class="today-content">
+                        <div class="today-header">
+                            <h2>Today's Focus</h2>
+                            <div class="today-date" id="todayDate"></div>
+                        </div>
+                        <div class="today-tasks" id="todayTasks"></div>
+                    </div>
+                </div>
+
+                <div class="view-container" id="upcomingView">
+                    <div class="upcoming-content">
+                        <h2>Upcoming Tasks</h2>
+                        <div class="upcoming-timeline" id="upcomingTimeline"></div>
+                    </div>
+                </div>
+
+                <div class="view-container" id="completedView">
+                    <div class="completed-content">
+                        <h2>Completed Tasks</h2>
+                        <div class="completed-list" id="completedList"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Capture Modal -->
+    <div class="modal-overlay" id="quickCaptureModal">
+        <div class="quick-capture-modal">
+            <div class="quick-capture-header">
+                <h3>⚡ Quick Capture</h3>
+                <button class="close-btn" onclick="todoApp.closeQuickCapture()">✕</button>
+            </div>
+            <input type="text" class="quick-input" id="quickTaskInput" placeholder="What needs to be done?">
+            <div class="quick-actions">
+                <button class="quick-btn secondary" onclick="todoApp.closeQuickCapture()">Cancel</button>
+                <button class="quick-btn primary" onclick="todoApp.saveQuickTask()">Add Task</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Task Modal -->
+    <div class="modal-overlay" id="taskModal">
+        <div class="task-modal">
+            <div class="modal-header">
+                <h3 id="modalTitle">Add New Task</h3>
+                <button class="close-btn" onclick="todoApp.closeModal()">✕</button>
+            </div>
+            
+            <form id="taskForm" class="task-form">
+                <div class="form-section">
+                    <div class="form-field">
+                        <label>Task Title</label>
+                        <input type="text" id="taskTitle" required>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-field">
+                            <label>Priority</label>
+                            <select id="taskPriority">
+                                <option value="low">🟢 Low</option>
+                                <option value="medium" selected>🟡 Medium</option>
+                                <option value="high">🔴 High</option>
+                            </select>
+                        </div>
+                        <div class="form-field">
+                            <label>Status</label>
+                            <select id="taskStatus">
+                                <option value="todo">📋 To Do</option>
+                                <option value="inprogress">⚡ In Progress</option>
+                                <option value="completed">✅ Completed</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <div class="form-field">
+                        <label>Description</label>
+                        <textarea id="taskDescription" rows="3"></textarea>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <div class="form-row">
+                        <div class="form-field">
+                            <label>Due Date</label>
+                            <input type="datetime-local" id="taskDueDate">
+                        </div>
+                        <div class="form-field">
+                            <label>Category</label>
+                            <input type="text" id="taskCategory" placeholder="e.g., Work, Personal">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <div class="form-field">
+                        <label>Tags</label>
+                        <input type="text" id="taskTags" placeholder="urgent, meeting, project">
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" class="form-btn secondary" onclick="todoApp.closeModal()">Cancel</button>
+                    <button type="submit" class="form-btn primary">Save Task</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- File Input -->
+    <input type="file" id="csvImport" accept=".csv" style="display: none;">
+
+    <!-- Notifications -->
+    <div class="notification-container" id="notificationContainer"></div>
+
+    <script src="script.js"></script>
+</body>
+</html>
