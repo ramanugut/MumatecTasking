@@ -14,6 +14,7 @@ class MumatecTaskManager {
 
     init() {
         this.loadTasks();
+        this.loadTheme();
         this.setupEventListeners();
         this.setupDragAndDrop();
         this.setupKeyboardShortcuts();
@@ -718,6 +719,11 @@ class MumatecTaskManager {
             this.importFromCSV(e);
         });
 
+        // Theme toggle
+        document.getElementById('themeToggle').addEventListener('click', () => {
+            this.toggleTheme();
+        });
+
         // Modal close on outside click
         document.querySelectorAll('.modal-overlay').forEach(modal => {
             modal.addEventListener('click', (e) => {
@@ -1064,6 +1070,28 @@ class MumatecTaskManager {
         
         result.push(current.trim());
         return result;
+    }
+
+    // Theme Management
+    loadTheme() {
+        const saved = localStorage.getItem('mumatecTheme');
+        if (saved === 'dark') {
+            document.body.classList.add('dark-mode');
+        }
+        this.updateThemeToggleIcon();
+    }
+
+    toggleTheme() {
+        const isDark = document.body.classList.toggle('dark-mode');
+        localStorage.setItem('mumatecTheme', isDark ? 'dark' : 'light');
+        this.updateThemeToggleIcon();
+    }
+
+    updateThemeToggleIcon() {
+        const btn = document.getElementById('themeToggle');
+        if (btn) {
+            btn.textContent = document.body.classList.contains('dark-mode') ? '☀️' : '🌙';
+        }
     }
 }
 
