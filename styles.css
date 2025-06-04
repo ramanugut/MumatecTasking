@@ -1221,3 +1221,16 @@ body {
         --shadow-hover: rgba(0, 0, 0, 0.4);
     }
 }
+
+/* Manual dark mode toggle */
+body.dark-mode {
+    --background: #1C1C1E;
+    --surface: #2C2C2E;
+    --surface-secondary: #3A3A3C;
+    --text-primary: rgba(0, 178, 248, 0.973);
+    --text-secondary: #98989D;
+    --text-tertiary: #636366;
+    --border: #38383A;
+    --shadow: rgba(0, 0, 0, 0.2);
+    --shadow-hover: rgba(0, 0, 0, 0.4);
+}
