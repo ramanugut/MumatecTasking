@@ -1077,6 +1077,8 @@ class MumatecTaskManager {
         const saved = localStorage.getItem('mumatecTheme');
         if (saved === 'dark') {
             document.body.classList.add('dark-mode');
+        } else if (saved !== 'light') {
+            localStorage.setItem('mumatecTheme', 'light');
         }
         this.updateThemeToggleIcon();
     }
