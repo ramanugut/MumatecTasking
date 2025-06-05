@@ -1207,11 +1207,8 @@ body {
     }
 }
 
-/* Dark mode support - applied only when `.dark-mode` is on the body */
-
-/* Manual dark mode toggle */
-body.dark-mode,
-html.dark-mode {
+/* Dark mode theme variables */
+:root[data-theme="dark"] {
     --background: #1C1C1E;
     --surface: #2C2C2E;
     --surface-secondary: #3A3A3C;
