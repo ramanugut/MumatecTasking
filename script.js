@@ -1076,15 +1076,22 @@ class MumatecTaskManager {
     loadTheme() {
         const saved = localStorage.getItem('mumatecTheme');
         if (saved === 'dark') {
+            document.documentElement.classList.add('dark-mode');
             document.body.classList.add('dark-mode');
-        } else if (saved !== 'light') {
-            localStorage.setItem('mumatecTheme', 'light');
+        } else {
+            document.documentElement.classList.remove('dark-mode');
+            document.body.classList.remove('dark-mode');
+            if (saved !== 'light') {
+                localStorage.setItem('mumatecTheme', 'light');
+            }
         }
         this.updateThemeToggleIcon();
     }
 
     toggleTheme() {
-        const isDark = document.body.classList.toggle('dark-mode');
+        const isDark = !document.body.classList.contains('dark-mode');
+        document.body.classList.toggle('dark-mode', isDark);
+        document.documentElement.classList.toggle('dark-mode', isDark);
         localStorage.setItem('mumatecTheme', isDark ? 'dark' : 'light');
         this.updateThemeToggleIcon();
     }
