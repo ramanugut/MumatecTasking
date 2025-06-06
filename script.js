@@ -38,9 +38,13 @@ class MumatecTaskManager {
     async loadTasks() {
         const loadingEl = document.getElementById('loadingOverlay');
         if (loadingEl) loadingEl.style.display = 'flex';
+
+        console.log('Loading tasks. User:', window.currentUser ? window.currentUser.uid : 'none');
         try {
             if (window.currentUser && db) {
                 const col = collection(db, 'users', window.currentUser.uid, 'tasks');
+                console.log('Subscribing to Firestore collection:', `users/${window.currentUser.uid}/tasks`);
+
                 this.unsubscribe = onSnapshot(col, (snap) => {
                     this.tasks = snap.docs.map(d => ({ id: d.id, ...d.data() }));
                     this.updateUI();
@@ -68,7 +72,9 @@ class MumatecTaskManager {
     async saveTaskToFirestore(task) {
         if (!window.currentUser || !db) return;
         try {
+            console.log('Saving task to Firestore:', task.id, task.title);
             await setDoc(doc(db, 'users', window.currentUser.uid, 'tasks', task.id), task);
+            console.log('→ saved successfully');
         } catch (error) {
             console.error('Firestore save error:', error);
         }
@@ -77,7 +83,9 @@ class MumatecTaskManager {
     async deleteTaskFromFirestore(taskId) {
         if (!window.currentUser || !db) return;
         try {
+            console.log('Deleting task from Firestore:', taskId);
             await deleteDoc(doc(db, 'users', window.currentUser.uid, 'tasks', taskId));
+            console.log('→ deleted successfully');
         } catch (error) {
             console.error('Firestore delete error:', error);
         }
