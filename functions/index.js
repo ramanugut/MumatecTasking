@@ -2,7 +2,7 @@ const functions = require('firebase-functions');
 const admin     = require('firebase-admin');
 admin.initializeApp();
 
-// Helper to confirm caller is Admin
+// Helper to confirm the caller is Admin
 async function checkAdmin(callerUid) {
   if (!callerUid) {
     throw new functions.https.HttpsError('unauthenticated','Sign-in required.');

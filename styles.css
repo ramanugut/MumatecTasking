@@ -1204,20 +1204,11 @@ body {
         display: none;
     }
 
-    .top-bar-right {
-        flex-wrap: wrap;
-        justify-content: center;
-        gap: 8px;
-    }
-
-    .top-bar-right .action-btn {
-        flex: 1 1 auto;
-        min-width: 100px;
-    }
-
+    
     .main-content {
         margin-left: 0;
     }
+
     
     .top-bar {
         padding: 0 16px;
@@ -1257,9 +1248,6 @@ body {
         font-size: 20px;
     }
 
-    .kanban-column {
-        min-width: 90vw;
-    }
 
     .action-btn span {
         display: none;
