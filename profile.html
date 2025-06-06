@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>User Profile - Mumatec Tasking</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    body { display: flex; align-items: center; justify-content: center; height: 100vh; }
+    .login-container { width: 300px; padding: 20px; border: 1px solid #ccc; border-radius: 6px; background: #fff; }
+    .login-container h2 { text-align: center; margin-bottom: 1rem; }
+    .login-container input { width: 100%; padding: 0.5rem; margin-bottom: 1rem; }
+    .login-container button { width: 100%; padding: 0.5rem; }
+    .login-container label { display: block; margin-bottom: 0.5rem; }
+    .error { color: red; text-align: center; margin-top: 0.5rem; }
+  </style>
+</head>
+<body>
+  <div class="login-container">
+    <h2>User Profile</h2>
+    <form id="profileForm">
+      <input type="text" id="name" placeholder="Name" required />
+      <input type="email" id="email" placeholder="Email" readonly />
+      <input type="text" id="photoURL" placeholder="Profile picture URL" />
+      <label><input type="checkbox" id="notifications" /> Email notifications</label>
+      <button type="submit">Save</button>
+      <div id="msg" class="error"></div>
+    </form>
+  </div>
+  <script type="module" src="firebase.js"></script>
+  <script type="module" src="profile.js"></script>
+</body>
+</html>

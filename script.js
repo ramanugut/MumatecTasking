@@ -1095,8 +1095,17 @@ class MumatecTaskManager {
     }
 }
 
-// Initialize the application
+// Initialize the application after authentication
+window.initTodoApp = function () {
+    if (!window.todoApp) {
+        window.todoApp = new MumatecTaskManager();
+        console.log('🚀 Mumatec Task Manager initialized successfully!');
+    }
+};
+
 document.addEventListener('DOMContentLoaded', () => {
-    window.todoApp = new MumatecTaskManager();
-    console.log('🚀 Mumatec Task Manager initialized successfully!');
+    if (window.currentUser) {
+        window.initTodoApp();
+    }
 });
+
