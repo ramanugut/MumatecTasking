@@ -4,10 +4,10 @@ import { getAuth } from 'https://www.gstatic.com/firebasejs/9.23.0/firebase-auth
 import { getFirestore } from 'https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js';
 
 const firebaseConfig = {
-  apiKey: "AIzaSyBfXDEcfgOIGjQ8EatsfXg7BbImSjvgv5U",
-  authDomain: "mumatectasking-a381f.firebaseapp.com",
-  projectId: "mumatectasking-a381f",
-  storageBucket: "mumatectasking-a381f.firebasestorage.app",
+  apiKey: "AIzaSyDT01V2niUl83vaYXUEukc5fGzUppwfQEI",
+  authDomain: "mumatectasking.firebaseapp.com",
+  projectId: "mumatectasking",
+  storageBucket: "mumatectasking.firebasestorage.app",
   messagingSenderId: "659745805145",
   appId: "1:659745805145:web:abb6f7a2629978846e7248",
   measurementId: "G-BFBY59K73J"
