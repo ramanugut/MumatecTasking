@@ -18,3 +18,7 @@ import { getFirestore } from 'https://www.gstatic.com/firebasejs/11.9.0/firebase
 const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 export const db = getFirestore(app);
+
+// Expose for non-module scripts
+window.auth = auth;
+window.db = db;
