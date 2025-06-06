@@ -1,4 +1,6 @@
 // Mumatec Task Manager - Professional Application
+import { db } from './firebase.js';
+import { collection, getDocs, setDoc, doc, deleteDoc } from 'https://www.gstatic.com/firebasejs/11.9.0/firebase-firestore.js';
 class MumatecTaskManager {
     constructor() {
         this.tasks = [];
@@ -12,8 +14,8 @@ class MumatecTaskManager {
         this.init();
     }
 
-    init() {
-        this.loadTasks();
+    async init() {
+        await this.loadTasks();
         this.loadTheme();
         this.setupEventListeners();
         this.setupDragAndDrop();
@@ -33,13 +35,24 @@ class MumatecTaskManager {
     }
 
     // Data Management
-    loadTasks() {
+    async loadTasks() {
         try {
+            if (window.currentUser && db) {
+                const col = collection(db, 'users', window.currentUser.uid, 'tasks');
+                const snap = await getDocs(col);
+                const tasks = [];
+                snap.forEach(d => tasks.push({ id: d.id, ...d.data() }));
+                if (tasks.length) {
+                    this.tasks = tasks;
+                    localStorage.setItem('mumatecTasks', JSON.stringify(this.tasks));
+                    return;
+                }
+            }
+
             const saved = localStorage.getItem('mumatecTasks');
             if (saved) {
                 this.tasks = JSON.parse(saved);
             } else {
-                // Add sample data for new users
                 this.createSampleTasks();
             }
         } catch (error) {
@@ -54,6 +67,24 @@ class MumatecTaskManager {
         } catch (error) {
             console.error('Error saving tasks:', error);
             this.showNotification('Error', 'Failed to save tasks', 'error');
+        }
+    }
+
+    async saveTaskToFirestore(task) {
+        if (!window.currentUser || !db) return;
+        try {
+            await setDoc(doc(db, 'users', window.currentUser.uid, 'tasks', task.id), task);
+        } catch (error) {
+            console.error('Firestore save error:', error);
+        }
+    }
+
+    async deleteTaskFromFirestore(taskId) {
+        if (!window.currentUser || !db) return;
+        try {
+            await deleteDoc(doc(db, 'users', window.currentUser.uid, 'tasks', taskId));
+        } catch (error) {
+            console.error('Firestore delete error:', error);
         }
     }
 
@@ -97,6 +128,7 @@ class MumatecTaskManager {
         
         this.tasks = sampleTasks;
         this.saveTasks();
+        sampleTasks.forEach(task => this.saveTaskToFirestore(task));
     }
 
     generateId() {
@@ -104,7 +136,7 @@ class MumatecTaskManager {
     }
 
     // Task Operations
-    addTask(taskData) {
+    async addTask(taskData) {
         const task = {
             id: this.generateId(),
             title: taskData.title.trim(),
@@ -121,12 +153,13 @@ class MumatecTaskManager {
 
         this.tasks.push(task);
         this.saveTasks();
+        this.saveTaskToFirestore(task);
         this.updateUI();
         this.showNotification('Success', 'Task created successfully', 'success');
         return task;
     }
 
-    updateTask(taskId, taskData) {
+    async updateTask(taskId, taskData) {
         const taskIndex = this.tasks.findIndex(task => task.id === taskId);
         if (taskIndex === -1) return false;
 
@@ -143,19 +176,21 @@ class MumatecTaskManager {
         };
 
         this.saveTasks();
+        this.saveTaskToFirestore(this.tasks[taskIndex]);
         this.updateUI();
         this.showNotification('Success', 'Task updated successfully', 'success');
         return true;
     }
 
-    deleteTask(taskId) {
+    async deleteTask(taskId) {
         this.tasks = this.tasks.filter(task => task.id !== taskId);
         this.saveTasks();
+        this.deleteTaskFromFirestore(taskId);
         this.updateUI();
         this.showNotification('Success', 'Task deleted successfully', 'success');
     }
 
-    moveTask(taskId, newStatus) {
+    async moveTask(taskId, newStatus) {
         const task = this.tasks.find(t => t.id === taskId);
         if (!task) return false;
 
@@ -163,6 +198,7 @@ class MumatecTaskManager {
         task.updatedAt = new Date().toISOString();
         
         this.saveTasks();
+        this.saveTaskToFirestore(task);
         this.updateUI();
         return true;
     }
