@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Your Boards - Mumatec Tasking</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="boards-container">
+    <h1>Your Boards</h1>
+    <div id="boardsList"></div>
+    <form id="createBoardForm" class="board-form">
+      <input type="text" id="boardTitle" placeholder="Board title" required />
+      <textarea id="boardDesc" placeholder="Description"></textarea>
+      <select id="boardVisibility">
+        <option value="private">Private</option>
+        <option value="public">Public</option>
+      </select>
+      <button type="submit">Create Board</button>
+    </form>
+  </div>
+  <script type="module" src="firebase.js"></script>
+  <script type="module" src="boards.js"></script>
+  <script type="module" src="auth.js"></script>
+</body>
+</html>
