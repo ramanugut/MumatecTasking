@@ -38,11 +38,13 @@ class MumatecTaskManager {
     async loadTasks() {
         const loadingEl = document.getElementById('loadingOverlay');
         if (loadingEl) loadingEl.style.display = 'flex';
+
         console.log('Loading tasks. User:', window.currentUser ? window.currentUser.uid : 'none');
         try {
             if (window.currentUser && db) {
                 const col = collection(db, 'users', window.currentUser.uid, 'tasks');
                 console.log('Subscribing to Firestore collection:', `users/${window.currentUser.uid}/tasks`);
+
                 this.unsubscribe = onSnapshot(col, (snap) => {
                     this.tasks = snap.docs.map(d => ({ id: d.id, ...d.data() }));
                     this.updateUI();
