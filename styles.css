@@ -269,6 +269,15 @@ body {
     min-width: 0;
 }
 
+.menu-btn {
+    display: none;
+    background: transparent;
+    border: none;
+    font-size: 24px;
+    margin-right: 12px;
+    cursor: pointer;
+}
+
 .page-title {
     font-size: 28px;
     font-weight: 700;
@@ -1170,6 +1179,19 @@ body {
     .sidebar.open {
         left: 0;
     }
+
+    .menu-btn {
+        display: block;
+    }
+
+    .top-bar-center {
+        display: none;
+    }
+
+    .import-btn,
+    .view-controls {
+        display: none;
+    }
     
     .main-content {
         margin-left: 0;
@@ -1179,9 +1201,6 @@ body {
         padding: 0 16px;
     }
     
-    .top-bar-center {
-        flex: 0 0 200px;
-    }
     
     .page-title {
         font-size: 24px;
@@ -1190,6 +1209,10 @@ body {
     .quick-stats {
         grid-template-columns: repeat(2, 1fr);
         gap: 12px;
+    }
+
+    .insights-panel {
+        display: none;
     }
     
     .kanban-container {
@@ -1204,6 +1227,20 @@ body {
     .form-row {
         grid-template-columns: 1fr;
         gap: 12px;
+    }
+}
+
+@media (max-width: 480px) {
+    .page-title {
+        font-size: 20px;
+    }
+
+    .action-btn span {
+        display: none;
+    }
+
+    .quick-stats {
+        display: none;
     }
 }
 
