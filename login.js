@@ -9,7 +9,7 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
   errorEl.textContent = '';
   try {
     await signInWithEmailAndPassword(auth, email, password);
-    window.location.href = 'index.html';
+    window.location.href = 'boards.html';
   } catch (err) {
     errorEl.textContent = err.message;
   }
