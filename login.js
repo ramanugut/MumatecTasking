@@ -1,5 +1,7 @@
 import { auth } from './firebase.js';
+
 import { signInWithEmailAndPassword } from 'https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js';
+
 
 document.getElementById('loginForm').addEventListener('submit', async (e) => {
   e.preventDefault();
@@ -9,7 +11,9 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
   errorEl.textContent = '';
   try {
     await signInWithEmailAndPassword(auth, email, password);
+
     window.location.href = 'boards.html';
+
   } catch (err) {
     errorEl.textContent = err.message;
   }

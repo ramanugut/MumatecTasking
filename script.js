@@ -1107,4 +1107,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if (window.currentUser) {
         window.initTodoApp();
     }
+
 });
+

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Login - Mumatec Tasking</title>
+  <title>Sign Up - Mumatec Tasking</title>
   <link rel="stylesheet" href="styles.css">
   <style>
     body { display: flex; align-items: center; justify-content: center; height: 100vh; }
@@ -11,22 +11,22 @@
     .login-container h2 { text-align: center; margin-bottom: 1rem; }
     .login-container input { width: 100%; padding: 0.5rem; margin-bottom: 1rem; }
     .login-container button { width: 100%; padding: 0.5rem; }
-
-
     .error { color: red; text-align: center; margin-top: 0.5rem; }
   </style>
 </head>
 <body>
   <div class="login-container">
-    <h2>Admin Login</h2>
-    <form id="loginForm">
+    <h2>Create Account</h2>
+    <form id="signupForm">
+      <input type="text" id="name" placeholder="Name" required />
       <input type="email" id="email" placeholder="Email" required />
       <input type="password" id="password" placeholder="Password" required />
-      <button type="submit">Login</button>
+      <input type="text" id="photoURL" placeholder="Profile picture URL (optional)" />
+      <button type="submit">Sign Up</button>
       <div id="error" class="error"></div>
     </form>
   </div>
   <script type="module" src="firebase.js"></script>
-  <script type="module" src="login.js"></script>
+  <script type="module" src="signup.js"></script>
 </body>
 </html>
