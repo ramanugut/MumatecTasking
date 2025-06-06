@@ -6,7 +6,8 @@ import {
   query,
   where,
   Timestamp
-} from 'https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js';
+} from 'https://www.gstatic.com/firebasejs/11.9.0/firebase-firestore.js';
+import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/11.9.0/firebase-auth.js';
 
 const boardsListEl = document.getElementById('boardsList');
 const createForm = document.getElementById('createBoardForm');
@@ -35,6 +36,13 @@ function loadBoards() {
     renderBoards(boards);
   });
 }
+
+// Wait for auth state before loading boards
+onAuthStateChanged(auth, (user) => {
+  if (user) {
+    loadBoards();
+  }
+});
 
 if (createForm) {
   createForm.addEventListener('submit', async (e) => {

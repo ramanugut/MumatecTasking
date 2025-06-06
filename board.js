@@ -8,10 +8,13 @@ import {
   onSnapshot,
   addDoc,
   Timestamp
-} from 'https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js';
+} from 'https://www.gstatic.com/firebasejs/11.9.0/firebase-firestore.js';
 
 const params = new URLSearchParams(window.location.search);
 const boardId = params.get('id');
+if (!boardId) {
+  window.location.href = 'boards.html';
+}
 const boardTitleEl = document.getElementById('boardTitle');
 const listsContainer = document.getElementById('listsContainer');
 const addListForm = document.getElementById('addListForm');
