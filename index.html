@@ -106,6 +106,7 @@
             <!-- Top Bar -->
             <div class="top-bar">
                 <div class="top-bar-left">
+                    <button class="menu-btn" id="menuToggle">☰</button>
                     <h1 class="page-title" id="pageTitle">Dashboard</h1>
                     <div class="page-subtitle" id="pageSubtitle">Welcome back! You have tasks to complete.</div>
                 </div>
@@ -118,7 +119,7 @@
                 </div>
 
                 <div class="top-bar-right">
-                    <button class="action-btn secondary" onclick="document.getElementById('csvImport').click()">
+                    <button class="action-btn secondary import-btn" onclick="document.getElementById('csvImport').click()">
                         <span>📥</span> Import
                     </button>
                     <button class="action-btn primary" onclick="todoApp.openAddTaskModal()">
