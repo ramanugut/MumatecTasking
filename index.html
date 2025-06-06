@@ -175,13 +175,13 @@
                     <div class="dashboard-grid">
                         <!-- Kanban Board -->
                         <div class="kanban-container">
-                            <div class="kanban-column" data-status="todo">
+                            <div class="kanban-column" data-status="backlog">
                                 <div class="column-header">
-                                    <div class="column-title">To Do</div>
-                                    <div class="column-count" id="todoCount">0</div>
+                                    <div class="column-title">Backlog</div>
+                                    <div class="column-count" id="backlogCount">0</div>
                                 </div>
-                                <div class="column-content" id="todoBoard">
-                                    <div class="add-task-card" onclick="todoApp.openAddTaskModal('todo')">
+                                <div class="column-content" id="backlogBoard">
+                                    <div class="add-task-card" onclick="todoApp.openAddTaskModal('backlog')">
                                         <span class="add-icon">➕</span>
                                         <span>Add task</span>
                                     </div>
@@ -201,13 +201,52 @@
                                 </div>
                             </div>
 
-                            <div class="kanban-column" data-status="completed">
+                            <div class="kanban-column" data-status="done">
                                 <div class="column-header">
-                                    <div class="column-title">Completed</div>
-                                    <div class="column-count" id="completedCount">0</div>
+                                    <div class="column-title">Done</div>
+                                    <div class="column-count" id="doneCount">0</div>
                                 </div>
-                                <div class="column-content" id="completedBoard">
-                                    <div class="add-task-card" onclick="todoApp.openAddTaskModal('completed')">
+                                <div class="column-content" id="doneBoard">
+                                    <div class="add-task-card" onclick="todoApp.openAddTaskModal('done')">
+                                        <span class="add-icon">➕</span>
+                                        <span>Add task</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="kanban-column" data-status="review">
+                                <div class="column-header">
+                                    <div class="column-title">Under Review</div>
+                                    <div class="column-count" id="reviewCount">0</div>
+                                </div>
+                                <div class="column-content" id="reviewBoard">
+                                    <div class="add-task-card" onclick="todoApp.openAddTaskModal('review')">
+                                        <span class="add-icon">➕</span>
+                                        <span>Add task</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="kanban-column" data-status="blocked">
+                                <div class="column-header">
+                                    <div class="column-title">Blocked</div>
+                                    <div class="column-count" id="blockedCount">0</div>
+                                </div>
+                                <div class="column-content" id="blockedBoard">
+                                    <div class="add-task-card" onclick="todoApp.openAddTaskModal('blocked')">
+                                        <span class="add-icon">➕</span>
+                                        <span>Add task</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="kanban-column" data-status="cancelled">
+                                <div class="column-header">
+                                    <div class="column-title">Cancelled</div>
+                                    <div class="column-count" id="cancelledCount">0</div>
+                                </div>
+                                <div class="column-content" id="cancelledBoard">
+                                    <div class="add-task-card" onclick="todoApp.openAddTaskModal('cancelled')">
                                         <span class="add-icon">➕</span>
                                         <span>Add task</span>
                                     </div>
@@ -317,14 +356,18 @@
                                 <option value="low">🟢 Low</option>
                                 <option value="medium" selected>🟡 Medium</option>
                                 <option value="high">🔴 High</option>
+                                <option value="critical">❗ Critical</option>
                             </select>
                         </div>
                         <div class="form-field">
                             <label>Status</label>
                             <select id="taskStatus">
-                                <option value="todo">📋 To Do</option>
+                                <option value="backlog">📋 Backlog</option>
                                 <option value="inprogress">⚡ In Progress</option>
-                                <option value="completed">✅ Completed</option>
+                                <option value="review">🔍 Under Review</option>
+                                <option value="done">✅ Done</option>
+                                <option value="blocked">⛔ Blocked</option>
+                                <option value="cancelled">❌ Cancelled</option>
                             </select>
                         </div>
                     </div>
@@ -346,6 +389,16 @@
                         <div class="form-field">
                             <label>Category</label>
                             <input type="text" id="taskCategory" placeholder="e.g., Work, Personal">
+                        </div>
+                        <div class="form-field">
+                            <label>Type</label>
+                            <select id="taskType">
+                                <option value="Maintenance">Maintenance</option>
+                                <option value="User Account Management">User Account Management</option>
+                                <option value="Access Control">Access Control</option>
+                                <option value="Security">Security</option>
+                                <option value="Compliance">Compliance</option>
+                            </select>
                         </div>
                     </div>
                 </div>

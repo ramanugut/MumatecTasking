@@ -10,6 +10,8 @@ class MumatecTaskManager {
         this.viewMode = 'kanban';
         this.searchTerm = '';
         this.activeFilter = null;
+        this.statuses = ['backlog', 'inprogress', 'review', 'done', 'blocked', 'cancelled'];
+        this.priorities = ['low', 'medium', 'high', 'critical'];
         
         this.init();
     }
@@ -98,8 +100,9 @@ class MumatecTaskManager {
                 title: 'Review server performance metrics',
                 description: 'Analyze CPU and memory usage across all hosting servers',
                 priority: 'high',
-                status: 'todo',
+                status: 'backlog',
                 category: 'Work',
+                type: 'Maintenance',
                 tags: ['hosting', 'performance'],
                 dueDate: new Date(Date.now() + 86400000).toISOString(),
                 createdAt: new Date().toISOString(),
@@ -112,6 +115,7 @@ class MumatecTaskManager {
                 priority: 'medium',
                 status: 'inprogress',
                 category: 'Work',
+                type: 'Compliance',
                 tags: ['documentation', 'clients'],
                 createdAt: new Date().toISOString(),
                 updatedAt: new Date().toISOString()
@@ -121,8 +125,9 @@ class MumatecTaskManager {
                 title: 'Team standup meeting',
                 description: 'Weekly team sync and progress review',
                 priority: 'medium',
-                status: 'completed',
+                status: 'done',
                 category: 'Work',
+                type: 'User Account Management',
                 tags: ['meeting', 'team'],
                 createdAt: new Date(Date.now() - 86400000).toISOString(),
                 updatedAt: new Date().toISOString()
@@ -144,9 +149,10 @@ class MumatecTaskManager {
             title: taskData.title.trim(),
             description: taskData.description?.trim() || '',
             priority: taskData.priority || 'medium',
-            status: taskData.status || 'todo',
+            status: taskData.status || 'backlog',
             dueDate: taskData.dueDate || null,
             category: taskData.category?.trim() || 'Work',
+            type: taskData.type || 'Maintenance',
             tags: this.parseTags(taskData.tags),
             createdAt: new Date().toISOString(),
             updatedAt: new Date().toISOString(),
@@ -169,9 +175,10 @@ class MumatecTaskManager {
             title: taskData.title.trim(),
             description: taskData.description?.trim() || '',
             priority: taskData.priority || 'medium',
-            status: taskData.status || 'todo',
+            status: taskData.status || 'backlog',
             dueDate: taskData.dueDate || null,
             category: taskData.category?.trim() || 'Work',
+            type: taskData.type || 'Maintenance',
             tags: this.parseTags(taskData.tags),
             updatedAt: new Date().toISOString()
         };
@@ -217,7 +224,7 @@ class MumatecTaskManager {
 
     updateStats() {
         const total = this.tasks.length;
-        const completed = this.tasks.filter(t => t.status === 'completed').length;
+        const completed = this.tasks.filter(t => t.status === 'done').length;
         const inProgress = this.tasks.filter(t => t.status === 'inprogress').length;
         const streak = this.calculateStreak();
 
@@ -238,7 +245,7 @@ class MumatecTaskManager {
                    new Date(t.dueDate).toDateString() !== today;
         }).length;
 
-        const completedTasks = this.tasks.filter(t => t.status === 'completed').length;
+        const completedTasks = this.tasks.filter(t => t.status === 'done').length;
         
         const workTasks = this.tasks.filter(t => t.category === 'Work').length;
         const personalTasks = this.tasks.filter(t => t.category === 'Personal').length;
@@ -254,7 +261,7 @@ class MumatecTaskManager {
     }
 
     updateProductivityRing() {
-        const completed = this.tasks.filter(t => t.status === 'completed').length;
+        const completed = this.tasks.filter(t => t.status === 'done').length;
         const total = this.tasks.length;
         const percentage = total > 0 ? Math.round((completed / total) * 100) : 0;
         
@@ -318,7 +325,7 @@ class MumatecTaskManager {
         const filteredTasks = this.getFilteredTasks();
         
         // Clear boards
-        ['todo', 'inprogress', 'completed'].forEach(status => {
+        this.statuses.forEach(status => {
             const board = document.getElementById(`${status}Board`);
             board.innerHTML = `
                 <div class="add-task-card" onclick="todoApp.openAddTaskModal('${status}')">
@@ -338,7 +345,7 @@ class MumatecTaskManager {
         });
 
         // Update column counts
-        ['todo', 'inprogress', 'completed'].forEach(status => {
+        this.statuses.forEach(status => {
             const count = filteredTasks.filter(task => task.status === status).length;
             const countElement = document.getElementById(`${status}Count`);
             if (countElement) {
@@ -353,7 +360,7 @@ class MumatecTaskManager {
         taskDiv.draggable = true;
         taskDiv.dataset.taskId = task.id;
 
-        const isOverdue = task.dueDate && new Date(task.dueDate) < new Date() && task.status !== 'completed';
+        const isOverdue = task.dueDate && new Date(task.dueDate) < new Date() && task.status !== 'done';
         const dueText = task.dueDate ? this.formatDate(new Date(task.dueDate)) : '';
         
         const tagsHtml = task.tags && task.tags.length > 0 
@@ -373,6 +380,7 @@ class MumatecTaskManager {
             ${tagsHtml}
             <div class="task-meta">
                 <span class="task-category">${this.escapeHtml(task.category || 'Work')}</span>
+                <span class="task-type">${this.escapeHtml(task.type || 'Maintenance')}</span>
                 ${task.dueDate ? `<span class="task-due ${isOverdue ? 'overdue' : ''}">${dueText}</span>` : ''}
             </div>
         `;
@@ -435,7 +443,7 @@ class MumatecTaskManager {
     }
 
     renderCompletedView() {
-        const completed = this.tasks.filter(t => t.status === 'completed')
+        const completed = this.tasks.filter(t => t.status === 'done')
             .sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
 
         const container = document.getElementById('completedList');
@@ -520,7 +528,7 @@ class MumatecTaskManager {
     }
 
     // Modal Management
-    openAddTaskModal(status = 'todo') {
+    openAddTaskModal(status = 'backlog') {
         this.currentEditingTask = null;
         document.getElementById('modalTitle').textContent = 'Add New Task';
         this.clearTaskForm();
@@ -542,6 +550,7 @@ class MumatecTaskManager {
         document.getElementById('taskStatus').value = task.status;
         document.getElementById('taskDueDate').value = task.dueDate || '';
         document.getElementById('taskCategory').value = task.category || '';
+        document.getElementById('taskType').value = task.type || 'Maintenance';
         document.getElementById('taskTags').value = task.tags?.join(', ') || '';
         
         document.getElementById('taskModal').classList.add('active');
@@ -558,9 +567,10 @@ class MumatecTaskManager {
         document.getElementById('taskTitle').value = '';
         document.getElementById('taskDescription').value = '';
         document.getElementById('taskPriority').value = 'medium';
-        document.getElementById('taskStatus').value = 'todo';
+        document.getElementById('taskStatus').value = 'backlog';
         document.getElementById('taskDueDate').value = '';
         document.getElementById('taskCategory').value = '';
+        document.getElementById('taskType').value = 'Maintenance';
         document.getElementById('taskTags').value = '';
     }
 
@@ -579,7 +589,7 @@ class MumatecTaskManager {
         const title = document.getElementById('quickTaskInput').value.trim();
         if (!title) return;
 
-        this.addTask({ title, status: 'todo', category: 'Work' });
+        this.addTask({ title, status: 'backlog', category: 'Work', type: 'Maintenance' });
         this.closeQuickCapture();
     }
 
@@ -613,9 +623,9 @@ class MumatecTaskManager {
             date.setDate(today.getDate() - (6 - i));
             const dateString = date.toISOString().split('T')[0];
             
-            data[i] = this.tasks.filter(task => 
-                task.status === 'completed' && 
-                task.updatedAt && 
+            data[i] = this.tasks.filter(task =>
+                task.status === 'done' &&
+                task.updatedAt &&
                 task.updatedAt.startsWith(dateString)
             ).length;
         }
@@ -633,7 +643,7 @@ class MumatecTaskManager {
         endDate.setHours(23, 59, 59, 999);
 
         return this.tasks.filter(task => {
-            if (task.status !== 'completed' || !task.updatedAt) return false;
+            if (task.status !== 'done' || !task.updatedAt) return false;
             const taskDate = new Date(task.updatedAt);
             return taskDate >= startDate && taskDate <= endDate;
         }).length;
@@ -648,9 +658,9 @@ class MumatecTaskManager {
             checkDate.setDate(today.getDate() - i);
             const dateString = checkDate.toISOString().split('T')[0];
             
-            const hasCompletedTasks = this.tasks.some(task => 
-                task.status === 'completed' && 
-                task.updatedAt && 
+            const hasCompletedTasks = this.tasks.some(task =>
+                task.status === 'done' &&
+                task.updatedAt &&
                 task.updatedAt.startsWith(dateString)
             );
             
@@ -668,7 +678,7 @@ class MumatecTaskManager {
         const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
         const dayCounts = new Array(7).fill(0);
         
-        this.tasks.filter(t => t.status === 'completed').forEach(task => {
+        this.tasks.filter(t => t.status === 'done').forEach(task => {
             if (task.updatedAt) {
                 const day = new Date(task.updatedAt).getDay();
                 dayCounts[day]++;
@@ -681,7 +691,7 @@ class MumatecTaskManager {
 
     calculateFocusScore() {
         const highPriority = this.tasks.filter(t => t.priority === 'high');
-        const completedHigh = highPriority.filter(t => t.status === 'completed');
+        const completedHigh = highPriority.filter(t => t.status === 'done');
         return highPriority.length > 0 ? Math.round((completedHigh.length / highPriority.length) * 100) : 100;
     }
 
@@ -878,6 +888,7 @@ class MumatecTaskManager {
             status: document.getElementById('taskStatus').value,
             dueDate: document.getElementById('taskDueDate').value,
             category: document.getElementById('taskCategory').value,
+            type: document.getElementById('taskType').value,
             tags: document.getElementById('taskTags').value
         };
 
@@ -923,7 +934,7 @@ class MumatecTaskManager {
         const now = new Date();
         
         this.tasks.forEach(task => {
-            if (task.dueDate && task.status !== 'completed' && !task.reminderSent) {
+            if (task.dueDate && task.status !== 'done' && !task.reminderSent) {
                 const dueDate = new Date(task.dueDate);
                 const timeDiff = dueDate.getTime() - now.getTime();
                 const hoursDiff = timeDiff / (1000 * 3600);
@@ -979,7 +990,7 @@ class MumatecTaskManager {
             return;
         }
 
-        const headers = ['ID', 'Title', 'Description', 'Priority', 'Status', 'Due Date', 'Category', 'Tags', 'Created', 'Updated'];
+        const headers = ['ID', 'Title', 'Description', 'Priority', 'Status', 'Due Date', 'Category', 'Type', 'Tags', 'Created', 'Updated'];
         const csvData = [headers];
 
         this.tasks.forEach(task => {
@@ -991,6 +1002,7 @@ class MumatecTaskManager {
                 task.status,
                 task.dueDate || '',
                 task.category || '',
+                task.type || 'Maintenance',
                 task.tags ? task.tags.join(';') : '',
                 task.createdAt,
                 task.updatedAt || task.createdAt
@@ -1039,13 +1051,14 @@ class MumatecTaskManager {
                             id: values[0] || this.generateId(),
                             title: values[1] || `Imported Task ${i}`,
                             description: values[2] || '',
-                            priority: ['low', 'medium', 'high'].includes(values[3]) ? values[3] : 'medium',
-                            status: ['todo', 'inprogress', 'completed'].includes(values[4]) ? values[4] : 'todo',
+                            priority: ['low', 'medium', 'high', 'critical'].includes(values[3]) ? values[3] : 'medium',
+                            status: this.statuses.includes(values[4]) ? values[4] : 'backlog',
                             dueDate: values[5] || null,
                             category: values[6] || 'Work',
-                            tags: values[7] ? values[7].split(';').map(tag => tag.trim()).filter(tag => tag) : [],
-                            createdAt: values[8] || new Date().toISOString(),
-                            updatedAt: values[9] || new Date().toISOString(),
+                            type: values[7] || 'Maintenance',
+                            tags: values[8] ? values[8].split(';').map(tag => tag.trim()).filter(tag => tag) : [],
+                            createdAt: values[9] || new Date().toISOString(),
+                            updatedAt: values[10] || new Date().toISOString(),
                             reminderSent: false
                         };
 

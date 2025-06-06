@@ -24,3 +24,6 @@ Admins can now:
 - Edit any user's email or display name
 - Generate password reset links for users
 
+
+## Workflow Documentation
+For an overview of task statuses, priorities, and categories, see [WORKFLOW.md](./WORKFLOW.md).
