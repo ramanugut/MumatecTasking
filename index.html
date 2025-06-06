@@ -17,11 +17,11 @@
                     <div class="logo-icon">📋</div>
                     <div class="logo-text">Mumatec Tasking</div>
                 </div>
-                <div class="user-info">
-                    <div class="user-avatar">👤</div>
+                <div class="user-info" id="userInfo" onclick="window.location.href='profile.html'">
+                    <div class="user-avatar" id="userAvatar">👤</div>
                     <div class="user-details">
-                        <div class="user-name">User</div>
-                        <div class="user-role">&nbsp;</div>
+                        <div class="user-name" id="userName">User</div>
+                        <div class="user-role" id="userRole">&nbsp;</div>
                     </div>
                 </div>
             </div>
@@ -125,6 +125,8 @@
                         <span>➕</span> New Task
                     </button>
                     <button class="action-btn secondary" id="themeToggle">🌙</button>
+                    <button class="action-btn secondary" id="profileLink" onclick="window.location.href='profile.html'">Profile</button>
+                    <button class="action-btn secondary" id="adminLink" style="display:none;" onclick="window.location.href='admin.html'">Admin</button>
                     <button class="action-btn secondary" onclick="logout()">Logout</button>
                     <div class="view-controls">
                         <button class="view-btn active" data-view="kanban">📋</button>
