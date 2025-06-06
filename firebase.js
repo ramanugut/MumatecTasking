@@ -7,7 +7,7 @@ const firebaseConfig = {
   apiKey: "AIzaSyDT01V2niUl83vaYXUEukc5fGzUppwfQEI",
   authDomain: "mumatectasking.firebaseapp.com",
   projectId: "mumatectasking",
-  storageBucket: "mumatectasking.firebasestorage.app",
+  storageBucket: "mumatectasking.appspot.com",
   messagingSenderId: "659745805145",
   appId: "1:659745805145:web:abb6f7a2629978846e7248",
   measurementId: "G-BFBY59K73J"
