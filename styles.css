@@ -269,15 +269,6 @@ body {
     min-width: 0;
 }
 
-.menu-btn {
-    display: none;
-    background: transparent;
-    border: none;
-    font-size: 24px;
-    margin-right: 12px;
-    cursor: pointer;
-}
-
 .page-title {
     font-size: 28px;
     font-weight: 700;
@@ -468,18 +459,12 @@ body {
 }
 
 /* Kanban Board */
-.board-container {
-    display: flex;
-    overflow-x: auto;
-    gap: 16px;
-    padding-bottom: 8px;
-}
-
 .kanban-container {
-    display: flex;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
     gap: 16px;
     height: 100%;
-    flex-shrink: 0;
+    overflow: hidden;
 }
 
 .kanban-column {
@@ -489,8 +474,6 @@ body {
     display: flex;
     flex-direction: column;
     overflow: hidden;
-    min-width: 280px;
-    flex-shrink: 0;
 }
 
 .column-header {
@@ -537,8 +520,6 @@ body {
     transition: var(--transition);
     position: relative;
     box-shadow: 0 1px 3px var(--shadow);
-    word-wrap: break-word;
-    white-space: normal;
 }
 
 .task-card:hover {
@@ -622,7 +603,6 @@ body {
     color: var(--text-secondary);
     line-height: 1.4;
     margin-bottom: 12px;
-    word-wrap: break-word;
 }
 
 .task-meta {
@@ -1190,30 +1170,18 @@ body {
     .sidebar.open {
         left: 0;
     }
-
-    .menu-btn {
-        display: block;
-    }
-
-    .top-bar-center {
-        display: none;
-    }
-
-    .import-btn,
-    .view-controls {
-        display: none;
-    }
-
     
     .main-content {
         margin-left: 0;
     }
-
     
     .top-bar {
         padding: 0 16px;
     }
     
+    .top-bar-center {
+        flex: 0 0 200px;
+    }
     
     .page-title {
         font-size: 24px;
@@ -1223,14 +1191,10 @@ body {
         grid-template-columns: repeat(2, 1fr);
         gap: 12px;
     }
-
-    .insights-panel {
-        display: none;
-    }
     
-    .board-container {
+    .kanban-container {
+        grid-template-columns: 1fr;
         gap: 12px;
-        padding: 0 8px 8px;
     }
     
     .content-area {
@@ -1240,21 +1204,6 @@ body {
     .form-row {
         grid-template-columns: 1fr;
         gap: 12px;
-    }
-}
-
-@media (max-width: 480px) {
-    .page-title {
-        font-size: 20px;
-    }
-
-
-    .action-btn span {
-        display: none;
-    }
-
-    .quick-stats {
-        display: none;
     }
 }
 
