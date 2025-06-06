@@ -758,6 +758,46 @@ class MumatecTaskManager {
             this.toggleTheme();
         });
 
+        // Mobile menu toggle
+        const menuBtn = document.getElementById('menuToggle');
+        if (menuBtn) {
+            menuBtn.addEventListener('click', () => {
+                document.querySelector('.sidebar').classList.toggle('open');
+            });
+        }
+
+        // Horizontal swipe for boards
+        const boardContainer = document.querySelector('.board-container');
+        if (boardContainer) {
+            let isDown = false;
+            let startX, scrollLeft;
+
+            const start = (x) => {
+                isDown = true;
+                startX = x - boardContainer.offsetLeft;
+                scrollLeft = boardContainer.scrollLeft;
+            };
+
+            const end = () => {
+                isDown = false;
+            };
+
+            const move = (x, e) => {
+                if (!isDown) return;
+                e.preventDefault();
+                const walk = (x - startX) * 2;
+                boardContainer.scrollLeft = scrollLeft - walk;
+            };
+
+            boardContainer.addEventListener('mousedown', e => start(e.pageX));
+            boardContainer.addEventListener('touchstart', e => start(e.touches[0].pageX));
+            boardContainer.addEventListener('mousemove', e => move(e.pageX, e));
+            boardContainer.addEventListener('touchmove', e => move(e.touches[0].pageX, e));
+            boardContainer.addEventListener('mouseleave', end);
+            boardContainer.addEventListener('mouseup', end);
+            boardContainer.addEventListener('touchend', end);
+        }
+
         // Modal close on outside click
         document.querySelectorAll('.modal-overlay').forEach(modal => {
             modal.addEventListener('click', (e) => {
