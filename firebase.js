@@ -1,14 +1,14 @@
 
-import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js';
-import { getAuth } from 'https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js';
-import { getFirestore } from 'https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js';
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.9.0/firebase-app.js';
+import { getAuth } from 'https://www.gstatic.com/firebasejs/11.9.0/firebase-auth.js';
+import { getFirestore } from 'https://www.gstatic.com/firebasejs/11.9.0/firebase-firestore.js';
 
 
   const firebaseConfig = {
   apiKey: "AIzaSyDT01V2niUl83vaYXUEukc5fGzUppwfQEI",
   authDomain: "mumatectasking.firebaseapp.com",
   projectId: "mumatectasking",
-  storageBucket: "mumatectasking.firebasestorage.app",
+  storageBucket: "mumatectasking.appspot.com",
   messagingSenderId: "10382608024",
   appId: "1:10382608024:web:0d94eae7dcb524b40f32ed",
   measurementId: "G-57MJ7G5HX2"
