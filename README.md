@@ -9,4 +9,4 @@ Simple task manager app with Firebase authentication.
 3. After signing in you will be redirected to `index.html`.
 4. Manage your profile from `profile.html` or reset your password from `reset.html`.
 
-Firebase is pre-configured with project **mumatectasking-a381f**. Update `firebase.js` if you need to change configuration.
+Firebase is pre-configured with project **mumatectasking**. Update `firebase.js` if you need to change configuration.
