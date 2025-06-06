@@ -106,7 +106,6 @@
             <!-- Top Bar -->
             <div class="top-bar">
                 <div class="top-bar-left">
-                    <button class="menu-btn" id="menuToggle">☰</button>
                     <h1 class="page-title" id="pageTitle">Dashboard</h1>
                     <div class="page-subtitle" id="pageSubtitle">Welcome back! You have tasks to complete.</div>
                 </div>
@@ -119,7 +118,7 @@
                 </div>
 
                 <div class="top-bar-right">
-                    <button class="action-btn secondary import-btn" onclick="document.getElementById('csvImport').click()">
+                    <button class="action-btn secondary" onclick="document.getElementById('csvImport').click()">
                         <span>📥</span> Import
                     </button>
                     <button class="action-btn primary" onclick="todoApp.openAddTaskModal()">
@@ -147,7 +146,6 @@
                                 <div class="stat-label">Total Tasks</div>
                             </div>
                         </div>
-                        </div>
                         <div class="stat-card">
                             <div class="stat-icon">✅</div>
                             <div class="stat-content">
@@ -174,8 +172,7 @@
                     <!-- Main Dashboard Content -->
                     <div class="dashboard-grid">
                         <!-- Kanban Board -->
-                        <div class="board-container">
-                            <div class="kanban-container">
+                        <div class="kanban-container">
                             <div class="kanban-column" data-status="todo">
                                 <div class="column-header">
                                     <div class="column-title">To Do</div>
@@ -214,7 +211,6 @@
                                     </div>
                                 </div>
                             </div>
-                        </div>
                         </div>
 
                         <!-- Insights Panel -->
