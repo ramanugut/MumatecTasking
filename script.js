@@ -758,16 +758,6 @@ class MumatecTaskManager {
             this.toggleTheme();
         });
 
-        // Mobile menu toggle
-        const menuBtn = document.getElementById('menuToggle');
-        if (menuBtn) {
-            menuBtn.addEventListener('click', () => {
-                document.querySelector('.sidebar').classList.toggle('open');
-            });
-        }
-
-
-
         // Modal close on outside click
         document.querySelectorAll('.modal-overlay').forEach(modal => {
             modal.addEventListener('click', (e) => {
