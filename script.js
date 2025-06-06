@@ -766,6 +766,8 @@ class MumatecTaskManager {
             });
         }
 
+
+
         // Modal close on outside click
         document.querySelectorAll('.modal-overlay').forEach(modal => {
             modal.addEventListener('click', (e) => {

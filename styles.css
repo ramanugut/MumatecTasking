@@ -468,12 +468,18 @@ body {
 }
 
 /* Kanban Board */
+.board-container {
+    display: flex;
+    overflow-x: auto;
+    gap: 16px;
+    padding-bottom: 8px;
+}
+
 .kanban-container {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    display: flex;
     gap: 16px;
     height: 100%;
-    overflow: hidden;
+    flex-shrink: 0;
 }
 
 .kanban-column {
@@ -483,6 +489,8 @@ body {
     display: flex;
     flex-direction: column;
     overflow: hidden;
+    min-width: 280px;
+    flex-shrink: 0;
 }
 
 .column-header {
@@ -529,6 +537,8 @@ body {
     transition: var(--transition);
     position: relative;
     box-shadow: 0 1px 3px var(--shadow);
+    word-wrap: break-word;
+    white-space: normal;
 }
 
 .task-card:hover {
@@ -612,6 +622,7 @@ body {
     color: var(--text-secondary);
     line-height: 1.4;
     margin-bottom: 12px;
+    word-wrap: break-word;
 }
 
 .task-meta {
@@ -1192,10 +1203,12 @@ body {
     .view-controls {
         display: none;
     }
+
     
     .main-content {
         margin-left: 0;
     }
+
     
     .top-bar {
         padding: 0 16px;
@@ -1215,9 +1228,9 @@ body {
         display: none;
     }
     
-    .kanban-container {
-        grid-template-columns: 1fr;
+    .board-container {
         gap: 12px;
+        padding: 0 8px 8px;
     }
     
     .content-area {
@@ -1234,6 +1247,7 @@ body {
     .page-title {
         font-size: 20px;
     }
+
 
     .action-btn span {
         display: none;
