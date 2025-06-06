@@ -7,6 +7,8 @@ const functions = getFunctions();
 const createUser = httpsCallable(functions, 'createUserWithRole');
 const updateRole = httpsCallable(functions, 'updateUserRole');
 const deleteUser = httpsCallable(functions, 'deleteUserAccount');
+const updateProfile = httpsCallable(functions, 'updateUserProfile');
+const sendReset = httpsCallable(functions, 'adminSendPasswordReset');
 
 const adminControls = document.getElementById('adminControls');
 const unauthEl = document.getElementById('unauth');
@@ -34,7 +36,11 @@ async function loadUsers() {
           <option value="admin" ${data.role === 'admin' ? 'selected' : ''}>admin</option>
         </select>
       </td>
-      <td><button data-del="${docSnap.id}">Delete</button></td>
+      <td>
+        <button data-edit="${docSnap.id}" data-email="${data.email}" data-name="${data.displayName || ''}">Edit</button>
+        <button data-reset="${docSnap.id}" data-email="${data.email}">Reset</button>
+        <button data-del="${docSnap.id}">Delete</button>
+      </td>
     `;
     userTableBody.appendChild(tr);
   });
@@ -94,5 +100,36 @@ userTableBody.addEventListener('click', async (e) => {
     } catch (err) {
       handleError(err);
     }
+    return;
+  }
+
+  if (e.target.dataset.reset) {
+    const email = e.target.dataset.email;
+    if (!confirm(`Send password reset email to ${email}?`)) return;
+    try {
+      const res = await sendReset({ targetEmail: email });
+      alert('Reset link generated: ' + res.data.link);
+    } catch (err) {
+      handleError(err);
+    }
+    return;
+  }
+
+  if (e.target.dataset.edit) {
+    const uid = e.target.dataset.edit;
+    const currentEmail = e.target.dataset.email;
+    const currentName = e.target.dataset.name || '';
+    const newEmail = prompt('Email:', currentEmail);
+    if (newEmail === null) return;
+    const newName = prompt('Display name:', currentName);
+    if (newName === null) return;
+    try {
+      await updateProfile({ targetUid: uid, email: newEmail, displayName: newName });
+      alert('User updated');
+      loadUsers();
+    } catch (err) {
+      handleError(err);
+    }
+    return;
   }
 });
