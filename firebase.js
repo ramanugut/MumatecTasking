@@ -1,7 +1,7 @@
 
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.9.0/firebase-app.js';
 import { getAuth } from 'https://www.gstatic.com/firebasejs/11.9.0/firebase-auth.js';
-import { getFirestore } from 'https://www.gstatic.com/firebasejs/11.9.0/firebase-firestore.js';
+import { getFirestore, enableIndexedDbPersistence } from 'https://www.gstatic.com/firebasejs/11.9.0/firebase-firestore.js';
 
 
   const firebaseConfig = {
@@ -18,6 +18,11 @@ import { getFirestore } from 'https://www.gstatic.com/firebasejs/11.9.0/firebase
 const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 export const db = getFirestore(app);
+
+// Enable offline persistence for Firestore
+enableIndexedDbPersistence(db).catch((err) => {
+  console.warn('Firestore persistence error:', err);
+});
 
 // Expose for non-module scripts
 window.auth = auth;

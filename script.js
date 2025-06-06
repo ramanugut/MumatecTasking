@@ -1,6 +1,6 @@
 // Mumatec Task Manager - Professional Application
 import { db } from './firebase.js';
-import { collection, getDocs, setDoc, doc, deleteDoc } from 'https://www.gstatic.com/firebasejs/11.9.0/firebase-firestore.js';
+import { collection, setDoc, doc, deleteDoc, onSnapshot } from 'https://www.gstatic.com/firebasejs/11.9.0/firebase-firestore.js';
 class MumatecTaskManager {
     constructor() {
         this.tasks = [];
@@ -36,44 +36,43 @@ class MumatecTaskManager {
 
     // Data Management
     async loadTasks() {
+        const loadingEl = document.getElementById('loadingOverlay');
+        if (loadingEl) loadingEl.style.display = 'flex';
+        console.log('Loading tasks. User:', window.currentUser ? window.currentUser.uid : 'none');
         try {
             if (window.currentUser && db) {
                 const col = collection(db, 'users', window.currentUser.uid, 'tasks');
-                const snap = await getDocs(col);
-                const tasks = [];
-                snap.forEach(d => tasks.push({ id: d.id, ...d.data() }));
-                if (tasks.length) {
-                    this.tasks = tasks;
-                    localStorage.setItem('mumatecTasks', JSON.stringify(this.tasks));
-                    return;
-                }
-            }
-
-            const saved = localStorage.getItem('mumatecTasks');
-            if (saved) {
-                this.tasks = JSON.parse(saved);
+                console.log('Subscribing to Firestore collection:', `users/${window.currentUser.uid}/tasks`);
+                this.unsubscribe = onSnapshot(col, (snap) => {
+                    this.tasks = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+                    this.updateUI();
+                    if (loadingEl) loadingEl.style.display = 'none';
+                }, (error) => {
+                    console.error('Error loading tasks:', error);
+                    this.showNotification('Error', 'Failed to load tasks', 'error');
+                    if (loadingEl) loadingEl.style.display = 'none';
+                });
             } else {
                 this.createSampleTasks();
+                if (loadingEl) loadingEl.style.display = 'none';
             }
         } catch (error) {
             console.error('Error loading tasks:', error);
-            this.showNotification('Error', 'Failed to load saved tasks', 'error');
+            this.showNotification('Error', 'Failed to load tasks', 'error');
+            if (loadingEl) loadingEl.style.display = 'none';
         }
     }
 
     saveTasks() {
-        try {
-            localStorage.setItem('mumatecTasks', JSON.stringify(this.tasks));
-        } catch (error) {
-            console.error('Error saving tasks:', error);
-            this.showNotification('Error', 'Failed to save tasks', 'error');
-        }
+        // Data persistence handled by Firestore; function retained for backward compatibility
     }
 
     async saveTaskToFirestore(task) {
         if (!window.currentUser || !db) return;
         try {
+            console.log('Saving task to Firestore:', task.id, task.title);
             await setDoc(doc(db, 'users', window.currentUser.uid, 'tasks', task.id), task);
+            console.log('→ saved successfully');
         } catch (error) {
             console.error('Firestore save error:', error);
         }
@@ -82,7 +81,9 @@ class MumatecTaskManager {
     async deleteTaskFromFirestore(taskId) {
         if (!window.currentUser || !db) return;
         try {
+            console.log('Deleting task from Firestore:', taskId);
             await deleteDoc(doc(db, 'users', window.currentUser.uid, 'tasks', taskId));
+            console.log('→ deleted successfully');
         } catch (error) {
             console.error('Firestore delete error:', error);
         }
@@ -127,7 +128,6 @@ class MumatecTaskManager {
         ];
         
         this.tasks = sampleTasks;
-        this.saveTasks();
         sampleTasks.forEach(task => this.saveTaskToFirestore(task));
     }
 
@@ -152,7 +152,6 @@ class MumatecTaskManager {
         };
 
         this.tasks.push(task);
-        this.saveTasks();
         this.saveTaskToFirestore(task);
         this.updateUI();
         this.showNotification('Success', 'Task created successfully', 'success');
@@ -175,7 +174,6 @@ class MumatecTaskManager {
             updatedAt: new Date().toISOString()
         };
 
-        this.saveTasks();
         this.saveTaskToFirestore(this.tasks[taskIndex]);
         this.updateUI();
         this.showNotification('Success', 'Task updated successfully', 'success');
@@ -184,7 +182,6 @@ class MumatecTaskManager {
 
     async deleteTask(taskId) {
         this.tasks = this.tasks.filter(task => task.id !== taskId);
-        this.saveTasks();
         this.deleteTaskFromFirestore(taskId);
         this.updateUI();
         this.showNotification('Success', 'Task deleted successfully', 'success');
@@ -197,7 +194,6 @@ class MumatecTaskManager {
         task.status = newStatus;
         task.updatedAt = new Date().toISOString();
         
-        this.saveTasks();
         this.saveTaskToFirestore(task);
         this.updateUI();
         return true;
@@ -868,11 +864,7 @@ class MumatecTaskManager {
     }
 
     setupAutoSave() {
-        setInterval(() => {
-            if (this.tasks.length > 0) {
-                this.saveTasks();
-            }
-        }, 30000); // Auto-save every 30 seconds
+        // Auto-save handled by Firestore real-time sync
     }
 
     // Form Handling
@@ -936,7 +928,7 @@ class MumatecTaskManager {
                 
                 if (hoursDiff <= 2 && hoursDiff > 0) {
                     task.reminderSent = true;
-                    this.saveTasks();
+                    this.saveTaskToFirestore(task);
                     
                     const message = `"${task.title}" is due in ${Math.ceil(hoursDiff)} hour${Math.ceil(hoursDiff) !== 1 ? 's' : ''}`;
                     this.showNotification('Task Reminder', message, 'warning');
@@ -1061,13 +1053,13 @@ class MumatecTaskManager {
                         } else {
                             this.tasks.push(task);
                         }
+                        this.saveTaskToFirestore(task);
                         importedCount++;
                     } catch (error) {
                         console.warn(`Error parsing line ${i + 1}:`, error);
                     }
                 }
 
-                this.saveTasks();
                 this.updateUI();
                 this.showNotification('Success', `Imported ${importedCount} tasks`, 'success');
             } catch (error) {
