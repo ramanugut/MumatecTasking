@@ -30,7 +30,9 @@ onAuthStateChanged(auth, async (user) => {
     if (adminLink) {
       adminLink.style.display = role === 'admin' ? 'inline-block' : 'none';
     }
-    if (typeof window.initTodoApp === 'function') {
+    if (typeof window.initDashboard === 'function') {
+      window.initDashboard();
+    } else if (typeof window.initTodoApp === 'function') {
       window.initTodoApp();
     }
   } else {
