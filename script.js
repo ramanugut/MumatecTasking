@@ -625,6 +625,7 @@ class MumatecTaskManager {
 
     openInsights() {
         document.getElementById('insightsModal').classList.add('active');
+        this.updateInsights();
         this.renderWeeklyChart();
         document.getElementById('insightsClose').focus();
     }
