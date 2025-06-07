@@ -3,7 +3,7 @@
 This document outlines the lifecycle of tasks within the application.
 
 ## Primary Status Categories
-- **Backlog/To Do** – Newly created tasks awaiting assignment
+- **Todo** – Newly created tasks awaiting assignment
 - **In Progress** – Tasks currently being worked on
 - **Under Review** – Work completed but awaiting approval/verification
 - **Done/Completed** – Successfully finished tasks
@@ -24,7 +24,7 @@ This document outlines the lifecycle of tasks within the application.
 - **Maintenance** – System updates, cleanup, or optimization
 
 ## Workflow Overview
-1. **Task Creation** – New tasks start in *Backlog/To Do* with metadata such as priority and type recorded.
+1. **Task Creation** – New tasks start in *Todo* with metadata such as priority and type recorded.
 2. **Assignment & Planning** – Tasks remain in backlog until assigned and scheduled.
 3. **Work Initiation** – Assigned users move tasks to *In Progress* and begin work.
 4. **Completion** – Once finished, tasks transition to *Under Review* for verification.
