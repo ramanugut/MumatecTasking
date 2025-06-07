@@ -42,7 +42,6 @@
     
     /* Layout */
     --sidebar-width: 280px;
-    --sidebar-collapsed-width: 60px;
     --sidebar-transition: width 0.3s ease;
     --top-bar-height: 72px;
     --border-radius: 12px;
@@ -56,6 +55,15 @@
     /* Transitions */
     --transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
     --transition-bounce: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+
+    /* Kanban */
+    --kanban-column-width: 280px;
+    --status-todo: var(--gray-300);
+    --status-inprogress: var(--warning-orange);
+    --status-review: var(--purple);
+    --status-done: var(--success-green);
+    --status-blocked: var(--error-red);
+    --status-cancelled: var(--text-tertiary);
 }
 
 body {
@@ -88,15 +96,16 @@ body {
 }
 
 .sidebar.collapsed {
-    width: var(--sidebar-collapsed-width);
+    width: 280px;
+    position: absolute;
+    border-right: none;
+    overflow: hidden;
+    transform: translateX(-100%);
 }
 
-.sidebar.collapsed .logo-text,
-.sidebar.collapsed .user-details,
-.sidebar.collapsed .nav-label,
-.sidebar.collapsed .nav-count,
-.sidebar.collapsed .nav-section-title,
-.sidebar.collapsed .productivity-text {
+.sidebar.collapsed .sidebar-header,
+.sidebar.collapsed .sidebar-nav,
+.sidebar.collapsed .sidebar-footer {
     display: none;
 }
 
@@ -498,6 +507,7 @@ body {
     overflow-x: auto;
     overflow-y: hidden;
     align-items: flex-start;
+    padding-bottom: 8px;
 }
 
 .kanban-column {
@@ -507,9 +517,10 @@ body {
     display: flex;
     flex-direction: column;
     overflow: hidden;
-    flex: 0 0 300px;
-    min-width: 300px;
+    flex: 0 0 var(--kanban-column-width);
+    min-width: var(--kanban-column-width);
     position: relative;
+    box-shadow: 0 1px 3px var(--shadow);
 }
 
 .kanban-column:not(:last-child)::after {
@@ -528,6 +539,7 @@ body {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    border-top: 4px solid transparent;
 }
 
 .column-title {
@@ -541,11 +553,19 @@ body {
     color: var(--text-secondary);
     padding: 4px 8px;
     border-radius: 12px;
-    font-size: 12px;
-    font-weight: 600;
-    min-width: 24px;
+    font-size: 14px;
+    font-weight: 700;
+    min-width: 28px;
     text-align: center;
 }
+
+/* Column status colors */
+.kanban-column[data-status="todo"] .column-header { border-top-color: var(--status-todo); }
+.kanban-column[data-status="inprogress"] .column-header { border-top-color: var(--status-inprogress); }
+.kanban-column[data-status="review"] .column-header { border-top-color: var(--status-review); }
+.kanban-column[data-status="done"] .column-header { border-top-color: var(--status-done); }
+.kanban-column[data-status="blocked"] .column-header { border-top-color: var(--status-blocked); }
+.kanban-column[data-status="cancelled"] .column-header { border-top-color: var(--status-cancelled); }
 
 .column-content {
     flex: 1;
@@ -601,7 +621,7 @@ body {
 
 .task-header {
     display: flex;
-    align-items: flex-start;
+    align-items: center;
     justify-content: space-between;
     margin-bottom: 8px;
 }
@@ -623,6 +643,19 @@ body {
 }
 
 .task-card:hover .task-actions {
+    opacity: 1;
+}
+
+.drag-handle {
+    cursor: move;
+    color: var(--text-tertiary);
+    font-size: 16px;
+    margin-right: 4px;
+    opacity: 0;
+    transition: var(--transition);
+}
+
+.task-card:hover .drag-handle {
     opacity: 1;
 }
 
