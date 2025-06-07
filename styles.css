@@ -42,7 +42,7 @@
     
     /* Layout */
     --sidebar-width: 280px;
-    --sidebar-collapsed-width: 60px;
+    --sidebar-collapsed-width: 0px;
     --sidebar-transition: width 0.3s ease;
     --top-bar-height: 72px;
     --border-radius: 12px;
@@ -89,14 +89,13 @@ body {
 
 .sidebar.collapsed {
     width: var(--sidebar-collapsed-width);
+    border-right: none;
+    overflow: hidden;
 }
 
-.sidebar.collapsed .logo-text,
-.sidebar.collapsed .user-details,
-.sidebar.collapsed .nav-label,
-.sidebar.collapsed .nav-count,
-.sidebar.collapsed .nav-section-title,
-.sidebar.collapsed .productivity-text {
+.sidebar.collapsed .sidebar-header,
+.sidebar.collapsed .sidebar-nav,
+.sidebar.collapsed .sidebar-footer {
     display: none;
 }
 
@@ -507,9 +506,10 @@ body {
     display: flex;
     flex-direction: column;
     overflow: hidden;
-    flex: 0 0 300px;
-    min-width: 300px;
+    flex: 1 1 260px;
+    min-width: 260px;
     position: relative;
+    box-shadow: 0 1px 3px var(--shadow);
 }
 
 .kanban-column:not(:last-child)::after {
@@ -601,7 +601,7 @@ body {
 
 .task-header {
     display: flex;
-    align-items: flex-start;
+    align-items: center;
     justify-content: space-between;
     margin-bottom: 8px;
 }
@@ -623,6 +623,19 @@ body {
 }
 
 .task-card:hover .task-actions {
+    opacity: 1;
+}
+
+.drag-handle {
+    cursor: move;
+    color: var(--text-tertiary);
+    font-size: 16px;
+    margin-right: 4px;
+    opacity: 0;
+    transition: var(--transition);
+}
+
+.task-card:hover .drag-handle {
     opacity: 1;
 }
 

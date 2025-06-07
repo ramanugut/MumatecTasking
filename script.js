@@ -372,10 +372,11 @@ class MumatecTaskManager {
         taskDiv.innerHTML = `
             <div class="task-priority priority-${task.priority}"></div>
             <div class="task-header">
+                <span class="material-icons drag-handle" aria-hidden="true">drag_handle</span>
                 <div class="task-title">${this.escapeHtml(task.title)}</div>
                 <div class="task-actions">
-                    <button class="task-action-btn" onclick="todoApp.openEditTaskModal('${task.id}')" title="Edit">✏️</button>
-                    <button class="task-action-btn" onclick="todoApp.confirmDeleteTask('${task.id}')" title="Delete">🗑️</button>
+                    <button class="task-action-btn" onclick="todoApp.openEditTaskModal('${task.id}')" title="Edit"><span class="material-icons">edit</span></button>
+                    <button class="task-action-btn" onclick="todoApp.confirmDeleteTask('${task.id}')" title="Delete"><span class="material-icons">delete</span></button>
                 </div>
             </div>
             ${task.description ? `<div class="task-description">${this.escapeHtml(task.description)}</div>` : ''}
@@ -402,7 +403,7 @@ class MumatecTaskManager {
         if (todayTasks.length === 0) {
             container.innerHTML = `
                 <div style="text-align: center; padding: 60px 20px; color: var(--text-secondary);">
-                    <div style="font-size: 48px; margin-bottom: 16px;">🎉</div>
+                <span class="material-icons" style="font-size:48px;margin-bottom:16px;">celebration</span>
                     <h3 style="margin-bottom: 8px;">No tasks due today!</h3>
                     <p>Enjoy your free time or add new tasks for today.</p>
                 </div>
@@ -429,7 +430,7 @@ class MumatecTaskManager {
         if (upcoming.length === 0) {
             container.innerHTML = `
                 <div style="text-align: center; padding: 60px 20px; color: var(--text-secondary);">
-                    <div style="font-size: 48px; margin-bottom: 16px;">📅</div>
+                <span class="material-icons" style="font-size:48px;margin-bottom:16px;">event</span>
                     <h3 style="margin-bottom: 8px;">No upcoming tasks</h3>
                     <p>You're all caught up! Add tasks with due dates to see them here.</p>
                 </div>
@@ -454,7 +455,7 @@ class MumatecTaskManager {
         if (completed.length === 0) {
             container.innerHTML = `
                 <div style="text-align: center; padding: 60px 20px; color: var(--text-secondary);">
-                    <div style="font-size: 48px; margin-bottom: 16px;">✅</div>
+                <span class="material-icons" style="font-size:48px;margin-bottom:16px;">check_circle</span>
                     <h3 style="margin-bottom: 8px;">No completed tasks yet</h3>
                     <p>Complete some tasks to see your achievements here!</p>
                 </div>
@@ -1191,7 +1192,7 @@ class MumatecTaskManager {
     updateThemeToggleIcon() {
         const btn = document.getElementById('themeToggle');
         if (btn) {
-            btn.textContent = document.body.classList.contains('dark-mode') ? '☀️' : '🌙';
+            btn.innerHTML = `<span class="material-icons">${document.body.classList.contains('dark-mode') ? 'light_mode' : 'dark_mode'}</span>`;
         }
     }
 
@@ -1199,7 +1200,7 @@ class MumatecTaskManager {
     loadSidebarState() {
         const collapsed = localStorage.getItem('sidebarCollapsed') === 'true';
         const sidebar = document.querySelector('.sidebar');
-        if (sidebar && collapsed) {
+        if (sidebar && collapsed && window.innerWidth > 768) {
             sidebar.classList.add('collapsed');
         }
         const btn = document.getElementById('sidebarToggle');
@@ -1218,11 +1219,15 @@ class MumatecTaskManager {
     toggleSidebar() {
         const sidebar = document.querySelector('.sidebar');
         if (!sidebar) return;
-        const collapsed = sidebar.classList.toggle('collapsed');
-        localStorage.setItem('sidebarCollapsed', collapsed);
-        const btn = document.getElementById('sidebarToggle');
-        if (btn) {
-            btn.setAttribute('aria-expanded', String(!collapsed));
+        if (window.innerWidth <= 768) {
+            sidebar.classList.toggle('open');
+        } else {
+            const collapsed = sidebar.classList.toggle('collapsed');
+            localStorage.setItem('sidebarCollapsed', collapsed);
+            const btn = document.getElementById('sidebarToggle');
+            if (btn) {
+                btn.setAttribute('aria-expanded', String(!collapsed));
+            }
         }
     }
 }
