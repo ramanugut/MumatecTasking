@@ -4,7 +4,7 @@ import { getAuth } from 'https://www.gstatic.com/firebasejs/11.9.0/firebase-auth
 import { getFirestore, enableIndexedDbPersistence } from 'https://www.gstatic.com/firebasejs/11.9.0/firebase-firestore.js';
 
 
-export const firebaseConfig = {
+  const firebaseConfig = {
   apiKey: "AIzaSyDT01V2niUl83vaYXUEukc5fGzUppwfQEI",
   authDomain: "mumatectasking.firebaseapp.com",
   projectId: "mumatectasking",
