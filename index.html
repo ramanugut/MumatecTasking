@@ -5,13 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mumatec Task Manager</title>
     <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 </head>
 <body>
     <div id="loadingOverlay" class="loading-overlay" style="display:none;">Loading...</div>
     <!-- Sticky Header -->
     <header class="top-bar" id="mainHeader">
         <div class="top-bar-left">
-            <button id="sidebarToggle" class="action-btn secondary" aria-label="Toggle navigation menu" aria-expanded="true">☰</button>
+            <button id="sidebarToggle" class="action-btn secondary" aria-label="Toggle navigation menu" aria-expanded="true"><span class="material-icons">menu</span></button>
             <h1 class="page-title" id="pageTitle">Dashboard</h1>
 
         </div>
@@ -19,25 +20,25 @@
         <div class="top-bar-center">
             <div class="search-container">
                 <input type="text" class="search-input" id="searchInput" placeholder="Search tasks..." aria-label="Search tasks">
-                <span class="search-icon">🔍</span>
+                <span class="material-icons search-icon">search</span>
             </div>
         </div>
 
         <div class="top-bar-right">
             <button class="action-btn secondary" onclick="document.getElementById('csvImport').click()">
-                <span>📥</span> Import
+                <span class="material-icons">file_upload</span> Import
             </button>
             <button class="action-btn primary" onclick="todoApp.openAddTaskModal()">
-                <span>➕</span> New Task
+                <span class="material-icons">add</span> New Task
             </button>
             <button class="action-btn secondary" id="insightsToggle" aria-label="Open insights" aria-haspopup="dialog">Insights</button>
-            <button class="action-btn secondary" id="themeToggle">🌙</button>
+            <button class="action-btn secondary" id="themeToggle"><span class="material-icons">dark_mode</span></button>
             <button class="action-btn secondary" id="profileLink" onclick="window.location.href='profile.html'">Profile</button>
             <button class="action-btn secondary" id="adminLink" style="display:none;" onclick="window.location.href='admin.html'">Admin</button>
             <button class="action-btn secondary" onclick="logout()">Logout</button>
             <div class="view-controls">
-                <button class="view-btn active" data-view="kanban" aria-label="Kanban view" aria-pressed="true">📋</button>
-                <button class="view-btn" data-view="list" aria-label="List view" aria-pressed="false">📄</button>
+                <button class="view-btn active material-icons" data-view="kanban" aria-label="Kanban view" aria-pressed="true">view_kanban</button>
+                <button class="view-btn material-icons" data-view="list" aria-label="List view" aria-pressed="false">view_list</button>
             </div>
         </div>
     </header>
@@ -48,11 +49,11 @@
         <div class="sidebar">
             <div class="sidebar-header">
                 <div class="app-logo">
-                    <div class="logo-icon">📋</div>
+                    <div class="logo-icon"><span class="material-icons">assignment</span></div>
                     <div class="logo-text">Mumatec Tasking</div>
                 </div>
                 <div class="user-info" id="userInfo" onclick="window.location.href='profile.html'">
-                    <div class="user-avatar" id="userAvatar">👤</div>
+                    <div class="user-avatar" id="userAvatar"><span class="material-icons">person</span></div>
                     <div class="user-details">
                         <div class="user-name" id="userName">User</div>
                         <div class="user-role" id="userRole">&nbsp;</div>
@@ -63,22 +64,22 @@
             <div class="sidebar-nav">
                 <div class="nav-section">
                     <div class="nav-item active" data-view="dashboard" aria-label="Dashboard">
-                        <span class="nav-icon">🏠</span>
+                        <span class="material-icons nav-icon">dashboard</span>
                         <span class="nav-label">Dashboard</span>
                         <span class="nav-count" id="dashboardCount">0</span>
                     </div>
                     <div class="nav-item" data-view="today" aria-label="Today">
-                        <span class="nav-icon">📅</span>
+                        <span class="material-icons nav-icon">today</span>
                         <span class="nav-label">Today</span>
                         <span class="nav-count" id="todayCount">0</span>
                     </div>
                     <div class="nav-item" data-view="upcoming" aria-label="Upcoming">
-                        <span class="nav-icon">⏰</span>
+                        <span class="material-icons nav-icon">schedule</span>
                         <span class="nav-label">Upcoming</span>
                         <span class="nav-count" id="upcomingCount">0</span>
                     </div>
                     <div class="nav-item" data-view="completed" aria-label="Completed">
-                        <span class="nav-icon">✅</span>
+                        <span class="material-icons nav-icon">check_circle</span>
                         <span class="nav-label">Completed</span>
                         <span class="nav-count" id="completedNavCount">0</span>
                     </div>
@@ -89,17 +90,17 @@
                 <div class="nav-section">
                     <div class="nav-section-title">Projects</div>
                     <div class="nav-item" data-filter="Work" aria-label="Work">
-                        <span class="nav-icon">💼</span>
+                        <span class="material-icons nav-icon">work</span>
                         <span class="nav-label">Work</span>
                         <span class="nav-count" id="workCount">0</span>
                     </div>
                     <div class="nav-item" data-filter="Personal" aria-label="Personal">
-                        <span class="nav-icon">🏠</span>
+                        <span class="material-icons nav-icon">home</span>
                         <span class="nav-label">Personal</span>
                         <span class="nav-count" id="personalCount">0</span>
                     </div>
                     <div class="nav-item" data-filter="Development" aria-label="Development">
-                        <span class="nav-icon">💻</span>
+                        <span class="material-icons nav-icon">code</span>
                         <span class="nav-label">Development</span>
                         <span class="nav-count" id="devCount">0</span>
                     </div>
@@ -109,11 +110,11 @@
 
                 <div class="nav-section">
                     <div class="nav-item" onclick="todoApp.openQuickCapture()" aria-label="Quick Capture">
-                        <span class="nav-icon">⚡</span>
+                        <span class="material-icons nav-icon">flash_on</span>
                         <span class="nav-label">Quick Capture</span>
                     </div>
                     <div class="nav-item" onclick="todoApp.exportToCSV()" aria-label="Export Data">
-                        <span class="nav-icon">📤</span>
+                        <span class="material-icons nav-icon">file_download</span>
                         <span class="nav-label">Export Data</span>
                     </div>
                 </div>
@@ -123,8 +124,8 @@
                 <div class="productivity-ring">
                     <svg class="ring-progress" width="60" height="60">
                         <circle cx="30" cy="30" r="25" fill="none" stroke="#f0f0f0" stroke-width="4"/>
-                        <circle cx="30" cy="30" r="25" fill="none" stroke="#007AFF" stroke-width="4" 
-                                stroke-dasharray="157" stroke-dashoffset="157" 
+                        <circle cx="30" cy="30" r="25" fill="none" stroke="#007AFF" stroke-width="4"
+                                stroke-dasharray="157" stroke-dashoffset="157"
                                 transform="rotate(-90 30 30)" id="progressRing"/>
                     </svg>
                     <div class="ring-content">
@@ -144,28 +145,28 @@
                     <!-- Quick Stats -->
                     <div class="quick-stats">
                         <div class="stat-card">
-                            <div class="stat-icon">📋</div>
+                            <div class="stat-icon material-icons">assignment</div>
                             <div class="stat-content">
                                 <div class="stat-number" id="totalTasks">0</div>
                                 <div class="stat-label">Total Tasks</div>
                             </div>
                         </div>
                         <div class="stat-card">
-                            <div class="stat-icon">✅</div>
+                            <div class="stat-icon material-icons">check_circle</div>
                             <div class="stat-content">
                                 <div class="stat-number" id="completedTasks">0</div>
                                 <div class="stat-label">Completed</div>
                             </div>
                         </div>
                         <div class="stat-card">
-                            <div class="stat-icon">⏳</div>
+                            <div class="stat-icon material-icons">hourglass_empty</div>
                             <div class="stat-content">
                                 <div class="stat-number" id="pendingTasks">0</div>
                                 <div class="stat-label">In Progress</div>
                             </div>
                         </div>
                         <div class="stat-card">
-                            <div class="stat-icon">🔥</div>
+                            <div class="stat-icon material-icons">whatshot</div>
                             <div class="stat-content">
                                 <div class="stat-number" id="streakDays">0</div>
                                 <div class="stat-label">Day Streak</div>
@@ -184,7 +185,7 @@
                                 </div>
                                 <div class="column-content" id="todoBoard">
                                     <div class="add-task-card" onclick="todoApp.openAddTaskModal('todo')">
-                                        <span class="add-icon">➕</span>
+                                        <span class="material-icons add-icon">add</span>
                                         <span>Add task</span>
                                     </div>
                                 </div>
@@ -197,7 +198,7 @@
                                 </div>
                                 <div class="column-content" id="inprogressBoard">
                                     <div class="add-task-card" onclick="todoApp.openAddTaskModal('inprogress')">
-                                        <span class="add-icon">➕</span>
+                                        <span class="material-icons add-icon">add</span>
                                         <span>Add task</span>
                                     </div>
                                 </div>
@@ -210,7 +211,7 @@
                                 </div>
                                 <div class="column-content" id="doneBoard">
                                     <div class="add-task-card" onclick="todoApp.openAddTaskModal('done')">
-                                        <span class="add-icon">➕</span>
+                                        <span class="material-icons add-icon">add</span>
                                         <span>Add task</span>
                                     </div>
                                 </div>
@@ -223,7 +224,7 @@
                                 </div>
                                 <div class="column-content" id="reviewBoard">
                                     <div class="add-task-card" onclick="todoApp.openAddTaskModal('review')">
-                                        <span class="add-icon">➕</span>
+                                        <span class="material-icons add-icon">add</span>
                                         <span>Add task</span>
                                     </div>
                                 </div>
@@ -236,7 +237,7 @@
                                 </div>
                                 <div class="column-content" id="blockedBoard">
                                     <div class="add-task-card" onclick="todoApp.openAddTaskModal('blocked')">
-                                        <span class="add-icon">➕</span>
+                                        <span class="material-icons add-icon">add</span>
                                         <span>Add task</span>
                                     </div>
                                 </div>
@@ -249,7 +250,7 @@
                                 </div>
                                 <div class="column-content" id="cancelledBoard">
                                     <div class="add-task-card" onclick="todoApp.openAddTaskModal('cancelled')">
-                                        <span class="add-icon">➕</span>
+                                        <span class="material-icons add-icon">add</span>
                                         <span>Add task</span>
                                     </div>
                                 </div>
@@ -291,8 +292,8 @@
     <div class="modal-overlay" id="quickCaptureModal" role="dialog" aria-hidden="true">
         <div class="quick-capture-modal">
             <div class="quick-capture-header">
-                <h3>⚡ Quick Capture</h3>
-                <button class="close-btn" onclick="todoApp.closeQuickCapture()">✕</button>
+                <h3><span class="material-icons">flash_on</span> Quick Capture</h3>
+                <button class="close-btn" onclick="todoApp.closeQuickCapture()"><span class="material-icons">close</span></button>
             </div>
             <input type="text" class="quick-input" id="quickTaskInput" placeholder="What needs to be done?">
             <div class="quick-actions">
@@ -307,35 +308,35 @@
         <div class="task-modal">
             <div class="modal-header">
                 <h3 id="modalTitle">Add New Task</h3>
-                <button class="close-btn" onclick="todoApp.closeModal()">✕</button>
+                <button class="close-btn" onclick="todoApp.closeModal()"><span class="material-icons">close</span></button>
             </div>
-            
+
             <form id="taskForm" class="task-form">
                 <div class="form-section">
                     <div class="form-field">
                         <label>Task Title</label>
                         <input type="text" id="taskTitle" required>
                     </div>
-                    
+
                     <div class="form-row">
                         <div class="form-field">
                             <label>Priority</label>
                             <select id="taskPriority">
-                                <option value="low">🟢 Low</option>
-                                <option value="medium" selected>🟡 Medium</option>
-                                <option value="high">🔴 High</option>
-                                <option value="critical">❗ Critical</option>
+                                <option value="low">Low</option>
+                                <option value="medium" selected>Medium</option>
+                                <option value="high">High</option>
+                                <option value="critical">Critical</option>
                             </select>
                         </div>
                         <div class="form-field">
                             <label>Status</label>
                             <select id="taskStatus">
-                                <option value="todo">📋 Todo</option>
-                                <option value="inprogress">⚡ In Progress</option>
-                                <option value="review">🔍 Under Review</option>
-                                <option value="done">✅ Done</option>
-                                <option value="blocked">⛔ Blocked</option>
-                                <option value="cancelled">❌ Cancelled</option>
+                                <option value="todo">Todo</option>
+                                <option value="inprogress">In Progress</option>
+                                <option value="review">Under Review</option>
+                                <option value="done">Done</option>
+                                <option value="blocked">Blocked</option>
+                                <option value="cancelled">Cancelled</option>
                             </select>
                         </div>
                     </div>
@@ -390,8 +391,8 @@
     <div class="modal-overlay" id="insightsModal" role="dialog" aria-modal="true" aria-labelledby="insightsTitle">
         <div class="insights-modal">
             <div class="modal-header">
-                <h3 id="insightsTitle">📊 Insights</h3>
-                <button class="close-btn" id="insightsClose" aria-label="Close insights" onclick="todoApp.closeInsights()">✕</button>
+                <h3 id="insightsTitle"><span class="material-icons">bar_chart</span> Insights</h3>
+                <button class="close-btn" id="insightsClose" aria-label="Close insights" onclick="todoApp.closeInsights()"><span class="material-icons">close</span></button>
             </div>
             <div class="insights-grid">
                 <div class="insight-metric">
@@ -402,17 +403,17 @@
                 <div class="insight-metric">
                     <div class="metric-label">Average Daily</div>
                     <div class="metric-value" id="dailyAverage">0</div>
-                    <div class="metric-trend">📈</div>
+                    <div class="metric-trend"><span class="material-icons">show_chart</span></div>
                 </div>
                 <div class="insight-metric">
                     <div class="metric-label">Most Productive</div>
                     <div class="metric-value" id="bestDay">Mon</div>
-                    <div class="metric-trend">⭐</div>
+                    <div class="metric-trend"><span class="material-icons">star</span></div>
                 </div>
                 <div class="insight-metric">
                     <div class="metric-label">Focus Score</div>
                     <div class="metric-value" id="focusScore">95%</div>
-                    <div class="metric-trend">🎯</div>
+                    <div class="metric-trend"><span class="material-icons">my_location</span></div>
                 </div>
             </div>
 
