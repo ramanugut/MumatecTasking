@@ -30,6 +30,7 @@
             <button class="action-btn primary" onclick="todoApp.openAddTaskModal()">
                 <span>➕</span> New Task
             </button>
+            <button class="action-btn secondary" id="insightsToggle" aria-label="Open insights" aria-haspopup="dialog">Insights</button>
             <button class="action-btn secondary" id="themeToggle">🌙</button>
             <button class="action-btn secondary" id="profileLink" onclick="window.location.href='profile.html'">Profile</button>
             <button class="action-btn secondary" id="adminLink" style="display:none;" onclick="window.location.href='admin.html'">Admin</button>
@@ -255,40 +256,6 @@
                             </div>
                         </div>
 
-                        <!-- Insights Panel -->
-                        <div class="insights-panel">
-                            <div class="panel-header">
-                                <h3>📊 Insights</h3>
-                                <button class="panel-action">⋯</button>
-                            </div>
-                            <div class="insights-grid">
-                                <div class="insight-metric">
-                                    <div class="metric-label">This Week</div>
-                                    <div class="metric-value" id="weeklyCompleted">0</div>
-                                    <div class="metric-change positive" id="weeklyChange">+0%</div>
-                                </div>
-                                <div class="insight-metric">
-                                    <div class="metric-label">Average Daily</div>
-                                    <div class="metric-value" id="dailyAverage">0</div>
-                                    <div class="metric-trend">📈</div>
-                                </div>
-                                <div class="insight-metric">
-                                    <div class="metric-label">Most Productive</div>
-                                    <div class="metric-value" id="bestDay">Mon</div>
-                                    <div class="metric-trend">⭐</div>
-                                </div>
-                                <div class="insight-metric">
-                                    <div class="metric-label">Focus Score</div>
-                                    <div class="metric-value" id="focusScore">95%</div>
-                                    <div class="metric-trend">🎯</div>
-                                </div>
-                            </div>
-                            
-                            <div class="weekly-chart">
-                                <div class="chart-header">Weekly Activity</div>
-                                <div class="chart-bars" id="weeklyChart"></div>
-                            </div>
-                        </div>
                     </div>
                 </div>
 
@@ -416,6 +383,43 @@
                     <button type="submit" class="form-btn primary">Save Task</button>
                 </div>
             </form>
+        </div>
+    </div>
+
+    <!-- Insights Modal -->
+    <div class="modal-overlay" id="insightsModal" role="dialog" aria-modal="true" aria-labelledby="insightsTitle">
+        <div class="insights-modal">
+            <div class="modal-header">
+                <h3 id="insightsTitle">📊 Insights</h3>
+                <button class="close-btn" id="insightsClose" aria-label="Close insights" onclick="todoApp.closeInsights()">✕</button>
+            </div>
+            <div class="insights-grid">
+                <div class="insight-metric">
+                    <div class="metric-label">This Week</div>
+                    <div class="metric-value" id="weeklyCompleted">0</div>
+                    <div class="metric-change positive" id="weeklyChange">+0%</div>
+                </div>
+                <div class="insight-metric">
+                    <div class="metric-label">Average Daily</div>
+                    <div class="metric-value" id="dailyAverage">0</div>
+                    <div class="metric-trend">📈</div>
+                </div>
+                <div class="insight-metric">
+                    <div class="metric-label">Most Productive</div>
+                    <div class="metric-value" id="bestDay">Mon</div>
+                    <div class="metric-trend">⭐</div>
+                </div>
+                <div class="insight-metric">
+                    <div class="metric-label">Focus Score</div>
+                    <div class="metric-value" id="focusScore">95%</div>
+                    <div class="metric-trend">🎯</div>
+                </div>
+            </div>
+
+            <div class="weekly-chart">
+                <div class="chart-header">Weekly Activity</div>
+                <div class="chart-bars" id="weeklyChart"></div>
+            </div>
         </div>
     </div>
 

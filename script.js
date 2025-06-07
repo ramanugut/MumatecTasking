@@ -608,11 +608,21 @@ class MumatecTaskManager {
         document.getElementById('quickTaskInput').focus();
     }
 
+
     closeQuickCapture() {
-        const modal = document.getElementById('quickCaptureModal');
-        modal.classList.remove('active');
-        modal.setAttribute('aria-hidden', 'true');
+        document.getElementById('quickCaptureModal').classList.remove('active');
         document.getElementById('quickTaskInput').value = '';
+    }
+
+    openInsights() {
+        document.getElementById('insightsModal').classList.add('active');
+        this.renderWeeklyChart();
+        document.getElementById('insightsClose').focus();
+    }
+
+    closeInsights() {
+        document.getElementById('insightsModal').classList.remove('active');
+        document.getElementById('insightsToggle')?.focus();
     }
 
     saveQuickTask() {
@@ -798,12 +808,23 @@ class MumatecTaskManager {
             this.toggleTheme();
         });
 
+        const insightsBtn = document.getElementById('insightsToggle');
+        if (insightsBtn) {
+            insightsBtn.addEventListener('click', () => this.openInsights());
+        }
+        const insightsClose = document.getElementById('insightsClose');
+        if (insightsClose) {
+            insightsClose.addEventListener('click', () => this.closeInsights());
+        }
+
         // Modal close on outside click
         document.querySelectorAll('.modal-overlay').forEach(modal => {
             modal.addEventListener('click', (e) => {
                 if (e.target === modal) {
                     if (modal.id === 'quickCaptureModal') {
                         this.closeQuickCapture();
+                    } else if (modal.id === 'insightsModal') {
+                        this.closeInsights();
                     } else {
                         this.closeModal();
                     }
@@ -854,6 +875,7 @@ class MumatecTaskManager {
             if (e.key === 'Escape') {
                 this.closeModal();
                 this.closeQuickCapture();
+                this.closeInsights();
             }
         });
     }
