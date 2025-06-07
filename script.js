@@ -515,16 +515,34 @@ class MumatecTaskManager {
 
         this.currentView = viewName;
         this.renderCurrentView();
+        this.updateHeaderShadow();
     }
 
     switchViewMode(mode) {
         document.querySelectorAll('.view-btn').forEach(btn => {
             btn.classList.remove('active');
+            btn.setAttribute('aria-pressed', 'false');
         });
-        document.querySelector(`[data-view="${mode}"]`)?.classList.add('active');
-        
+        const activeBtn = document.querySelector(`[data-view="${mode}"]`);
+        if (activeBtn) {
+            activeBtn.classList.add('active');
+            activeBtn.setAttribute('aria-pressed', 'true');
+        }
+
         this.viewMode = mode;
         this.renderCurrentView();
+        this.updateHeaderShadow();
+    }
+
+    updateHeaderShadow() {
+        const header = document.querySelector('.top-bar');
+        const activeView = document.querySelector('.view-container.active');
+        if (!header || !activeView) return;
+        if (activeView.scrollTop > 0) {
+            header.classList.add('sticky-active');
+        } else {
+            header.classList.remove('sticky-active');
+        }
     }
 
     // Modal Management
@@ -780,6 +798,12 @@ class MumatecTaskManager {
                 }
             });
         });
+
+        // Header shadow on scroll
+        document.querySelectorAll('.view-container').forEach(view => {
+            view.addEventListener('scroll', () => this.updateHeaderShadow());
+        });
+        this.updateHeaderShadow();
     }
 
     setupKeyboardShortcuts() {

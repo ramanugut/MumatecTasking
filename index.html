@@ -8,6 +8,38 @@
 </head>
 <body>
     <div id="loadingOverlay" class="loading-overlay" style="display:none;">Loading...</div>
+    <!-- Sticky Header -->
+    <header class="top-bar" id="mainHeader">
+        <div class="top-bar-left">
+            <h1 class="page-title" id="pageTitle">Dashboard</h1>
+
+        </div>
+
+        <div class="top-bar-center">
+            <div class="search-container">
+                <input type="text" class="search-input" id="searchInput" placeholder="Search tasks..." aria-label="Search tasks">
+                <span class="search-icon">🔍</span>
+            </div>
+        </div>
+
+        <div class="top-bar-right">
+            <button class="action-btn secondary" onclick="document.getElementById('csvImport').click()">
+                <span>📥</span> Import
+            </button>
+            <button class="action-btn primary" onclick="todoApp.openAddTaskModal()">
+                <span>➕</span> New Task
+            </button>
+            <button class="action-btn secondary" id="themeToggle">🌙</button>
+            <button class="action-btn secondary" id="profileLink" onclick="window.location.href='profile.html'">Profile</button>
+            <button class="action-btn secondary" id="adminLink" style="display:none;" onclick="window.location.href='admin.html'">Admin</button>
+            <button class="action-btn secondary" onclick="logout()">Logout</button>
+            <div class="view-controls">
+                <button class="view-btn active" data-view="kanban" aria-label="Kanban view" aria-pressed="true">📋</button>
+                <button class="view-btn" data-view="list" aria-label="List view" aria-pressed="false">📄</button>
+            </div>
+        </div>
+    </header>
+
     <!-- App Shell -->
     <div class="app-container">
         <!-- Sidebar -->
@@ -103,38 +135,6 @@
 
         <!-- Main Content -->
         <div class="main-content">
-            <!-- Top Bar -->
-            <div class="top-bar">
-                <div class="top-bar-left">
-                    <h1 class="page-title" id="pageTitle">Dashboard</h1>
-                   
-                </div>
-
-                <div class="top-bar-center">
-                    <div class="search-container">
-                        <input type="text" class="search-input" id="searchInput" placeholder="Search tasks...">
-                        <span class="search-icon">🔍</span>
-                    </div>
-                </div>
-
-                <div class="top-bar-right">
-                    <button class="action-btn secondary" onclick="document.getElementById('csvImport').click()">
-                        <span>📥</span> Import
-                    </button>
-                    <button class="action-btn primary" onclick="todoApp.openAddTaskModal()">
-                        <span>➕</span> New Task
-                    </button>
-                    <button class="action-btn secondary" id="themeToggle">🌙</button>
-                    <button class="action-btn secondary" id="profileLink" onclick="window.location.href='profile.html'">Profile</button>
-                    <button class="action-btn secondary" id="adminLink" style="display:none;" onclick="window.location.href='admin.html'">Admin</button>
-                    <button class="action-btn secondary" onclick="logout()">Logout</button>
-                    <div class="view-controls">
-                        <button class="view-btn active" data-view="kanban">📋</button>
-                        <button class="view-btn" data-view="list">📄</button>
-                    </div>
-                </div>
-            </div>
-
             <!-- Content Area -->
             <div class="content-area">
                 <!-- Dashboard View -->
