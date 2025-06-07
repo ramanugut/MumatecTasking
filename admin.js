@@ -1,26 +1,14 @@
-import { auth, db, firebaseConfig } from './firebase.js';
-import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.9.0/firebase-app.js';
-import {
-  getAuth,
-  createUserWithEmailAndPassword,
-  updateProfile,
-  sendPasswordResetEmail,
-  signOut,
-} from 'https://www.gstatic.com/firebasejs/11.9.0/firebase-auth.js';
+import { auth, db } from './firebase.js';
+import { getFunctions, httpsCallable } from 'https://www.gstatic.com/firebasejs/11.9.0/firebase-functions.js';
 import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/11.9.0/firebase-auth.js';
-import {
-  collection,
-  getDocs,
-  doc,
-  getDoc,
-  setDoc,
-  updateDoc,
-  deleteDoc,
-} from 'https://www.gstatic.com/firebasejs/11.9.0/firebase-firestore.js';
+import { collection, getDocs, doc, getDoc } from 'https://www.gstatic.com/firebasejs/11.9.0/firebase-firestore.js';
 
-// Secondary Firebase app used for creating users without affecting current session
-const secondaryApp = initializeApp(firebaseConfig, 'secondary');
-const secondaryAuth = getAuth(secondaryApp);
+const functions = getFunctions();
+const createUser = httpsCallable(functions, 'createUserWithRole');
+const updateRole = httpsCallable(functions, 'updateUserRole');
+const deleteUser = httpsCallable(functions, 'deleteUserAccount');
+const updateProfile = httpsCallable(functions, 'updateUserProfile');
+const sendReset = httpsCallable(functions, 'adminSendPasswordReset');
 
 const adminControls = document.getElementById('adminControls');
 const unauthEl = document.getElementById('unauth');
@@ -79,16 +67,7 @@ if (document.getElementById('btnCreateUser')) {
     const password = document.getElementById('newPassword').value;
     const displayName = document.getElementById('newDisplayName').value.trim();
     try {
-      const cred = await createUserWithEmailAndPassword(secondaryAuth, email, password);
-      if (displayName) {
-        await updateProfile(cred.user, { displayName });
-      }
-      await setDoc(doc(db, 'users', cred.user.uid), {
-        email,
-        displayName,
-        role: 'member'
-      });
-      await signOut(secondaryAuth);
+      await createUser({ email, password, displayName });
       alert('User successfully created!');
       loadUsers();
     } catch (err) {
@@ -102,7 +81,7 @@ userTableBody.addEventListener('change', async (e) => {
     const uid = e.target.getAttribute('data-uid');
     const newRole = e.target.value;
     try {
-      await updateDoc(doc(db, 'users', uid), { role: newRole });
+      await updateRole({ targetUid: uid, newRole });
       alert('Role successfully updated!');
     } catch (err) {
       handleError(err);
@@ -115,8 +94,8 @@ userTableBody.addEventListener('click', async (e) => {
     if (!confirm('Are you sure you want to delete this user?')) return;
     const uid = e.target.dataset.del;
     try {
-      await deleteDoc(doc(db, 'users', uid));
-      alert('User record deleted. Remove auth user manually.');
+      await deleteUser({ targetUid: uid });
+      alert('User account deleted!');
       loadUsers();
     } catch (err) {
       handleError(err);
@@ -128,8 +107,8 @@ userTableBody.addEventListener('click', async (e) => {
     const email = e.target.dataset.email;
     if (!confirm(`Send password reset email to ${email}?`)) return;
     try {
-      await sendPasswordResetEmail(auth, email);
-      alert('Password reset email sent!');
+      const res = await sendReset({ targetEmail: email });
+      alert('Reset link generated: ' + res.data.link);
     } catch (err) {
       handleError(err);
     }
@@ -145,8 +124,8 @@ userTableBody.addEventListener('click', async (e) => {
     const newName = prompt('Display name:', currentName);
     if (newName === null) return;
     try {
-      await updateDoc(doc(db, 'users', uid), { email: newEmail, displayName: newName });
-      alert('User profile updated');
+      await updateProfile({ targetUid: uid, email: newEmail, displayName: newName });
+      alert('User updated');
       loadUsers();
     } catch (err) {
       handleError(err);
