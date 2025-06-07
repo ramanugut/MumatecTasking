@@ -10,7 +10,7 @@ class MumatecTaskManager {
         this.viewMode = 'kanban';
         this.searchTerm = '';
         this.activeFilter = null;
-        this.statuses = ['backlog', 'inprogress', 'review', 'done', 'blocked', 'cancelled'];
+        this.statuses = ['todo', 'inprogress', 'review', 'done', 'blocked', 'cancelled'];
         this.priorities = ['low', 'medium', 'high', 'critical'];
         
         this.init();
@@ -102,7 +102,7 @@ class MumatecTaskManager {
                 title: 'Review server performance metrics',
                 description: 'Analyze CPU and memory usage across all hosting servers',
                 priority: 'high',
-                status: 'backlog',
+                status: 'todo',
                 category: 'Work',
                 type: 'Maintenance',
                 tags: ['hosting', 'performance'],
@@ -151,7 +151,7 @@ class MumatecTaskManager {
             title: taskData.title.trim(),
             description: taskData.description?.trim() || '',
             priority: taskData.priority || 'medium',
-            status: taskData.status || 'backlog',
+            status: taskData.status || 'todo',
             dueDate: taskData.dueDate || null,
             category: taskData.category?.trim() || 'Work',
             type: taskData.type || 'Maintenance',
@@ -177,7 +177,7 @@ class MumatecTaskManager {
             title: taskData.title.trim(),
             description: taskData.description?.trim() || '',
             priority: taskData.priority || 'medium',
-            status: taskData.status || 'backlog',
+            status: taskData.status || 'todo',
             dueDate: taskData.dueDate || null,
             category: taskData.category?.trim() || 'Work',
             type: taskData.type || 'Maintenance',
@@ -548,12 +548,14 @@ class MumatecTaskManager {
     }
 
     // Modal Management
-    openAddTaskModal(status = 'backlog') {
+    openAddTaskModal(status = 'todo') {
         this.currentEditingTask = null;
         document.getElementById('modalTitle').textContent = 'Add New Task';
         this.clearTaskForm();
         document.getElementById('taskStatus').value = status;
-        document.getElementById('taskModal').classList.add('active');
+        const modal = document.getElementById('taskModal');
+        modal.classList.add('active');
+        modal.setAttribute('aria-hidden', 'false');
         document.getElementById('taskTitle').focus();
     }
 
@@ -573,12 +575,16 @@ class MumatecTaskManager {
         document.getElementById('taskType').value = task.type || 'Maintenance';
         document.getElementById('taskTags').value = task.tags?.join(', ') || '';
         
-        document.getElementById('taskModal').classList.add('active');
+        const modal = document.getElementById('taskModal');
+        modal.classList.add('active');
+        modal.setAttribute('aria-hidden', 'false');
         document.getElementById('taskTitle').focus();
     }
 
     closeModal() {
-        document.getElementById('taskModal').classList.remove('active');
+        const modal = document.getElementById('taskModal');
+        modal.classList.remove('active');
+        modal.setAttribute('aria-hidden', 'true');
         this.clearTaskForm();
         this.currentEditingTask = null;
     }
@@ -587,7 +593,7 @@ class MumatecTaskManager {
         document.getElementById('taskTitle').value = '';
         document.getElementById('taskDescription').value = '';
         document.getElementById('taskPriority').value = 'medium';
-        document.getElementById('taskStatus').value = 'backlog';
+        document.getElementById('taskStatus').value = 'todo';
         document.getElementById('taskDueDate').value = '';
         document.getElementById('taskCategory').value = '';
         document.getElementById('taskType').value = 'Maintenance';
@@ -596,12 +602,16 @@ class MumatecTaskManager {
 
     // Quick Capture
     openQuickCapture() {
-        document.getElementById('quickCaptureModal').classList.add('active');
+        const modal = document.getElementById('quickCaptureModal');
+        modal.classList.add('active');
+        modal.setAttribute('aria-hidden', 'false');
         document.getElementById('quickTaskInput').focus();
     }
 
     closeQuickCapture() {
-        document.getElementById('quickCaptureModal').classList.remove('active');
+        const modal = document.getElementById('quickCaptureModal');
+        modal.classList.remove('active');
+        modal.setAttribute('aria-hidden', 'true');
         document.getElementById('quickTaskInput').value = '';
     }
 
@@ -609,7 +619,7 @@ class MumatecTaskManager {
         const title = document.getElementById('quickTaskInput').value.trim();
         if (!title) return;
 
-        this.addTask({ title, status: 'backlog', category: 'Work', type: 'Maintenance' });
+        this.addTask({ title, status: 'todo', category: 'Work', type: 'Maintenance' });
         this.closeQuickCapture();
     }
 
@@ -1078,7 +1088,7 @@ class MumatecTaskManager {
                             title: values[1] || `Imported Task ${i}`,
                             description: values[2] || '',
                             priority: ['low', 'medium', 'high', 'critical'].includes(values[3]) ? values[3] : 'medium',
-                            status: this.statuses.includes(values[4]) ? values[4] : 'backlog',
+                            status: this.statuses.includes(values[4]) ? values[4] : 'todo',
                             dueDate: values[5] || null,
                             category: values[6] || 'Work',
                             type: values[7] || 'Maintenance',
