@@ -1036,7 +1036,7 @@ class MumatecTaskManager {
         if ('Notification' in window && Notification.permission === 'granted') {
             new Notification(title, {
                 body,
-                icon: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">📋</text></svg>'
+                icon: 'https://fonts.gstatic.com/s/i/materialicons/assignment/v1/24px.svg'
             });
         }
     }
