@@ -68,9 +68,10 @@ body {
 /* App Container */
 .app-container {
     display: flex;
-    height: 100vh;
+    height: calc(100vh - var(--top-bar-height));
     width: 100vw;
     position: relative;
+    margin-top: var(--top-bar-height);
 }
 
 /* Sidebar */
@@ -256,6 +257,10 @@ body {
 
 /* Top Bar */
 .top-bar {
+    position: sticky;
+    top: 0;
+    left: 0;
+    width: 100%;
     height: var(--top-bar-height);
     background: var(--background);
     border-bottom: 1px solid var(--border);
@@ -264,6 +269,11 @@ body {
     justify-content: space-between;
     padding: 0 24px;
     gap: 24px;
+    z-index: 1000;
+}
+
+.top-bar.sticky-active {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
 }
 
 .top-bar-left {
