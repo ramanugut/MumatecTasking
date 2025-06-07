@@ -11,6 +11,7 @@
     <!-- Sticky Header -->
     <header class="top-bar" id="mainHeader">
         <div class="top-bar-left">
+            <button id="sidebarToggle" class="action-btn secondary" aria-label="Toggle navigation menu" aria-expanded="true">☰</button>
             <h1 class="page-title" id="pageTitle">Dashboard</h1>
 
         </div>
@@ -60,22 +61,22 @@
 
             <div class="sidebar-nav">
                 <div class="nav-section">
-                    <div class="nav-item active" data-view="dashboard">
+                    <div class="nav-item active" data-view="dashboard" aria-label="Dashboard">
                         <span class="nav-icon">🏠</span>
                         <span class="nav-label">Dashboard</span>
                         <span class="nav-count" id="dashboardCount">0</span>
                     </div>
-                    <div class="nav-item" data-view="today">
+                    <div class="nav-item" data-view="today" aria-label="Today">
                         <span class="nav-icon">📅</span>
                         <span class="nav-label">Today</span>
                         <span class="nav-count" id="todayCount">0</span>
                     </div>
-                    <div class="nav-item" data-view="upcoming">
+                    <div class="nav-item" data-view="upcoming" aria-label="Upcoming">
                         <span class="nav-icon">⏰</span>
                         <span class="nav-label">Upcoming</span>
                         <span class="nav-count" id="upcomingCount">0</span>
                     </div>
-                    <div class="nav-item" data-view="completed">
+                    <div class="nav-item" data-view="completed" aria-label="Completed">
                         <span class="nav-icon">✅</span>
                         <span class="nav-label">Completed</span>
                         <span class="nav-count" id="completedNavCount">0</span>
@@ -86,17 +87,17 @@
 
                 <div class="nav-section">
                     <div class="nav-section-title">Projects</div>
-                    <div class="nav-item" data-filter="Work">
+                    <div class="nav-item" data-filter="Work" aria-label="Work">
                         <span class="nav-icon">💼</span>
                         <span class="nav-label">Work</span>
                         <span class="nav-count" id="workCount">0</span>
                     </div>
-                    <div class="nav-item" data-filter="Personal">
+                    <div class="nav-item" data-filter="Personal" aria-label="Personal">
                         <span class="nav-icon">🏠</span>
                         <span class="nav-label">Personal</span>
                         <span class="nav-count" id="personalCount">0</span>
                     </div>
-                    <div class="nav-item" data-filter="Development">
+                    <div class="nav-item" data-filter="Development" aria-label="Development">
                         <span class="nav-icon">💻</span>
                         <span class="nav-label">Development</span>
                         <span class="nav-count" id="devCount">0</span>
@@ -106,11 +107,11 @@
                 <div class="nav-divider"></div>
 
                 <div class="nav-section">
-                    <div class="nav-item" onclick="todoApp.openQuickCapture()">
+                    <div class="nav-item" onclick="todoApp.openQuickCapture()" aria-label="Quick Capture">
                         <span class="nav-icon">⚡</span>
                         <span class="nav-label">Quick Capture</span>
                     </div>
-                    <div class="nav-item" onclick="todoApp.exportToCSV()">
+                    <div class="nav-item" onclick="todoApp.exportToCSV()" aria-label="Export Data">
                         <span class="nav-icon">📤</span>
                         <span class="nav-label">Export Data</span>
                     </div>

@@ -42,6 +42,8 @@
     
     /* Layout */
     --sidebar-width: 280px;
+    --sidebar-collapsed-width: 60px;
+    --sidebar-transition: width 0.3s ease;
     --top-bar-height: 72px;
     --border-radius: 12px;
     --border-radius-sm: 8px;
@@ -82,6 +84,20 @@ body {
     display: flex;
     flex-direction: column;
     overflow: hidden;
+    transition: var(--sidebar-transition);
+}
+
+.sidebar.collapsed {
+    width: var(--sidebar-collapsed-width);
+}
+
+.sidebar.collapsed .logo-text,
+.sidebar.collapsed .user-details,
+.sidebar.collapsed .nav-label,
+.sidebar.collapsed .nav-count,
+.sidebar.collapsed .nav-section-title,
+.sidebar.collapsed .productivity-text {
+    display: none;
 }
 
 .sidebar-header {
@@ -279,6 +295,9 @@ body {
 .top-bar-left {
     flex: 1;
     min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: 12px;
 }
 
 .page-title {

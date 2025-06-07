@@ -19,7 +19,9 @@ class MumatecTaskManager {
     async init() {
         await this.loadTasks();
         this.loadTheme();
+        this.loadSidebarState();
         this.setupEventListeners();
+        this.setupSidebarToggle();
         this.setupDragAndDrop();
         this.setupKeyboardShortcuts();
         this.requestNotificationPermission();
@@ -1158,6 +1160,37 @@ class MumatecTaskManager {
         const btn = document.getElementById('themeToggle');
         if (btn) {
             btn.textContent = document.body.classList.contains('dark-mode') ? '☀️' : '🌙';
+        }
+    }
+
+    // Sidebar collapse state
+    loadSidebarState() {
+        const collapsed = localStorage.getItem('sidebarCollapsed') === 'true';
+        const sidebar = document.querySelector('.sidebar');
+        if (sidebar && collapsed) {
+            sidebar.classList.add('collapsed');
+        }
+        const btn = document.getElementById('sidebarToggle');
+        if (btn) {
+            btn.setAttribute('aria-expanded', String(!collapsed));
+        }
+    }
+
+    setupSidebarToggle() {
+        const btn = document.getElementById('sidebarToggle');
+        if (btn) {
+            btn.addEventListener('click', () => this.toggleSidebar());
+        }
+    }
+
+    toggleSidebar() {
+        const sidebar = document.querySelector('.sidebar');
+        if (!sidebar) return;
+        const collapsed = sidebar.classList.toggle('collapsed');
+        localStorage.setItem('sidebarCollapsed', collapsed);
+        const btn = document.getElementById('sidebarToggle');
+        if (btn) {
+            btn.setAttribute('aria-expanded', String(!collapsed));
         }
     }
 }
