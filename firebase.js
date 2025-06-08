@@ -3,6 +3,7 @@ import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.9.0/firebas
 import { getAuth } from 'https://www.gstatic.com/firebasejs/11.9.0/firebase-auth.js';
 import { getFirestore, enableIndexedDbPersistence } from 'https://www.gstatic.com/firebasejs/11.9.0/firebase-firestore.js';
 import { getFunctions } from 'https://www.gstatic.com/firebasejs/11.9.0/firebase-functions.js';
+import { getDatabase, ref, onDisconnect, set } from 'https://www.gstatic.com/firebasejs/11.9.0/firebase-database.js';
 
 
 export const firebaseConfig = {
@@ -20,6 +21,7 @@ const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 export const db = getFirestore(app);
 export const functions = getFunctions(app);
+export const rtdb = getDatabase(app);
 
 // Enable offline persistence for Firestore
 enableIndexedDbPersistence(db).catch((err) => {
@@ -30,3 +32,11 @@ enableIndexedDbPersistence(db).catch((err) => {
 window.auth = auth;
 window.db = db;
 window.functions = functions;
+window.rtdb = rtdb;
+
+export function initPresence(uid) {
+  if (!uid) return;
+  const userRef = ref(rtdb, `presence/${uid}`);
+  set(userRef, { state: 'online', lastChanged: Date.now() });
+  onDisconnect(userRef).set({ state: 'offline', lastChanged: Date.now() });
+}
