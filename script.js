@@ -15,6 +15,7 @@ class MumatecTaskManager {
         this.samplePushed = false;
         this.customTypes = [];
         this.users = [];
+        this.userMap = {};
         
         this.init();
     }
@@ -124,9 +125,12 @@ class MumatecTaskManager {
         try {
             const snap = await getDocs(collection(db, 'users'));
             this.users = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+            this.userMap = {};
+            this.users.forEach(u => { this.userMap[u.id] = u; });
         } catch (e) {
             console.warn('Failed to load users', e);
             this.users = [];
+            this.userMap = {};
         }
         this.populateAssigneeDatalist();
     }
@@ -295,17 +299,16 @@ class MumatecTaskManager {
 
     // UI Management
     updateUI() {
-        this.updateStats();
-        this.updateNavigationCounts();
-        this.updateProductivityRing();
+        const stats = this.getTaskStats();
+        this.updateStats(stats);
+        this.updateNavigationCounts(stats);
+        this.updateProductivityRing(stats);
         this.renderCurrentView();
         this.updateInsights();
     }
 
-    updateStats() {
-        const total = this.tasks.length;
-        const completed = this.tasks.filter(t => t.status === 'done').length;
-        const inProgress = this.tasks.filter(t => t.status === 'inprogress').length;
+    updateStats(stats) {
+        const { total, completed, inProgress } = stats;
         const streak = this.calculateStreak();
 
         document.getElementById('totalTasks').textContent = total;
@@ -314,36 +317,20 @@ class MumatecTaskManager {
         document.getElementById('streakDays').textContent = streak;
     }
 
-    updateNavigationCounts() {
-        const today = new Date().toDateString();
-        const todayTasks = this.tasks.filter(t => {
-            return t.dueDate && new Date(t.dueDate).toDateString() === today;
-        }).length;
+    updateNavigationCounts(stats) {
+        const { today, upcoming, completed, categories } = stats;
 
-        const upcomingTasks = this.tasks.filter(t => {
-            return t.dueDate && new Date(t.dueDate) > new Date() && 
-                   new Date(t.dueDate).toDateString() !== today;
-        }).length;
-
-        const completedTasks = this.tasks.filter(t => t.status === 'done').length;
-        
-        const workTasks = this.tasks.filter(t => t.category === 'Work').length;
-        const personalTasks = this.tasks.filter(t => t.category === 'Personal').length;
-        const devTasks = this.tasks.filter(t => t.category === 'Development').length;
-
-        document.getElementById('dashboardCount').textContent = this.tasks.length;
-        document.getElementById('todayCount').textContent = todayTasks;
-        document.getElementById('upcomingCount').textContent = upcomingTasks;
-        document.getElementById('completedNavCount').textContent = completedTasks;
-        document.getElementById('workCount').textContent = workTasks;
-        document.getElementById('personalCount').textContent = personalTasks;
-        document.getElementById('devCount').textContent = devTasks;
+        document.getElementById('dashboardCount').textContent = stats.total;
+        document.getElementById('todayCount').textContent = today;
+        document.getElementById('upcomingCount').textContent = upcoming;
+        document.getElementById('completedNavCount').textContent = completed;
+        document.getElementById('workCount').textContent = categories['Work'] || 0;
+        document.getElementById('personalCount').textContent = categories['Personal'] || 0;
+        document.getElementById('devCount').textContent = categories['Development'] || 0;
     }
 
-    updateProductivityRing() {
-        const completed = this.tasks.filter(t => t.status === 'done').length;
-        const total = this.tasks.length;
-        const percentage = total > 0 ? Math.round((completed / total) * 100) : 0;
+    updateProductivityRing(stats) {
+        const percentage = stats.total > 0 ? Math.round((stats.completed / stats.total) * 100) : 0;
         
         const ring = document.getElementById('progressRing');
         const circumference = 2 * Math.PI * 25; // radius = 25
@@ -455,7 +442,7 @@ class MumatecTaskManager {
             ? `<div class="task-tags">${task.tags.map(tag => `<span class="task-tag">${this.escapeHtml(tag)}</span>`).join('')}</div>`
             : '';
 
-        const assignee = this.users.find(u => u.id === task.assignedTo);
+        const assignee = this.userMap[task.assignedTo];
         const avatar = assignee && assignee.photoURL ? `<img src="${assignee.photoURL}" class="task-avatar" alt="${this.escapeHtml(assignee.displayName || '')}">` : '';
 
         taskDiv.innerHTML = `
@@ -665,7 +652,7 @@ class MumatecTaskManager {
         document.getElementById('taskDueDate').value = task.dueDate || '';
         document.getElementById('taskCategory').value = task.category || '';
         document.getElementById('taskType').value = task.type || '';
-        const assignee = this.users.find(u => u.id === task.assignedTo);
+        const assignee = this.userMap[task.assignedTo];
         document.getElementById('taskAssignee').value = assignee ? (assignee.displayName || assignee.email) : '';
         document.getElementById('taskDependencies').value = (task.dependencies || []).join(', ');
         document.getElementById('taskEstimate').value = task.estimate || 0;
@@ -763,6 +750,35 @@ class MumatecTaskManager {
         }
 
         return filtered;
+    }
+
+    getTaskStats() {
+        const stats = {
+            total: this.tasks.length,
+            completed: 0,
+            inProgress: 0,
+            today: 0,
+            upcoming: 0,
+            categories: {}
+        };
+
+        const todayStr = new Date().toDateString();
+        const now = new Date();
+
+        for (const t of this.tasks) {
+            if (t.status === 'done') stats.completed++;
+            if (t.status === 'inprogress') stats.inProgress++;
+            if (t.category) {
+                stats.categories[t.category] = (stats.categories[t.category] || 0) + 1;
+            }
+            if (t.dueDate) {
+                const due = new Date(t.dueDate);
+                if (due.toDateString() === todayStr) stats.today++;
+                else if (due > now && due.toDateString() !== todayStr) stats.upcoming++;
+            }
+        }
+
+        return stats;
     }
 
     getWeeklyData() {
@@ -866,9 +882,18 @@ class MumatecTaskManager {
         return div.innerHTML;
     }
 
+    debounce(fn, delay = 300) {
+        let timeout;
+        return (...args) => {
+            clearTimeout(timeout);
+            timeout = setTimeout(() => fn.apply(this, args), delay);
+        };
+    }
+
     lookupUserId(display) {
-        const user = this.users.find(u => (u.displayName || u.email) === display);
-        return user ? user.id : null;
+        const userEntry = Object.values(this.userMap).find(u =>
+            (u.displayName || u.email) === display);
+        return userEntry ? userEntry.id : null;
     }
 
     collectNewComment() {
@@ -903,10 +928,10 @@ class MumatecTaskManager {
         });
 
         // Search
-        document.getElementById('searchInput').addEventListener('input', (e) => {
+        document.getElementById('searchInput').addEventListener('input', this.debounce((e) => {
             this.searchTerm = e.target.value.trim();
             this.updateUI();
-        });
+        }, 300));
 
         // Form submission
         document.getElementById('taskForm').addEventListener('submit', (e) => {
