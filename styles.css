@@ -542,13 +542,15 @@ body {
 
 /* Kanban Board */
 .kanban-container {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(var(--kanban-column-width), 1fr));
+    display: flex;
+    flex-wrap: nowrap;
     gap: 24px;
     height: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
     align-items: flex-start;
-    width: 100%;
     padding-bottom: 8px;
+    width: max-content;
 }
 
 .kanban-column {
@@ -558,7 +560,7 @@ body {
     display: flex;
     flex-direction: column;
     overflow: hidden;
-    flex: 1 1 var(--kanban-column-width);
+    flex: 0 0 var(--kanban-column-width);
     min-width: var(--kanban-column-width);
     position: relative;
     box-shadow: 0 1px 3px var(--shadow);
@@ -1377,12 +1379,14 @@ body {
     }
     
     .kanban-container {
-        grid-template-columns: 1fr;
+        flex-direction: column;
+        overflow-x: hidden;
         gap: 12px;
         width: 100%;
     }
     .kanban-column {
-        min-width: 0;
+        flex-basis: 100%;
+        min-width: auto;
         width: 100%;
     }
     .kanban-column:not(:last-child)::after {
@@ -1521,7 +1525,7 @@ body.dark-mode {
   }
 
   .kanban-column {
-    flex: 1 1 var(--kanban-column-width);
+    flex: 0 0 var(--kanban-column-width);
     min-width: var(--kanban-column-width);
   }
 
