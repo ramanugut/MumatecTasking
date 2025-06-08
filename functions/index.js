@@ -333,3 +333,78 @@ exports.getTeamWorkload = functions.https.onCall(async (data, context) => {
   }
   return { workload };
 });
+
+// Advanced admin settings
+exports.updateSettings = functions.https.onCall(async (data, context) => {
+  await checkAdmin(context.auth.uid);
+  const { section, settings } = data;
+  if (!section) throw new functions.https.HttpsError('invalid-argument', 'Missing section');
+  await admin.firestore().doc(`settings/${section}`).set(settings || {}, { merge: true });
+  await logAudit(context.auth.uid, 'updateSettings', null, { section });
+  return { ok: true };
+});
+
+exports.getSettings = functions.https.onCall(async (data, context) => {
+  await checkAdmin(context.auth.uid);
+  const { section } = data;
+  if (!section) throw new functions.https.HttpsError('invalid-argument', 'Missing section');
+  const snap = await admin.firestore().doc(`settings/${section}`).get();
+  return { settings: snap.exists ? snap.data() : null };
+});
+
+const crypto = require('crypto');
+
+exports.createApiKey = functions.https.onCall(async (data, context) => {
+  await checkAdmin(context.auth.uid);
+  const key = crypto.randomBytes(16).toString('hex');
+  const ref = await admin.firestore().collection('apiKeys').add({
+    key,
+    createdBy: context.auth.uid,
+    createdAt: admin.firestore.FieldValue.serverTimestamp()
+  });
+  await logAudit(context.auth.uid, 'createApiKey', ref.id);
+  return { id: ref.id, key };
+});
+
+exports.revokeApiKey = functions.https.onCall(async (data, context) => {
+  await checkAdmin(context.auth.uid);
+  const { id } = data;
+  if (!id) throw new functions.https.HttpsError('invalid-argument', 'Missing id');
+  await admin.firestore().collection('apiKeys').doc(id).delete();
+  await logAudit(context.auth.uid, 'revokeApiKey', id);
+  return { ok: true };
+});
+
+exports.listApiKeys = functions.https.onCall(async (data, context) => {
+  await checkAdmin(context.auth.uid);
+  const snap = await admin.firestore().collection('apiKeys').get();
+  const keys = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  return { keys };
+});
+
+exports.exportUserData = functions.https.onCall(async (data, context) => {
+  await checkAdmin(context.auth.uid);
+  const { email } = data || {};
+  let query;
+  if (email) {
+    query = await admin.firestore().collection('users').where('email', '==', email).limit(1).get();
+    if (query.empty) throw new functions.https.HttpsError('not-found', 'User not found');
+  }
+  const usersSnap = email ? query : await admin.firestore().collection('users').get();
+  const result = [];
+  for (const docSnap of usersSnap.docs) {
+    const userId = docSnap.id;
+    const data = docSnap.data();
+    const tasksSnap = await admin.firestore().collection(`users/${userId}/tasks`).get();
+    const tasks = tasksSnap.docs.map(t => ({ id: t.id, ...t.data() }));
+    result.push({ id: userId, ...data, tasks });
+  }
+  return result;
+});
+
+exports.exportAuditLogs = functions.https.onCall(async (data, context) => {
+  await checkAdmin(context.auth.uid);
+  const snap = await admin.firestore().collection('auditLogs').orderBy('timestamp', 'desc').limit(1000).get();
+  const logs = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  return { logs };
+});

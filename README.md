@@ -34,6 +34,13 @@ Admins can now:
 - View audit logs of all admin actions
 - Manage teams, projects and client assignments
 
+### Advanced Admin Features
+
+Admins can also configure organization branding and domain restrictions, set
+security policies like password requirements and session timeouts, manage API
+keys and webhooks, export user data for backups, and handle GDPR data requests
+along with audit log exports.
+
 ### User profile features
 
 The profile page now supports avatar upload with cropping and extended details
