@@ -50,7 +50,10 @@ onAuthStateChanged(auth, async (user) => {
     deptEl.value = data.department || '';
     phoneEl.value = data.phone || '';
     tzEl.value = data.timezone || '';
-    skillsEl.value = (data.skills || []).join(', ');
+    const skillVals = data.skills || [];
+    Array.from(skillsEl.options).forEach(opt => {
+      opt.selected = skillVals.includes(opt.value);
+    });
     statusEl.value = data.status || 'online';
     emailNotifEl.checked = data.notifications?.email !== false;
     pushNotifEl.checked = data.notifications?.push || false;
@@ -105,7 +108,7 @@ document.getElementById('profileForm').addEventListener('submit', async (e) => {
   if (cropper) {
     photoURL = await uploadAvatar(user.uid);
   }
-  const skillsArr = skillsEl.value.split(',').map(s => s.trim()).filter(Boolean);
+  const skillsArr = Array.from(skillsEl.selectedOptions).map(o => o.value);
   try {
     await updateProfile(user, { displayName: name, photoURL: photoURL || user.photoURL || null });
     await setDoc(doc(db, 'users', user.uid), {
