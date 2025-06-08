@@ -61,7 +61,7 @@ onAuthStateChanged(auth, async (user) => {
     }
     try {
       const logLogin = httpsCallable(functions, 'logUserLogin');
-      logLogin();
+      await logLogin();
     } catch (e) {
       console.error('Failed to log login', e);
     }
