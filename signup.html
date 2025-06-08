@@ -6,37 +6,59 @@
   <title>Sign Up - Mumatec Tasking</title>
   <link rel="stylesheet" href="styles.css">
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-  <style>
-    body { display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; }
-    .login-container { width: 320px; max-width: 95%; padding: 20px; border: 1px solid #ccc; border-radius: 6px; background: #fff; }
-    .login-container h2 { text-align: center; margin-bottom: 1rem; }
-    .login-container input, .login-container select { width: 100%; padding: 0.5rem; margin-bottom: 1rem; }
-    .login-container button { width: 100%; padding: 0.5rem; }
-    .error { color: red; text-align: center; margin-top: 0.5rem; }
-  </style>
 </head>
-<body>
-  <div class="login-container">
+<body class="auth-page">
+  <div class="auth-container">
     <h2>Create Account</h2>
     <form id="signupForm">
-      <input type="text" id="name" placeholder="Name" required />
-      <input type="email" id="email" placeholder="Email" required />
-      <input type="password" id="password" placeholder="Password" required />
-      <input type="text" id="photoURL" placeholder="Profile picture URL (optional)" />
-      <input type="text" id="jobTitle" placeholder="Job title" />
-      <input type="text" id="department" placeholder="Department" />
-      <input type="tel" id="phone" placeholder="Phone" />
-      <input type="text" id="timezone" placeholder="Timezone" />
-      <input type="text" id="skills" placeholder="Skills (comma separated)" />
-      <select id="status">
+      <div class="form-field">
+        <label for="name">Name</label>
+        <input type="text" id="name" required />
+      </div>
+      <div class="form-field">
+        <label for="email">Email</label>
+        <input type="email" id="email" required />
+      </div>
+      <div class="form-field">
+        <label for="password">Password</label>
+        <input type="password" id="password" required />
+      </div>
+      <div class="form-field">
+        <label for="photoURL">Profile picture URL (optional)</label>
+        <input type="text" id="photoURL" />
+      </div>
+      <div class="form-field">
+        <label for="jobTitle">Job title</label>
+        <input type="text" id="jobTitle" />
+      </div>
+      <div class="form-field">
+        <label for="department">Department</label>
+        <input type="text" id="department" />
+      </div>
+      <div class="form-field">
+        <label for="phone">Phone</label>
+        <input type="tel" id="phone" />
+      </div>
+      <div class="form-field">
+        <label for="timezone">Timezone</label>
+        <input type="text" id="timezone" />
+      </div>
+      <div class="form-field">
+        <label for="skills">Skills (comma separated)</label>
+        <input type="text" id="skills" />
+      </div>
+      <div class="form-field">
+        <label for="status">Status</label>
+        <select id="status">
         <option value="online">Online</option>
         <option value="offline">Offline</option>
         <option value="away">Away</option>
         <option value="busy">Busy</option>
       </select>
+      </div>
       <label><input type="checkbox" id="emailNotif" checked /> Email notifications</label>
       <label><input type="checkbox" id="pushNotif" /> Push notifications</label>
-      <button type="submit">Sign Up</button>
+      <button type="submit" class="action-btn primary">Sign Up</button>
       <div id="error" class="error"></div>
     </form>
     <p style="text-align:center;margin-top:0.5rem;">
