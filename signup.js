@@ -1,5 +1,5 @@
 import { auth, db } from './firebase.js';
-import { createUserWithEmailAndPassword } from 'https://www.gstatic.com/firebasejs/11.9.0/firebase-auth.js';
+import { createUserWithEmailAndPassword, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/11.9.0/firebase-auth.js';
 import { doc, setDoc } from 'https://www.gstatic.com/firebasejs/11.9.0/firebase-firestore.js';
 
 document.getElementById('signupForm').addEventListener('submit', async (e) => {
@@ -31,10 +31,17 @@ document.getElementById('signupForm').addEventListener('submit', async (e) => {
       skills,
       status,
       role: 'client',
+      onboarded: false,
       notifications: { email: emailNotif, push: pushNotif }
     });
-    window.location.href = 'index.html';
+    window.location.href = 'client-onboarding.html';
   } catch (err) {
     errorEl.textContent = err.message;
+  }
+});
+
+onAuthStateChanged(auth, (user) => {
+  if (user) {
+    window.location.href = 'index.html';
   }
 });
