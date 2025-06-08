@@ -42,7 +42,7 @@
     
     /* Layout */
     --sidebar-width: 280px;
-    --sidebar-transition: width 0.3s ease;
+    --sidebar-transition: transform 0.3s ease, width 0.3s ease;
     --top-bar-height: 72px;
     --border-radius: 12px;
     --border-radius-sm: 8px;
@@ -1337,7 +1337,6 @@ body {
 
 @media (max-width: 768px) {
     :root {
-        --sidebar-width: 0px;
         --top-bar-height: 60px;
     }
     
