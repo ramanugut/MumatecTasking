@@ -1,6 +1,6 @@
 import { auth } from './firebase.js';
 
-import { signInWithEmailAndPassword } from 'https://www.gstatic.com/firebasejs/11.9.0/firebase-auth.js';
+import { signInWithEmailAndPassword, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/11.9.0/firebase-auth.js';
 
 
 document.getElementById('loginForm').addEventListener('submit', async (e) => {
@@ -16,5 +16,11 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
 
   } catch (err) {
     errorEl.textContent = err.message;
+  }
+});
+
+onAuthStateChanged(auth, (user) => {
+  if (user) {
+    window.location.href = 'index.html';
   }
 });
