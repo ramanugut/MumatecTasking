@@ -51,5 +51,13 @@ The application defines the following roles:
 - **client** – view only their own projects.
 - **guest** – limited read-only access.
 
+### Custom Role Builder
+
+Administrators can define additional roles with granular permissions using the new
+**Custom Role Builder** available from the admin panel. Roles can specify
+Create/Read/Update/Delete rights for Projects, Tasks, Users, Reports, Settings,
+Billing and Client Data. Resource level access can be limited to specific
+projects or clients and features may be toggled on or off per role.
+
 ## Workflow Documentation
 For an overview of task statuses, priorities, and categories, see [WORKFLOW.md](./WORKFLOW.md).
