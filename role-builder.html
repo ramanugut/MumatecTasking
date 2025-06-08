@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Custom Role Builder</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    body { padding:20px; }
+    table { width:100%; border-collapse:collapse; margin-top:1rem; }
+    th, td { border:1px solid #ccc; padding:6px; text-align:left; }
+    td.center { text-align:center; }
+  </style>
+</head>
+<body>
+  <h2>Create Custom Role</h2>
+  <input id="roleName" type="text" placeholder="Role name" />
+  <button id="createRole">Create</button>
+
+  <div id="roleEditor" style="display:none;">
+    <h3 id="editorTitle"></h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Resource</th>
+          <th class="center">Create</th>
+          <th class="center">Read</th>
+          <th class="center">Update</th>
+          <th class="center">Delete</th>
+          <th class="center">Feature Enabled</th>
+        </tr>
+      </thead>
+      <tbody id="permTable"></tbody>
+    </table>
+
+    <h4>Resource Access</h4>
+    <label>Projects: <input id="projectsAccess" placeholder="project IDs comma separated"></label><br>
+    <label>Clients: <input id="clientsAccess" placeholder="client IDs comma separated"></label><br>
+    <button id="saveRole">Save Role</button>
+  </div>
+
+  <h3>Existing Roles</h3>
+  <ul id="roleList"></ul>
+
+  <script type="module">
+    import { RoleBuilder, FEATURES, ACTIONS } from './role-builder.js';
+    const rb = new RoleBuilder();
+    const roleNameInput = document.getElementById('roleName');
+    const createBtn = document.getElementById('createRole');
+    const editor = document.getElementById('roleEditor');
+    const editorTitle = document.getElementById('editorTitle');
+    const permTable = document.getElementById('permTable');
+    const projectsInput = document.getElementById('projectsAccess');
+    const clientsInput = document.getElementById('clientsAccess');
+    const roleList = document.getElementById('roleList');
+    let currentRole = null;
+
+    function renderRoles() {
+      roleList.innerHTML = '';
+      rb.getAllRoles().forEach(r => {
+        const li = document.createElement('li');
+        const btn = document.createElement('button');
+        btn.textContent = 'Edit';
+        btn.onclick = () => editRole(r.name);
+        li.textContent = r.name + ' ';
+        li.appendChild(btn);
+        roleList.appendChild(li);
+      });
+    }
+
+    function editRole(name) {
+      currentRole = rb.getRole(name);
+      if (!currentRole) return;
+      editor.style.display = 'block';
+      editorTitle.textContent = name;
+      permTable.innerHTML = '';
+      FEATURES.forEach(res => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td>${res}</td>` + ACTIONS.map(a => `<td class="center"><input type="checkbox" data-res="${res}" data-act="${a}"></td>`).join('') + `<td class="center"><input type="checkbox" data-feature="${res}"></td>`;
+        permTable.appendChild(tr);
+      });
+      // populate existing values
+      FEATURES.forEach(res => {
+        ACTIONS.forEach(a => {
+          const cb = permTable.querySelector(`[data-res="${res}"][data-act="${a}"]`);
+          if (cb && currentRole.permissions[res]) {
+            cb.checked = !!currentRole.permissions[res][a];
+          }
+        });
+        const fcb = permTable.querySelector(`[data-feature="${res}"]`);
+        if (fcb) fcb.checked = !!currentRole.features[res];
+      });
+      projectsInput.value = currentRole.access.projects.join(',');
+      clientsInput.value = currentRole.access.clients.join(',');
+    }
+
+    createBtn.onclick = () => {
+      const name = roleNameInput.value.trim();
+      if (!name) return;
+      if (!rb.createRole(name)) {
+        alert('Role already exists');
+        return;
+      }
+      roleNameInput.value = '';
+      renderRoles();
+      editRole(name);
+    };
+
+    document.getElementById('saveRole').onclick = () => {
+      if (!currentRole) return;
+      FEATURES.forEach(res => {
+        ACTIONS.forEach(a => {
+          const cb = permTable.querySelector(`[data-res="${res}"][data-act="${a}"]`);
+          rb.setPermission(currentRole.name, res, a, cb.checked);
+        });
+        const fcb = permTable.querySelector(`[data-feature="${res}"]`);
+        rb.toggleFeature(currentRole.name, res, fcb.checked);
+      });
+      rb.setResourceAccess(currentRole.name, 'projects', projectsInput.value.split(',').map(v => v.trim()).filter(v => v));
+      rb.setResourceAccess(currentRole.name, 'clients', clientsInput.value.split(',').map(v => v.trim()).filter(v => v));
+      renderRoles();
+      alert('Role saved');
+    };
+
+    renderRoles();
+  </script>
+</body>
+</html>
