@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Invite User</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="container">
+    <h1>Invite User</h1>
+    <form id="inviteForm">
+      <label>Email <input type="email" id="inviteEmail" required></label><br>
+      <label>Display Name <input type="text" id="inviteName"></label><br>
+      <label>Role
+        <select id="inviteRole">
+          <option value="guest">guest</option>
+          <option value="client">client</option>
+          <option value="developer">developer</option>
+          <option value="designer">designer</option>
+          <option value="projectManager">projectManager</option>
+          <option value="teamLead">teamLead</option>
+          <option value="admin">admin</option>
+        </select>
+      </label><br>
+      <label>Expiration (days, optional) <input type="number" id="inviteDays" min="1"></label>
+      <button type="submit">Send Invite</button>
+    </form>
+    <pre id="inviteResult"></pre>
+  </div>
+  <script type="module" src="invite.js"></script>
+</body>
+</html>

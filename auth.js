@@ -17,6 +17,19 @@ onAuthStateChanged(auth, async (user) => {
         docData = snap.data();
         role = docData.role || null;
         if (!name) name = docData.displayName || docData.name || '';
+        if (docData.guestExpiresAt && docData.guestExpiresAt.toDate() < new Date()) {
+          alert('Your temporary access has expired.');
+          await signOut(auth);
+          return;
+        }
+        if (docData.onboarded === false && !location.pathname.endsWith('onboarding.html') && !location.pathname.endsWith('client-onboarding.html')) {
+          if (role === 'client') {
+            window.location.href = 'client-onboarding.html';
+          } else {
+            window.location.href = 'onboarding.html';
+          }
+          return;
+        }
       }
     } catch (e) {
       console.error('Failed to fetch user role', e);

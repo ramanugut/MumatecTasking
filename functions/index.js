@@ -198,6 +198,31 @@ exports.bulkInviteUsers = functions.https.onCall(async (data, context) => {
   return { results };
 });
 
+// Invite a single user and optionally set an expiration for guest access.
+exports.inviteUser = functions.https.onCall(async (data, context) => {
+  await checkAdmin(context.auth.uid);
+  const { email, displayName, role, expiresAt } = data;
+  if (!email) {
+    throw new functions.https.HttpsError('invalid-argument', 'Missing email');
+  }
+  const record = await admin.auth().createUser({ email, displayName: displayName || '' });
+  const userData = {
+    email,
+    displayName: displayName || '',
+    role: ALLOWED_ROLES.includes(role) ? role : 'guest',
+    createdAt: admin.firestore.FieldValue.serverTimestamp(),
+    onboarded: false,
+  };
+  if (expiresAt) {
+    userData.guestExpiresAt = admin.firestore.Timestamp.fromMillis(expiresAt);
+  }
+  await admin.firestore().doc(`users/${record.uid}`).set(userData);
+  await admin.auth().setCustomUserClaims(record.uid, { role: userData.role });
+  const link = await admin.auth().generatePasswordResetLink(email);
+  await logAudit(context.auth.uid, 'invite', record.uid, { email });
+  return { link };
+});
+
 exports.logUserLogin = functions.https.onCall(async (data, context) => {
   if (!context.auth) throw new functions.https.HttpsError('unauthenticated');
   const uid = context.auth.uid;
