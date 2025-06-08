@@ -57,7 +57,7 @@
     --transition-bounce: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
 
     /* Kanban */
-    --kanban-column-width: 280px;
+    --kanban-column-width: 320px;
     --status-todo: var(--gray-300);
     --status-inprogress: var(--warning-orange);
     --status-review: var(--purple);
@@ -542,15 +542,13 @@ body {
 
 /* Kanban Board */
 .kanban-container {
-    display: flex;
-    flex-wrap: nowrap;
-    gap: 16px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(var(--kanban-column-width), 1fr));
+    gap: 24px;
     height: 100%;
-    overflow-x: auto;
-    overflow-y: hidden;
     align-items: flex-start;
+    width: 100%;
     padding-bottom: 8px;
-    width: max-content;
 }
 
 .kanban-column {
@@ -560,7 +558,7 @@ body {
     display: flex;
     flex-direction: column;
     overflow: hidden;
-    flex: 0 0 var(--kanban-column-width);
+    flex: 1 1 var(--kanban-column-width);
     min-width: var(--kanban-column-width);
     position: relative;
     box-shadow: 0 1px 3px var(--shadow);
@@ -629,6 +627,9 @@ body {
     transition: var(--transition);
     position: relative;
     box-shadow: 0 1px 3px var(--shadow);
+    display: flex;
+    flex-direction: column;
+    min-height: 160px;
 }
 
 .task-card:hover {
@@ -735,6 +736,7 @@ body {
     flex-wrap: wrap;
     font-size: 11px;
     color: var(--text-tertiary);
+    margin-top: auto;
 }
 
 .task-due {
@@ -1375,14 +1377,12 @@ body {
     }
     
     .kanban-container {
-        flex-direction: column;
-        overflow-x: hidden;
+        grid-template-columns: 1fr;
         gap: 12px;
         width: 100%;
     }
     .kanban-column {
-        flex-basis: 100%;
-        min-width: auto;
+        min-width: 0;
         width: 100%;
     }
     .kanban-column:not(:last-child)::after {
@@ -1522,7 +1522,7 @@ body.dark-mode {
 
   .kanban-column {
     flex: 1 1 var(--kanban-column-width);
-    min-width: 0;
+    min-width: var(--kanban-column-width);
   }
 
   .dashboard-grid {
