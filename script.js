@@ -154,7 +154,7 @@ class MumatecTaskManager {
             status: taskData.status || 'todo',
             dueDate: taskData.dueDate || null,
             category: taskData.category?.trim() || 'Work',
-            type: taskData.type || 'Maintenance',
+            type: taskData.type || 'General',
             tags: this.parseTags(taskData.tags),
             createdAt: new Date().toISOString(),
             updatedAt: new Date().toISOString(),
@@ -180,7 +180,7 @@ class MumatecTaskManager {
             status: taskData.status || 'todo',
             dueDate: taskData.dueDate || null,
             category: taskData.category?.trim() || 'Work',
-            type: taskData.type || 'Maintenance',
+            type: taskData.type || 'General',
             tags: this.parseTags(taskData.tags),
             updatedAt: new Date().toISOString()
         };
@@ -391,7 +391,7 @@ class MumatecTaskManager {
             ${tagsHtml}
             <div class="task-meta">
                 <span class="task-category">${this.escapeHtml(task.category || 'Work')}</span>
-                <span class="task-type">${this.escapeHtml(task.type || 'Maintenance')}</span>
+                <span class="task-type">${this.escapeHtml(task.type || 'General')}</span>
                 ${task.dueDate ? `<span class="task-due ${isOverdue ? 'overdue' : ''}">${dueText}</span>` : ''}
             </div>
         `;
@@ -581,7 +581,7 @@ class MumatecTaskManager {
         document.getElementById('taskStatus').value = task.status;
         document.getElementById('taskDueDate').value = task.dueDate || '';
         document.getElementById('taskCategory').value = task.category || '';
-        document.getElementById('taskType').value = task.type || 'Maintenance';
+        document.getElementById('taskType').value = task.type || '';
         document.getElementById('taskTags').value = task.tags?.join(', ') || '';
         
         const modal = document.getElementById('taskModal');
@@ -605,7 +605,7 @@ class MumatecTaskManager {
         document.getElementById('taskStatus').value = 'todo';
         document.getElementById('taskDueDate').value = '';
         document.getElementById('taskCategory').value = '';
-        document.getElementById('taskType').value = 'Maintenance';
+        document.getElementById('taskType').value = '';
         document.getElementById('taskTags').value = '';
     }
 
@@ -639,7 +639,7 @@ class MumatecTaskManager {
         const title = document.getElementById('quickTaskInput').value.trim();
         if (!title) return;
 
-        this.addTask({ title, status: 'todo', category: 'Work', type: 'Maintenance' });
+        this.addTask({ title, status: 'todo', category: 'Work', type: 'General' });
         this.closeQuickCapture();
     }
 
@@ -1070,7 +1070,7 @@ class MumatecTaskManager {
                 task.status,
                 task.dueDate || '',
                 task.category || '',
-                task.type || 'Maintenance',
+                task.type || 'General',
                 task.tags ? task.tags.join(';') : '',
                 task.createdAt,
                 task.updatedAt || task.createdAt
@@ -1123,7 +1123,7 @@ class MumatecTaskManager {
                             status: this.statuses.includes(values[4]) ? values[4] : 'todo',
                             dueDate: values[5] || null,
                             category: values[6] || 'Work',
-                            type: values[7] || 'Maintenance',
+                            type: values[7] || 'General',
                             tags: values[8] ? values[8].split(';').map(tag => tag.trim()).filter(tag => tag) : [],
                             createdAt: values[9] || new Date().toISOString(),
                             updatedAt: values[10] || new Date().toISOString(),

@@ -374,13 +374,14 @@
                         </div>
                         <div class="form-field">
                             <label>Type</label>
-                            <select id="taskType">
-                                <option value="Maintenance">Maintenance</option>
-                                <option value="User Account Management">User Account Management</option>
-                                <option value="Access Control">Access Control</option>
-                                <option value="Security">Security</option>
-                                <option value="Compliance">Compliance</option>
-                            </select>
+                            <input type="text" id="taskType" list="typeSuggestions" placeholder="e.g., Maintenance">
+                            <datalist id="typeSuggestions">
+                                <option value="Maintenance">
+                                <option value="User Account Management">
+                                <option value="Access Control">
+                                <option value="Security">
+                                <option value="Compliance">
+                            </datalist>
                         </div>
                     </div>
                 </div>
