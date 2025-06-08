@@ -1,7 +1,8 @@
 
-import { auth, db } from './firebase.js';
+import { auth, db, functions } from './firebase.js';
 import { onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/11.9.0/firebase-auth.js';
 import { doc, getDoc } from 'https://www.gstatic.com/firebasejs/11.9.0/firebase-firestore.js';
+import { httpsCallable } from 'https://www.gstatic.com/firebasejs/11.9.0/firebase-functions.js';
 
 
 onAuthStateChanged(auth, async (user) => {
@@ -29,6 +30,12 @@ onAuthStateChanged(auth, async (user) => {
     const adminLink = document.getElementById('adminLink');
     if (adminLink) {
       adminLink.style.display = role === 'admin' ? 'inline-block' : 'none';
+    }
+    try {
+      const logLogin = httpsCallable(functions, 'logUserLogin');
+      logLogin();
+    } catch (e) {
+      console.error('Failed to log login', e);
     }
     if (typeof window.initTodoApp === 'function') {
       window.initTodoApp();

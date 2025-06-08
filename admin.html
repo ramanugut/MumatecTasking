@@ -21,12 +21,35 @@
     <input id="newEmail" type="email" placeholder="Email" />
     <input id="newPassword" type="password" placeholder="Password" />
     <input id="newDisplayName" type="text" placeholder="Display Name" />
+    <select id="newRole">
+      <option value="member">member</option>
+      <option value="admin">admin</option>
+    </select>
     <button id="btnCreateUser">Create User</button>
+    <input type="file" id="userCsv" accept=".csv" />
+    <button id="btnImportCsv">Import CSV</button>
 
     <h3>Existing Users</h3>
+    <input type="text" id="searchUsers" placeholder="Search users..." />
     <table id="userTable">
       <thead>
-        <tr><th>Email</th><th>Name</th><th>Role</th><th>Actions</th></tr>
+        <tr><th><input type="checkbox" id="selectAll"></th><th>Email</th><th>Name</th><th>Role</th><th>Status</th><th>Last Login</th><th>Actions</th></tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+
+    <div id="bulkActions">
+      <select id="bulkRole">
+        <option value="member">member</option>
+        <option value="admin">admin</option>
+      </select>
+      <button id="applyBulkRole">Apply Role</button>
+    </div>
+
+    <h3>Audit Logs</h3>
+    <table id="auditTable">
+      <thead>
+        <tr><th>Timestamp</th><th>Admin</th><th>Action</th><th>Target</th></tr>
       </thead>
       <tbody></tbody>
     </table>

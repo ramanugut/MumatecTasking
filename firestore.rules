@@ -24,5 +24,11 @@ service cloud.firestore {
     match /boards/{boardId} {
       allow read, write: if isAdmin() || (request.auth.uid in resource.data.members);
     }
+
+    match /auditLogs/{logId} {
+      allow read: if isAdmin();
+      allow create: if isAdmin();
+      allow update, delete: if false;
+    }
   }
 }

@@ -26,6 +26,10 @@ Admins can now:
 - Grant or revoke admin rights
 - Edit any user's email or display name
 - Generate password reset links for users
+- Activate or deactivate accounts
+- Impersonate users
+- Bulk update roles and invite users via CSV
+- View audit logs of all admin actions
 
 ### User profile features
 
