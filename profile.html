@@ -6,13 +6,15 @@
   <title>User Profile - Mumatec Tasking</title>
   <link rel="stylesheet" href="styles.css">
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/cropperjs@1.5.13/dist/cropper.min.css" rel="stylesheet">
   <style>
     body { display: flex; align-items: center; justify-content: center; height: 100vh; }
-    .login-container { width: 300px; padding: 20px; border: 1px solid #ccc; border-radius: 6px; background: #fff; }
+    .login-container { width: 320px; padding: 20px; border: 1px solid #ccc; border-radius: 6px; background: #fff; overflow-y:auto; max-height:90vh; }
     .login-container h2 { text-align: center; margin-bottom: 1rem; }
-    .login-container input { width: 100%; padding: 0.5rem; margin-bottom: 1rem; }
+    .login-container input, .login-container select { width: 100%; padding: 0.5rem; margin-bottom: 1rem; }
     .login-container button { width: 100%; padding: 0.5rem; }
     .login-container label { display: block; margin-bottom: 0.5rem; }
+    #avatarPreview { width: 100%; max-height: 200px; margin-bottom:1rem; }
     .error { color: red; text-align: center; margin-top: 0.5rem; }
   </style>
 </head>
@@ -22,13 +24,33 @@
     <form id="profileForm">
       <input type="text" id="name" placeholder="Name" required />
       <input type="email" id="email" placeholder="Email" readonly />
-      <input type="text" id="photoURL" placeholder="Profile picture URL" />
-      <label><input type="checkbox" id="notifications" /> Email notifications</label>
+      <input type="file" id="avatar" accept="image/*" />
+      <img id="avatarPreview" style="display:none;"/>
+      <input type="text" id="jobTitle" placeholder="Job title" />
+      <input type="text" id="department" placeholder="Department" />
+      <input type="tel" id="phone" placeholder="Phone number" />
+      <input type="text" id="timezone" placeholder="Timezone" />
+      <input type="text" id="skills" placeholder="Skills (comma separated)" />
+      <select id="status">
+        <option value="online">Online</option>
+        <option value="offline">Offline</option>
+        <option value="away">Away</option>
+        <option value="busy">Busy</option>
+      </select>
+      <label><input type="checkbox" id="emailNotif" /> Email notifications</label>
+      <label><input type="checkbox" id="pushNotif" /> Push notifications</label>
       <button type="submit">Save</button>
       <div id="msg" class="error"></div>
     </form>
+    <h3>Security</h3>
+    <input type="password" id="newPassword" placeholder="New password" />
+    <input type="password" id="confirmPassword" placeholder="Confirm password" />
+    <button id="changePassword">Change Password</button>
+    <button id="setup2fa">Setup 2FA</button>
+    <div id="sessionInfo"></div>
   </div>
   <script type="module" src="firebase.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/cropperjs@1.5.13/dist/cropper.min.js"></script>
   <script type="module" src="profile.js"></script>
 </body>
 </html>

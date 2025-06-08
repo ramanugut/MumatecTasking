@@ -9,11 +9,14 @@ and always has full rights to manage other users.
 
 1. Serve the files using any static server (e.g. `npx serve`).
 2. Visit `login.html` to sign in with your admin credentials.
-3. After signing in you will be redirected to `index.html` where you can manage your tasks.
+3. After signing in you will be redirected to `index.html` where you can manage
+your tasks.
 
-Firebase is pre-configured with project **mumatectasking**. Update `firebase.js` if you need to change configuration.
+Firebase is pre-configured with project **mumatectasking**. Update `firebase.js`
+ if you need to change configuration.
 
-Tasks are stored in **Firebase Firestore** so they sync across devices. Offline changes are queued and saved once connectivity returns.
+Tasks are stored in **Firebase Firestore** so they sync across devices. Offline
+changes are queued and saved once connectivity returns.
 
 ### Admin features
 
@@ -24,6 +27,12 @@ Admins can now:
 - Edit any user's email or display name
 - Generate password reset links for users
 
+### User profile features
+
+The profile page now supports avatar upload with cropping and extended details
+like job title, phone, timezone, skills, availability status and granular
+notification settings. Password changes are also available from the profile
+screen.
 
 ## Workflow Documentation
 For an overview of task statuses, priorities, and categories, see [WORKFLOW.md](./WORKFLOW.md).
