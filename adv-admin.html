@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Advanced Admin - Mumatec Tasking</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    body { padding:20px; }
+    table { width:100%; border-collapse:collapse; margin-top:1rem; }
+    th, td { border:1px solid #ccc; padding:6px; text-align:left; }
+  </style>
+</head>
+<body>
+  <h2>Advanced Admin Settings</h2>
+  <div id="unauth" class="error" style="display:none;">You are not authorized.</div>
+  <div id="advControls" style="display:none;">
+    <section>
+      <h3>Organization Settings</h3>
+      <input id="orgName" type="text" placeholder="Company name" />
+      <input id="brandColor" type="color" />
+      <input id="domains" type="text" placeholder="Allowed domains (comma separated)" />
+      <button id="saveOrg">Save</button>
+    </section>
+
+    <section>
+      <h3>Security Policies</h3>
+      <input id="minPass" type="number" min="6" placeholder="Min password length" />
+      <input id="sessionTimeout" type="number" min="5" placeholder="Session timeout (minutes)" />
+      <textarea id="allowedIps" placeholder="Allowed IPs, comma separated"></textarea>
+      <button id="saveSecurity">Save</button>
+    </section>
+
+    <section>
+      <h3>Integration Management</h3>
+      <input id="webhook" type="url" placeholder="Webhook URL" />
+      <button id="saveIntegration">Save</button>
+      <h4>API Keys</h4>
+      <button id="newKey">Create Key</button>
+      <table id="keysTable"><thead><tr><th>ID</th><th>Key</th><th></th></tr></thead><tbody></tbody></table>
+    </section>
+
+    <section>
+      <h3>Backup &amp; Data Export</h3>
+      <button id="exportUsers">Export User Data</button>
+    </section>
+
+    <section>
+      <h3>Compliance Tools</h3>
+      <input id="gdprEmail" type="email" placeholder="User email" />
+      <button id="reqGdpr">Request Data</button>
+      <button id="exportAudit">Export Audit Logs</button>
+    </section>
+  </div>
+
+  <script type="module" src="firebase.js"></script>
+  <script type="module" src="adv-admin.js"></script>
+</body>
+</html>
