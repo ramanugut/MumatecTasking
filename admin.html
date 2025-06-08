@@ -68,7 +68,14 @@
     </table>
   </div>
 
+  <div class="notification-container" id="notificationContainer"></div>
+
   <script type="module" src="firebase.js"></script>
   <script type="module" src="admin.js"></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('sw.js');
+    }
+  </script>
 </body>
 </html>

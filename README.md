@@ -34,6 +34,11 @@ Admins can now:
 - View audit logs of all admin actions
 - Manage teams, projects and client assignments
 
+The admin panel is mobile-friendly. Swipe left on a user row to delete and
+swipe right to quickly disable or enable accounts. Push notifications alert
+admins of new user requests, and a service worker caches admin pages for
+offline management.
+
 ### Advanced Admin Features
 
 Admins can also configure organization branding and domain restrictions, set

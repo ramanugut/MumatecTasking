@@ -11,7 +11,8 @@ import {
   collection,
   getDocs,
   doc,
-  getDoc
+  getDoc,
+  onSnapshot
 } from 'https://www.gstatic.com/firebasejs/11.9.0/firebase-firestore.js';
 
 
@@ -37,6 +38,18 @@ const ROLES = [
   'guest'
 ];
 
+function requestNotificationPermission() {
+  if ('Notification' in window && Notification.permission === 'default') {
+    Notification.requestPermission();
+  }
+}
+
+function showSystemNotification(title, body) {
+  if ('Notification' in window && Notification.permission === 'granted') {
+    new Notification(title, { body });
+  }
+}
+
 function renderRoleOptions(selected) {
   return ROLES.map(r => `<option value="${r}" ${selected===r?'selected':''}>${r}</option>`).join('');
 }
@@ -61,6 +74,8 @@ async function loadUsers() {
     const data = docSnap.data();
     if (query && !data.email.toLowerCase().includes(query) && !(data.displayName || '').toLowerCase().includes(query)) return;
     const tr = document.createElement('tr');
+    tr.dataset.uid = docSnap.id;
+    tr.dataset.disabled = !!data.disabled;
     const lastLogin = data.lastLogin ? new Date(data.lastLogin.seconds * 1000).toLocaleString() : '';
     tr.innerHTML = `
       <td><input type="checkbox" data-select="${docSnap.id}"></td>
@@ -110,6 +125,17 @@ onAuthStateChanged(auth, async user => {
   adminControls.style.display = 'block';
   loadUsers();
   loadAuditLogs();
+  requestNotificationPermission();
+  const reqRef = collection(db, 'userRequests');
+  onSnapshot(reqRef, snap => {
+    snap.docChanges().forEach(ch => {
+      if (ch.type === 'added') {
+        const d = ch.doc.data();
+        const msg = d.message || 'New request received';
+        showSystemNotification('User Request', msg);
+      }
+    });
+  });
 });
 
 // Create user
@@ -266,3 +292,36 @@ if (importCsvBtn) {
     }
   });
 }
+
+let touchStartX = 0;
+let touchRow = null;
+userTableBody.addEventListener('touchstart', e => {
+  touchRow = e.target.closest('tr');
+  if (!touchRow) return;
+  touchStartX = e.touches[0].clientX;
+});
+
+userTableBody.addEventListener('touchend', async e => {
+  if (!touchRow) return;
+  const diff = e.changedTouches[0].clientX - touchStartX;
+  const uid = touchRow.dataset.uid;
+  const disabled = touchRow.dataset.disabled === 'true';
+  if (Math.abs(diff) > 60) {
+    if (diff < 0) {
+      if (confirm('Delete this user?')) {
+        try {
+          const fn = httpsCallable(functions, 'deleteUserAccount');
+          await fn({ targetUid: uid });
+          loadUsers();
+        } catch (err) { handleError(err); }
+      }
+    } else {
+      try {
+        const fn = httpsCallable(functions, 'setUserDisabled');
+        await fn({ targetUid: uid, disabled: !disabled });
+        loadUsers();
+      } catch (err) { handleError(err); }
+    }
+  }
+  touchRow = null;
+});
