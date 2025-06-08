@@ -1435,3 +1435,10 @@ body.dark-mode {
     color: var(--text-primary);
 }
 
+
+/* Admin mobile adjustments */
+@media (max-width: 600px) {
+  #userTable th, #userTable td { padding: 12px; }
+  #userTable button { padding: 8px 12px; font-size: 1rem; }
+}
+
