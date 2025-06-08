@@ -1,13 +1,15 @@
 
-import { auth, db, functions } from './firebase.js';
+import { auth, db, functions, initPresence, rtdb } from './firebase.js';
 import { onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/11.9.0/firebase-auth.js';
 import { doc, getDoc } from 'https://www.gstatic.com/firebasejs/11.9.0/firebase-firestore.js';
 import { httpsCallable } from 'https://www.gstatic.com/firebasejs/11.9.0/firebase-functions.js';
+import { ref, set } from 'https://www.gstatic.com/firebasejs/11.9.0/firebase-database.js';
 
 
 onAuthStateChanged(auth, async (user) => {
   window.currentUser = user;
   if (user) {
+    initPresence(user.uid);
     let role = null;
     let name = user.displayName || '';
     let docData = null;
@@ -63,4 +65,11 @@ onAuthStateChanged(auth, async (user) => {
 });
 
 
-window.logout = () => signOut(auth);
+
+window.logout = () => {
+  const uid = auth.currentUser?.uid;
+  if (uid) {
+    set(ref(rtdb, `presence/${uid}`), { state: 'offline', lastChanged: Date.now() });
+  }
+  return signOut(auth);
+};
