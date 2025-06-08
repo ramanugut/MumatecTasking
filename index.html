@@ -379,19 +379,43 @@
                         </div>
                         <div class="form-field">
                             <label>Type</label>
-                            <input type="text" id="taskType" list="typeSuggestions" placeholder="e.g., Maintenance">
-                            <datalist id="typeSuggestions">
-                                <option value="Maintenance">
-                                <option value="User Account Management">
-                                <option value="Access Control">
-                                <option value="Security">
-                                <option value="Compliance">
-                            </datalist>
+                            <input type="text" id="taskType" list="typeSuggestions" placeholder="e.g., Bug">
+                            <datalist id="typeSuggestions"></datalist>
                         </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-field">
+                            <label>Assignee</label>
+                            <input type="text" id="taskAssignee" list="assigneeSuggestions" placeholder="Assign user">
+                            <datalist id="assigneeSuggestions"></datalist>
+                        </div>
+                        <div class="form-field">
+                            <label>Dependencies</label>
+                            <input type="text" id="taskDependencies" placeholder="Task IDs comma separated">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-field">
+                            <label>Est. Hours</label>
+                            <input type="number" id="taskEstimate" min="0" step="0.1">
+                        </div>
+                        <div class="form-field">
+                            <label>Time Spent</label>
+                            <input type="number" id="taskTimeSpent" min="0" step="0.1">
+                        </div>
+                    </div>
+                    <div class="form-field">
+                        <label>Attachments</label>
+                        <input type="file" id="taskAttachments" multiple>
                     </div>
                 </div>
 
                 <div class="form-section">
+                    <div id="commentsContainer" class="comments-container"></div>
+                    <div class="form-field">
+                        <label>Add Comment</label>
+                        <textarea id="taskComment" rows="2" placeholder="Add a comment"></textarea>
+                    </div>
                     <div class="form-field">
                         <label>Tags</label>
                         <input type="text" id="taskTags" placeholder="urgent, meeting, project">
