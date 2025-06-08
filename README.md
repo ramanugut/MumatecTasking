@@ -30,6 +30,7 @@ Admins can now:
 - Impersonate users
 - Bulk update roles and invite users via CSV
 - View audit logs of all admin actions
+- Manage teams, projects and client assignments
 
 ### User profile features
 
@@ -50,6 +51,9 @@ The application defines the following roles:
 - **designer** – handle design tasks and manage assets.
 - **client** – view only their own projects.
 - **guest** – limited read-only access.
+
+Organization admins can access the new **Organization Management** page at
+`org.html` to create teams, assign projects and link clients to users.
 
 ## Workflow Documentation
 For an overview of task statuses, priorities, and categories, see [WORKFLOW.md](./WORKFLOW.md).
