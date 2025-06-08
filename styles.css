@@ -1511,3 +1511,34 @@ body.dark-mode {
   #userTable button { padding: 8px 12px; font-size: 1rem; }
 }
 
+/* Desktop enhancements */
+@media (min-width: 1024px) {
+  .task-modal {
+    max-width: 800px;
+  }
+
+  .kanban-container {
+    width: 100%;
+  }
+
+  .kanban-column {
+    flex: 1 1 var(--kanban-column-width);
+    min-width: 0;
+  }
+
+  .dashboard-grid {
+    grid-template-columns: 3fr 1fr;
+  }
+}
+
+/* Profile page layout */
+.profile-container {
+  margin: 0 auto;
+}
+
+.profile-form .form-row {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+
