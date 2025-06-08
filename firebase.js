@@ -2,6 +2,7 @@
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.9.0/firebase-app.js';
 import { getAuth } from 'https://www.gstatic.com/firebasejs/11.9.0/firebase-auth.js';
 import { getFirestore, enableIndexedDbPersistence } from 'https://www.gstatic.com/firebasejs/11.9.0/firebase-firestore.js';
+import { getFunctions } from 'https://www.gstatic.com/firebasejs/11.9.0/firebase-functions.js';
 
 
 export const firebaseConfig = {
@@ -18,6 +19,7 @@ export const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 export const db = getFirestore(app);
+export const functions = getFunctions(app);
 
 // Enable offline persistence for Firestore
 enableIndexedDbPersistence(db).catch((err) => {
@@ -27,3 +29,4 @@ enableIndexedDbPersistence(db).catch((err) => {
 // Expose for non-module scripts
 window.auth = auth;
 window.db = db;
+window.functions = functions;
