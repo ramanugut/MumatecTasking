@@ -1,14 +1,23 @@
 
 import { auth, db, functions, initPresence, rtdb } from './firebase.js';
 import { onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/11.9.0/firebase-auth.js';
-import { doc, getDoc } from 'https://www.gstatic.com/firebasejs/11.9.0/firebase-firestore.js';
 import { httpsCallable } from 'https://www.gstatic.com/firebasejs/11.9.0/firebase-functions.js';
+import { doc, getDoc } from 'https://www.gstatic.com/firebasejs/11.9.0/firebase-firestore.js';
 import { ref, set } from 'https://www.gstatic.com/firebasejs/11.9.0/firebase-database.js';
+
+const sessionId = localStorage.getItem('sessionId') || Math.random().toString(36).slice(2);
+localStorage.setItem('sessionId', sessionId);
+const logSession = httpsCallable(functions, 'logUserSession');
 
 
 onAuthStateChanged(auth, async (user) => {
   window.currentUser = user;
   if (user) {
+    try {
+      await logSession({ action: 'start', sessionId, userAgent: navigator.userAgent });
+    } catch (e) {
+      console.error('Failed to start session', e);
+    }
     initPresence(user.uid);
     let role = null;
     let name = user.displayName || '';
@@ -70,6 +79,13 @@ window.logout = () => {
   const uid = auth.currentUser?.uid;
   if (uid) {
     set(ref(rtdb, `presence/${uid}`), { state: 'offline', lastChanged: Date.now() });
+    logSession({ action: 'end', sessionId }).catch(()=>{});
   }
   return signOut(auth);
 };
+
+window.addEventListener('beforeunload', () => {
+  if (auth.currentUser) {
+    logSession({ action: 'end', sessionId }).catch(()=>{});
+  }
+});

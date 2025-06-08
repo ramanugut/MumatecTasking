@@ -50,8 +50,23 @@ async function checkAdmin(callerUid) {
   }
 }
 
+async function checkRateLimit(uid, action, limit = 10, windowMs = 60000) {
+  const ref = admin.firestore().doc(`rateLimits/${uid}_${action}`);
+  const doc = await ref.get();
+  const now = Date.now();
+  if (doc.exists && now - doc.data().startAt.toMillis() < windowMs) {
+    if (doc.data().count >= limit) {
+      throw new functions.https.HttpsError('resource-exhausted', 'Rate limit exceeded');
+    }
+    await ref.update({ count: admin.firestore.FieldValue.increment(1) });
+  } else {
+    await ref.set({ startAt: admin.firestore.Timestamp.fromMillis(now), count: 1 });
+  }
+}
+
 exports.createUserWithRole = functions.https.onCall(async (data, context) => {
   await checkAdmin(context.auth.uid);
+  await checkRateLimit(context.auth.uid, 'createUser');
   const { email, password, displayName, role } = data;
   if (!email || !password || !displayName) {
     throw new functions.https.HttpsError('invalid-argument','Missing fields');
@@ -179,6 +194,7 @@ exports.bulkUpdateRoles = functions.https.onCall(async (data, context) => {
 
 exports.bulkInviteUsers = functions.https.onCall(async (data, context) => {
   await checkAdmin(context.auth.uid);
+  await checkRateLimit(context.auth.uid, 'invite', 20);
   const users = Array.isArray(data.users) ? data.users : [];
   const results = [];
   for (const u of users) {
@@ -201,6 +217,7 @@ exports.bulkInviteUsers = functions.https.onCall(async (data, context) => {
 // Invite a single user and optionally set an expiration for guest access.
 exports.inviteUser = functions.https.onCall(async (data, context) => {
   await checkAdmin(context.auth.uid);
+  await checkRateLimit(context.auth.uid, 'invite');
   const { email, displayName, role, expiresAt } = data;
   if (!email) {
     throw new functions.https.HttpsError('invalid-argument', 'Missing email');
@@ -227,6 +244,22 @@ exports.logUserLogin = functions.https.onCall(async (data, context) => {
   if (!context.auth) throw new functions.https.HttpsError('unauthenticated');
   const uid = context.auth.uid;
   await admin.firestore().doc(`users/${uid}`).set({ lastLogin: admin.firestore.FieldValue.serverTimestamp() }, { merge: true });
+  return { ok: true };
+});
+
+exports.logUserSession = functions.https.onCall(async (data, context) => {
+  if (!context.auth) throw new functions.https.HttpsError('unauthenticated');
+  const { sessionId, action, userAgent } = data || {};
+  if (!sessionId || !action) {
+    throw new functions.https.HttpsError('invalid-argument', 'Missing session data');
+  }
+  const uid = context.auth.uid;
+  const ref = admin.firestore().doc(`users/${uid}/sessions/${sessionId}`);
+  if (action === 'start') {
+    await ref.set({ userAgent: userAgent || '', startAt: admin.firestore.FieldValue.serverTimestamp(), active: true });
+  } else if (action === 'end') {
+    await ref.set({ endAt: admin.firestore.FieldValue.serverTimestamp(), active: false }, { merge: true });
+  }
   return { ok: true };
 });
 

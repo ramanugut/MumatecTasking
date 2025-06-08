@@ -1,6 +1,7 @@
-import { auth, db } from './firebase.js';
+import { auth, db, functions } from './firebase.js';
 import { onAuthStateChanged, updateProfile, updatePassword } from 'https://www.gstatic.com/firebasejs/11.9.0/firebase-auth.js';
-import { doc, getDoc, setDoc } from 'https://www.gstatic.com/firebasejs/11.9.0/firebase-firestore.js';
+import { doc, getDoc, setDoc, collection, getDocs } from 'https://www.gstatic.com/firebasejs/11.9.0/firebase-firestore.js';
+import { httpsCallable } from 'https://www.gstatic.com/firebasejs/11.9.0/firebase-functions.js';
 import { getStorage, ref, uploadBytes, getDownloadURL } from 'https://www.gstatic.com/firebasejs/11.9.0/firebase-storage.js';
 
 const nameEl = document.getElementById('name');
@@ -21,6 +22,7 @@ const confirmPassEl = document.getElementById('confirmPassword');
 const changePassBtn = document.getElementById('changePassword');
 const setup2faBtn = document.getElementById('setup2fa');
 const sessionInfo = document.getElementById('sessionInfo');
+const sessionsList = document.getElementById('sessionsList');
 let cropper;
 
 avatarEl.addEventListener('change', e => {
@@ -56,6 +58,30 @@ onAuthStateChanged(auth, async (user) => {
       avatarPreview.src = data.photoURL;
       avatarPreview.style.display = 'block';
     }
+  }
+  loadSessions(user.uid);
+});
+
+async function loadSessions(uid) {
+  if (!sessionsList) return;
+  const snap = await getDocs(collection(db, 'users', uid, 'sessions'));
+  sessionsList.innerHTML = '';
+  snap.forEach(docSnap => {
+    const d = docSnap.data();
+    const li = document.createElement('li');
+    const start = d.startAt ? new Date(d.startAt.seconds * 1000).toLocaleString() : '';
+    const end = d.endAt ? new Date(d.endAt.seconds * 1000).toLocaleString() : '';
+    const active = d.active !== false;
+    li.innerHTML = `${d.userAgent || 'device'} - ${start} ${active ? '(active)' : '(ended ' + end + ')' } <button data-end="${docSnap.id}">End</button>`;
+    sessionsList.appendChild(li);
+  });
+}
+
+sessionsList?.addEventListener('click', async e => {
+  if (e.target.dataset.end) {
+    const fn = httpsCallable(functions, 'logUserSession');
+    await fn({ action: 'end', sessionId: e.target.dataset.end });
+    loadSessions(auth.currentUser.uid);
   }
 });
 
