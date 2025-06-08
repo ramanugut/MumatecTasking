@@ -53,6 +53,7 @@ The application defines the following roles:
 - **guest** – limited read-only access.
 
 
+
 ### Custom Role Builder
 
 Administrators can define additional roles with granular permissions using the new
