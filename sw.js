@@ -1,9 +1,14 @@
-const CACHE_NAME = 'admin-cache-v1';
+const CACHE_NAME = 'app-cache-v2';
 const ASSETS = [
   './',
+  './index.html',
   './admin.html',
+  './login.html',
+  './client-portal.html',
   './admin.js',
   './firebase.js',
+  './pwa.js',
+  './manifest.json',
   './styles.css'
 ];
 
@@ -26,6 +31,12 @@ self.addEventListener('activate', event => {
 self.addEventListener('fetch', event => {
   if (event.request.method !== 'GET') return;
   event.respondWith(
-    caches.match(event.request).then(res => res || fetch(event.request))
+    fetch(event.request)
+      .then(res => {
+        const clone = res.clone();
+        caches.open(CACHE_NAME).then(cache => cache.put(event.request, clone));
+        return res;
+      })
+      .catch(() => caches.match(event.request))
   );
 });

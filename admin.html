@@ -6,6 +6,7 @@
   <title>Admin Panel - Mumatec Tasking</title>
   <link rel="stylesheet" href="styles.css">
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link rel="manifest" href="manifest.json">
   <style>
     body { padding:20px; }
     table { width:100%; border-collapse:collapse; margin-top:1rem; }
@@ -78,11 +79,7 @@
   <div class="notification-container" id="notificationContainer"></div>
 
   <script type="module" src="firebase.js"></script>
+  <script type="module" src="pwa.js"></script>
   <script type="module" src="admin.js"></script>
-  <script>
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('sw.js');
-    }
-  </script>
 </body>
 </html>

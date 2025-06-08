@@ -441,3 +441,38 @@ exports.exportAuditLogs = functions.https.onCall(async (data, context) => {
   const logs = snap.docs.map(d => ({ id: d.id, ...d.data() }));
   return { logs };
 });
+
+// Record a time entry for billing
+exports.logTimeEntry = functions.https.onCall(async (data, context) => {
+  if (!context.auth) throw new functions.https.HttpsError('unauthenticated');
+  const { projectId, minutes, description } = data || {};
+  if (!projectId || !minutes) {
+    throw new functions.https.HttpsError('invalid-argument', 'Missing projectId or minutes');
+  }
+  const entry = {
+    userId: context.auth.uid,
+    minutes: Number(minutes),
+    description: description || '',
+    createdAt: admin.firestore.FieldValue.serverTimestamp()
+  };
+  await admin.firestore().collection(`projects/${projectId}/timeEntries`).add(entry);
+  return { ok: true };
+});
+
+// Generate a simple invoice per client for a given month
+exports.generateInvoice = functions.https.onCall(async (data, context) => {
+  await checkAdmin(context.auth.uid);
+  const { clientId, month } = data || {};
+  if (!clientId || !month) {
+    throw new functions.https.HttpsError('invalid-argument', 'Missing clientId or month');
+  }
+  const projectsSnap = await admin.firestore().collection('projects').where('clientId', '==', clientId).get();
+  let total = 0;
+  for (const proj of projectsSnap.docs) {
+    const entries = await admin.firestore().collection(`projects/${proj.id}/timeEntries`).where('createdAt', '>=', new Date(month)).get();
+    entries.forEach(e => { total += e.data().minutes || 0; });
+  }
+  const invoice = { clientId, month, totalMinutes: total, createdAt: admin.firestore.FieldValue.serverTimestamp() };
+  const ref = await admin.firestore().collection('invoices').add(invoice);
+  return { id: ref.id, ...invoice };
+});

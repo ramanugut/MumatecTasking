@@ -48,6 +48,14 @@ service cloud.firestore {
       allow read, write: if isAdmin() || uid == request.auth.uid;
     }
 
+    match /projects/{projectId}/timeEntries/{entryId} {
+      allow read, write: if isAdmin() || request.auth.uid == resource.data.userId;
+    }
+
+    match /invoices/{invoiceId} {
+      allow read, write: if isAdmin();
+    }
+
     match /auditLogs/{logId} {
       allow read: if isAdmin();
       allow create: if isAdmin();
