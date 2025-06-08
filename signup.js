@@ -8,6 +8,14 @@ document.getElementById('signupForm').addEventListener('submit', async (e) => {
   const email = document.getElementById('email').value.trim();
   const password = document.getElementById('password').value;
   const photoURL = document.getElementById('photoURL').value.trim();
+  const jobTitle = document.getElementById('jobTitle').value.trim();
+  const department = document.getElementById('department').value.trim();
+  const phone = document.getElementById('phone').value.trim();
+  const timezone = document.getElementById('timezone').value.trim();
+  const skills = document.getElementById('skills').value.split(',').map(s => s.trim()).filter(Boolean);
+  const status = document.getElementById('status').value;
+  const emailNotif = document.getElementById('emailNotif').checked;
+  const pushNotif = document.getElementById('pushNotif').checked;
   const errorEl = document.getElementById('error');
   errorEl.textContent = '';
   try {
@@ -16,7 +24,13 @@ document.getElementById('signupForm').addEventListener('submit', async (e) => {
       name,
       email,
       photoURL: photoURL || null,
-      notifications: true
+      jobTitle,
+      department,
+      phone,
+      timezone,
+      skills,
+      status,
+      notifications: { email: emailNotif, push: pushNotif }
     });
     window.location.href = 'index.html';
   } catch (err) {
