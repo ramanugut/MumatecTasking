@@ -7,22 +7,20 @@
   <link rel="stylesheet" href="styles.css">
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
   <link rel="manifest" href="manifest.json">
-  <style>
-    body { display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; }
-    .login-container { width: 320px; max-width: 95%; padding: 20px; border: 1px solid #ccc; border-radius: 6px; background: #fff; }
-    .login-container h2 { text-align: center; margin-bottom: 1rem; }
-    .login-container input { width: 100%; padding: 0.5rem; margin-bottom: 1rem; }
-    .login-container button { width: 100%; padding: 0.5rem; }
-    .error { color: red; text-align: center; margin-top: 0.5rem; }
-  </style>
 </head>
-<body>
-  <div class="login-container">
+<body class="auth-page">
+  <div class="auth-container">
     <h2>Admin Login</h2>
     <form id="loginForm">
-      <input type="email" id="email" placeholder="Email" required />
-      <input type="password" id="password" placeholder="Password" required />
-      <button type="submit">Login</button>
+      <div class="form-field">
+        <label for="email">Email</label>
+        <input type="email" id="email" required />
+      </div>
+      <div class="form-field">
+        <label for="password">Password</label>
+        <input type="password" id="password" required />
+      </div>
+      <button type="submit" class="action-btn primary">Login</button>
       <div id="error" class="error"></div>
     </form>
     <p style="text-align:center;margin-top:0.5rem;">
