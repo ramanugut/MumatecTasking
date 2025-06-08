@@ -1,6 +1,6 @@
 // Mumatec Task Manager - Professional Application
 import { db } from './firebase.js';
-import { collection, setDoc, doc, deleteDoc, onSnapshot } from 'https://www.gstatic.com/firebasejs/11.9.0/firebase-firestore.js';
+import { collection, setDoc, doc, deleteDoc, onSnapshot, getDocs, getDoc } from 'https://www.gstatic.com/firebasejs/11.9.0/firebase-firestore.js';
 class MumatecTaskManager {
     constructor() {
         this.tasks = [];
@@ -13,12 +13,16 @@ class MumatecTaskManager {
         this.statuses = ['todo', 'inprogress', 'review', 'done', 'blocked', 'cancelled'];
         this.priorities = ['low', 'medium', 'high', 'critical'];
         this.samplePushed = false;
+        this.customTypes = [];
+        this.users = [];
         
         this.init();
     }
 
     async init() {
         await this.loadTasks();
+        await this.loadTaskTypes();
+        await this.loadUsers();
         this.loadTheme();
         this.loadSidebarState();
         this.setupEventListeners();
@@ -103,6 +107,42 @@ class MumatecTaskManager {
         }
     }
 
+    async loadTaskTypes() {
+        if (!db) return;
+        try {
+            const docSnap = await getDoc(doc(db, 'settings', 'taskTypes'));
+            this.customTypes = docSnap.exists() ? (docSnap.data().types || []) : ['Bug', 'Feature', 'Design', 'Hosting Setup'];
+        } catch (e) {
+            console.warn('Failed to load task types', e);
+            this.customTypes = ['Bug', 'Feature', 'Design', 'Hosting Setup'];
+        }
+        this.populateTypeDatalist();
+    }
+
+    async loadUsers() {
+        if (!db) return;
+        try {
+            const snap = await getDocs(collection(db, 'users'));
+            this.users = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        } catch (e) {
+            console.warn('Failed to load users', e);
+            this.users = [];
+        }
+        this.populateAssigneeDatalist();
+    }
+
+    populateTypeDatalist() {
+        const list = document.getElementById('typeSuggestions');
+        if (!list) return;
+        list.innerHTML = this.customTypes.map(t => `<option value="${this.escapeHtml(t)}"></option>`).join('');
+    }
+
+    populateAssigneeDatalist() {
+        const list = document.getElementById('assigneeSuggestions');
+        if (!list) return;
+        list.innerHTML = this.users.map(u => `<option value="${this.escapeHtml(u.displayName || u.email)}" data-uid="${u.id}"></option>`).join('');
+    }
+
     createSampleTasks() {
         const sampleTasks = [
             {
@@ -114,6 +154,12 @@ class MumatecTaskManager {
                 category: 'Work',
                 type: 'Maintenance',
                 tags: ['hosting', 'performance'],
+                assignedTo: null,
+                dependencies: [],
+                estimate: 2,
+                timeSpent: 0,
+                attachments: [],
+                comments: [],
                 dueDate: new Date(Date.now() + 86400000).toISOString(),
                 createdAt: new Date().toISOString(),
                 updatedAt: new Date().toISOString()
@@ -127,6 +173,12 @@ class MumatecTaskManager {
                 category: 'Work',
                 type: 'Compliance',
                 tags: ['documentation', 'clients'],
+                assignedTo: null,
+                dependencies: [],
+                estimate: 1,
+                timeSpent: 0,
+                attachments: [],
+                comments: [],
                 createdAt: new Date().toISOString(),
                 updatedAt: new Date().toISOString()
             },
@@ -139,6 +191,12 @@ class MumatecTaskManager {
                 category: 'Work',
                 type: 'User Account Management',
                 tags: ['meeting', 'team'],
+                assignedTo: null,
+                dependencies: [],
+                estimate: 0.5,
+                timeSpent: 0.5,
+                attachments: [],
+                comments: [],
                 createdAt: new Date(Date.now() - 86400000).toISOString(),
                 updatedAt: new Date().toISOString()
             }
@@ -163,6 +221,12 @@ class MumatecTaskManager {
             dueDate: taskData.dueDate || null,
             category: taskData.category?.trim() || 'Work',
             type: taskData.type || 'General',
+            assignedTo: taskData.assignedTo || null,
+            dependencies: this.parseTags(taskData.dependencies),
+            estimate: parseFloat(taskData.estimate) || 0,
+            timeSpent: parseFloat(taskData.timeSpent) || 0,
+            attachments: taskData.attachments || [],
+            comments: taskData.comments || [],
             tags: this.parseTags(taskData.tags),
             createdAt: new Date().toISOString(),
             updatedAt: new Date().toISOString(),
@@ -189,6 +253,12 @@ class MumatecTaskManager {
             dueDate: taskData.dueDate || null,
             category: taskData.category?.trim() || 'Work',
             type: taskData.type || 'General',
+            assignedTo: taskData.assignedTo || this.tasks[taskIndex].assignedTo || null,
+            dependencies: this.parseTags(taskData.dependencies),
+            estimate: parseFloat(taskData.estimate) || this.tasks[taskIndex].estimate || 0,
+            timeSpent: parseFloat(taskData.timeSpent) || this.tasks[taskIndex].timeSpent || 0,
+            attachments: taskData.attachments && taskData.attachments.length ? [...(this.tasks[taskIndex].attachments || []), ...taskData.attachments] : (this.tasks[taskIndex].attachments || []),
+            comments: taskData.comments ? [...(this.tasks[taskIndex].comments || []), ...taskData.comments] : (this.tasks[taskIndex].comments || []),
             tags: this.parseTags(taskData.tags),
             updatedAt: new Date().toISOString()
         };
@@ -381,9 +451,12 @@ class MumatecTaskManager {
         const isOverdue = task.dueDate && new Date(task.dueDate) < new Date() && task.status !== 'done';
         const dueText = task.dueDate ? this.formatDate(new Date(task.dueDate)) : '';
         
-        const tagsHtml = task.tags && task.tags.length > 0 
+        const tagsHtml = task.tags && task.tags.length > 0
             ? `<div class="task-tags">${task.tags.map(tag => `<span class="task-tag">${this.escapeHtml(tag)}</span>`).join('')}</div>`
             : '';
+
+        const assignee = this.users.find(u => u.id === task.assignedTo);
+        const avatar = assignee && assignee.photoURL ? `<img src="${assignee.photoURL}" class="task-avatar" alt="${this.escapeHtml(assignee.displayName || '')}">` : '';
 
         taskDiv.innerHTML = `
             <div class="task-priority priority-${task.priority}"></div>
@@ -401,6 +474,7 @@ class MumatecTaskManager {
                 <span class="task-category">${this.escapeHtml(task.category || 'Work')}</span>
                 <span class="task-type">${this.escapeHtml(task.type || 'General')}</span>
                 ${task.dueDate ? `<span class="task-due ${isOverdue ? 'overdue' : ''}">${dueText}</span>` : ''}
+                ${avatar}
             </div>
         `;
 
@@ -570,6 +644,7 @@ class MumatecTaskManager {
         document.getElementById('modalTitle').textContent = 'Add New Task';
         this.clearTaskForm();
         document.getElementById('taskStatus').value = status;
+        document.getElementById('commentsContainer').innerHTML = '';
         const modal = document.getElementById('taskModal');
         modal.classList.add('active');
         modal.setAttribute('aria-hidden', 'false');
@@ -590,6 +665,17 @@ class MumatecTaskManager {
         document.getElementById('taskDueDate').value = task.dueDate || '';
         document.getElementById('taskCategory').value = task.category || '';
         document.getElementById('taskType').value = task.type || '';
+        const assignee = this.users.find(u => u.id === task.assignedTo);
+        document.getElementById('taskAssignee').value = assignee ? (assignee.displayName || assignee.email) : '';
+        document.getElementById('taskDependencies').value = (task.dependencies || []).join(', ');
+        document.getElementById('taskEstimate').value = task.estimate || 0;
+        document.getElementById('taskTimeSpent').value = task.timeSpent || 0;
+        document.getElementById('taskAttachments').value = '';
+        if (task.attachments && task.attachments.length) {
+            document.getElementById('commentsContainer').insertAdjacentHTML('afterbegin', task.attachments.map(a => `<div class="comment-item">Attachment: ${this.escapeHtml(a.name || '')}</div>`).join(''));
+        }
+        document.getElementById('commentsContainer').innerHTML = (task.comments || []).map(c => `<div class="comment-item"><div class="comment-meta">${this.escapeHtml(c.author)} - ${this.formatDate(new Date(c.timestamp))}</div><div>${this.escapeHtml(c.text)}</div></div>`).join('');
+        document.getElementById('taskComment').value = '';
         document.getElementById('taskTags').value = task.tags?.join(', ') || '';
         
         const modal = document.getElementById('taskModal');
@@ -614,6 +700,13 @@ class MumatecTaskManager {
         document.getElementById('taskDueDate').value = '';
         document.getElementById('taskCategory').value = '';
         document.getElementById('taskType').value = '';
+        document.getElementById('taskAssignee').value = '';
+        document.getElementById('taskDependencies').value = '';
+        document.getElementById('taskEstimate').value = '';
+        document.getElementById('taskTimeSpent').value = '';
+        document.getElementById('taskAttachments').value = '';
+        document.getElementById('taskComment').value = '';
+        document.getElementById('commentsContainer').innerHTML = '';
         document.getElementById('taskTags').value = '';
     }
 
@@ -771,6 +864,18 @@ class MumatecTaskManager {
         const div = document.createElement('div');
         div.textContent = text;
         return div.innerHTML;
+    }
+
+    lookupUserId(display) {
+        const user = this.users.find(u => (u.displayName || u.email) === display);
+        return user ? user.id : null;
+    }
+
+    collectNewComment() {
+        const text = document.getElementById('taskComment').value.trim();
+        if (!text) return null;
+        const author = window.currentUser?.displayName || 'Me';
+        return [{ text, author, timestamp: new Date().toISOString() }];
     }
 
     // Event Listeners
@@ -965,6 +1070,12 @@ class MumatecTaskManager {
             dueDate: document.getElementById('taskDueDate').value,
             category: document.getElementById('taskCategory').value,
             type: document.getElementById('taskType').value,
+            assignedTo: this.lookupUserId(document.getElementById('taskAssignee').value),
+            dependencies: document.getElementById('taskDependencies').value,
+            estimate: document.getElementById('taskEstimate').value,
+            timeSpent: document.getElementById('taskTimeSpent').value,
+            attachments: Array.from(document.getElementById('taskAttachments').files).map(f => ({ name: f.name })),
+            comments: this.collectNewComment(),
             tags: document.getElementById('taskTags').value
         };
 

@@ -12,7 +12,8 @@ import {
   getDocs,
   doc,
   getDoc,
-  onSnapshot
+  onSnapshot,
+  setDoc
 } from 'https://www.gstatic.com/firebasejs/11.9.0/firebase-firestore.js';
 
 
@@ -27,6 +28,8 @@ const applyBulkRoleBtn = document.getElementById('applyBulkRole');
 const userCsvInput = document.getElementById('userCsv');
 const importCsvBtn = document.getElementById('btnImportCsv');
 const auditTableBody = document.querySelector('#auditTable tbody');
+const taskTypesInput = document.getElementById('taskTypes');
+const saveTaskTypesBtn = document.getElementById('saveTaskTypes');
 const ROLES = [
   'superAdmin',
   'admin',
@@ -112,6 +115,14 @@ async function loadAuditLogs() {
   });
 }
 
+async function loadTaskTypes() {
+  if (!taskTypesInput) return;
+  const snap = await getDoc(doc(db, 'settings', 'taskTypes'));
+  if (snap.exists()) {
+    taskTypesInput.value = (snap.data().types || []).join(',');
+  }
+}
+
 onAuthStateChanged(auth, async user => {
   if (!user) {
     window.location.href = 'login.html';
@@ -125,6 +136,7 @@ onAuthStateChanged(auth, async user => {
   adminControls.style.display = 'block';
   loadUsers();
   loadAuditLogs();
+  loadTaskTypes();
   requestNotificationPermission();
   const reqRef = collection(db, 'userRequests');
   onSnapshot(reqRef, snap => {
@@ -287,6 +299,18 @@ if (importCsvBtn) {
       await fn({ users });
       alert('CSV processed');
       loadUsers();
+    } catch (err) {
+      handleError(err);
+    }
+  });
+}
+
+if (saveTaskTypesBtn) {
+  saveTaskTypesBtn.addEventListener('click', async () => {
+    const types = (taskTypesInput.value || '').split(',').map(t => t.trim()).filter(t => t);
+    try {
+      await setDoc(doc(db, 'settings', 'taskTypes'), { types });
+      alert('Task types saved');
     } catch (err) {
       handleError(err);
     }
