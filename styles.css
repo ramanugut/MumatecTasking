@@ -143,6 +143,44 @@ body {
     align-items: center;
     gap: 12px;
     cursor: pointer;
+    position: relative;
+}
+
+.profile-dropdown {
+    display: none;
+    flex-direction: column;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background: var(--background);
+    border: 1px solid var(--border);
+    border-radius: var(--border-radius);
+    padding: 8px 0;
+    min-width: 160px;
+    z-index: 1000;
+}
+
+.user-info:hover .profile-dropdown {
+    display: flex;
+}
+
+.profile-dropdown a,
+.profile-dropdown .dropdown-btn {
+    display: block;
+    padding: 8px 16px;
+    font-size: 14px;
+    color: var(--text-primary);
+    text-decoration: none;
+    background: none;
+    border: none;
+    text-align: left;
+    width: 100%;
+    cursor: pointer;
+}
+
+.profile-dropdown a:hover,
+.profile-dropdown .dropdown-btn:hover {
+    background: var(--gray-100);
 }
 
 .user-avatar {
