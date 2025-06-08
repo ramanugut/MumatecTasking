@@ -29,7 +29,7 @@ onAuthStateChanged(auth, async (user) => {
     if (roleEl && role) roleEl.textContent = role;
     const adminLink = document.getElementById('adminLink');
     if (adminLink) {
-      adminLink.style.display = role === 'admin' ? 'inline-block' : 'none';
+      adminLink.style.display = ['admin','superAdmin'].includes(role) ? 'inline-block' : 'none';
     }
     try {
       const logLogin = httpsCallable(functions, 'logUserLogin');
