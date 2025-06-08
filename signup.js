@@ -30,6 +30,7 @@ document.getElementById('signupForm').addEventListener('submit', async (e) => {
       timezone,
       skills,
       status,
+      role: 'client',
       notifications: { email: emailNotif, push: pushNotif }
     });
     window.location.href = 'index.html';

@@ -3,6 +3,16 @@ const admin = require('firebase-admin');
 admin.initializeApp();
 
 const SUPER_ADMIN_EMAIL = 'mumatechosting@gmail.com';
+const ALLOWED_ROLES = [
+  'superAdmin',
+  'admin',
+  'projectManager',
+  'teamLead',
+  'developer',
+  'designer',
+  'client',
+  'guest'
+];
 
 // Helper to confirm the caller is Admin. The email defined in
 // SUPER_ADMIN_EMAIL is always considered an admin even if no Firestore
@@ -19,30 +29,30 @@ async function checkAdmin(callerUid) {
   if (userRecord.email === SUPER_ADMIN_EMAIL) {
     const docRef = admin.firestore().doc(`users/${callerUid}`);
     const snap = await docRef.get();
-    if (!snap.exists || snap.data().role !== 'admin') {
+    if (!snap.exists || snap.data().role !== 'superAdmin') {
       await docRef.set({
         email: userRecord.email,
         displayName: userRecord.displayName || '',
-        role: 'admin',
+        role: 'superAdmin',
         createdAt: admin.firestore.FieldValue.serverTimestamp(),
       }, { merge: true });
     }
     const claims = userRecord.customClaims || {};
-    if (claims.role !== 'admin') {
-      await admin.auth().setCustomUserClaims(callerUid, { role: 'admin' });
+    if (claims.role !== 'superAdmin') {
+      await admin.auth().setCustomUserClaims(callerUid, { role: 'superAdmin' });
     }
     return;
   }
 
   const docSnap = await admin.firestore().doc(`users/${callerUid}`).get();
-  if (!docSnap.exists || docSnap.data().role !== 'admin') {
+  if (!docSnap.exists || !['superAdmin','admin'].includes(docSnap.data().role)) {
     throw new functions.https.HttpsError('permission-denied', 'Admin only.');
   }
 }
 
 exports.createUserWithRole = functions.https.onCall(async (data, context) => {
   await checkAdmin(context.auth.uid);
-  const { email, password, displayName } = data;
+  const { email, password, displayName, role } = data;
   if (!email || !password || !displayName) {
     throw new functions.https.HttpsError('invalid-argument','Missing fields');
   }
@@ -51,10 +61,10 @@ exports.createUserWithRole = functions.https.onCall(async (data, context) => {
   await admin.firestore().doc(`users/${newUid}`).set({
     email,
     displayName,
-    role: 'member',
+    role: ALLOWED_ROLES.includes(role) ? role : 'guest',
     createdAt: admin.firestore.FieldValue.serverTimestamp()
   });
-  await admin.auth().setCustomUserClaims(newUid, { role: 'member' });
+  await admin.auth().setCustomUserClaims(newUid, { role: ALLOWED_ROLES.includes(role) ? role : 'guest' });
   await logAudit(context.auth.uid, 'createUser', newUid);
   return { uid: newUid };
 });
@@ -62,7 +72,7 @@ exports.createUserWithRole = functions.https.onCall(async (data, context) => {
 exports.updateUserRole = functions.https.onCall(async (data, context) => {
   await checkAdmin(context.auth.uid);
   const { targetUid, newRole } = data;
-  if (!targetUid || !['admin','member'].includes(newRole)) {
+  if (!targetUid || !ALLOWED_ROLES.includes(newRole)) {
     throw new functions.https.HttpsError('invalid-argument','Missing or invalid fields');
   }
   // Prevent demoting last Admin
@@ -158,7 +168,7 @@ exports.bulkUpdateRoles = functions.https.onCall(async (data, context) => {
   const updates = Array.isArray(data.updates) ? data.updates : [];
   const batch = admin.firestore().batch();
   for (const u of updates) {
-    if (!u.uid || !['admin', 'member'].includes(u.role)) continue;
+    if (!u.uid || !ALLOWED_ROLES.includes(u.role)) continue;
     batch.update(admin.firestore().doc(`users/${u.uid}`), { role: u.role });
     await admin.auth().setCustomUserClaims(u.uid, { role: u.role });
     await logAudit(context.auth.uid, 'bulkRole', u.uid, { role: u.role });
@@ -177,10 +187,10 @@ exports.bulkInviteUsers = functions.https.onCall(async (data, context) => {
     await admin.firestore().doc(`users/${record.uid}`).set({
       email: u.email,
       displayName: u.displayName || '',
-      role: u.role || 'member',
+      role: ALLOWED_ROLES.includes(u.role) ? u.role : 'guest',
       createdAt: admin.firestore.FieldValue.serverTimestamp(),
     });
-    await admin.auth().setCustomUserClaims(record.uid, { role: u.role || 'member' });
+    await admin.auth().setCustomUserClaims(record.uid, { role: ALLOWED_ROLES.includes(u.role) ? u.role : 'guest' });
     const link = await admin.auth().generatePasswordResetLink(u.email);
     results.push({ email: u.email, link });
     await logAudit(context.auth.uid, 'invite', record.uid, { email: u.email });

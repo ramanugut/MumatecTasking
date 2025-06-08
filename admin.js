@@ -26,6 +26,25 @@ const applyBulkRoleBtn = document.getElementById('applyBulkRole');
 const userCsvInput = document.getElementById('userCsv');
 const importCsvBtn = document.getElementById('btnImportCsv');
 const auditTableBody = document.querySelector('#auditTable tbody');
+const ROLES = [
+  'superAdmin',
+  'admin',
+  'projectManager',
+  'teamLead',
+  'developer',
+  'designer',
+  'client',
+  'guest'
+];
+
+function renderRoleOptions(selected) {
+  return ROLES.map(r => `<option value="${r}" ${selected===r?'selected':''}>${r}</option>`).join('');
+}
+
+// populate role selects if they exist
+const newRoleSelect = document.getElementById('newRole');
+if (newRoleSelect) newRoleSelect.innerHTML = renderRoleOptions('guest');
+if (bulkRoleSelect) bulkRoleSelect.innerHTML = renderRoleOptions('guest');
 
 function handleError(err) {
   console.error(err);
@@ -49,8 +68,7 @@ async function loadUsers() {
       <td>${data.displayName || ''}</td>
       <td>
         <select data-uid="${docSnap.id}">
-          <option value="member" ${data.role === 'member' ? 'selected' : ''}>member</option>
-          <option value="admin" ${data.role === 'admin' ? 'selected' : ''}>admin</option>
+          ${renderRoleOptions(data.role || 'guest')}
         </select>
       </td>
       <td>${data.disabled ? 'Disabled' : 'Active'}</td>
@@ -85,7 +103,7 @@ onAuthStateChanged(auth, async user => {
     return;
   }
   const prof = await getDoc(doc(db, 'users', user.uid));
-  if (!prof.exists() || prof.data().role !== 'admin') {
+  if (!prof.exists() || !['admin','superAdmin'].includes(prof.data().role)) {
     unauthEl.style.display = 'block';
     return;
   }
@@ -236,7 +254,7 @@ if (importCsvBtn) {
     const rows = text.split(/\n+/).map(r => r.trim()).filter(r => r);
     const users = rows.map(r => {
       const [email, displayName, role] = r.split(',');
-      return { email: email.trim(), displayName: (displayName || '').trim(), role: (role || 'member').trim() };
+      return { email: email.trim(), displayName: (displayName || '').trim(), role: (role || 'guest').trim() };
     });
     try {
       const fn = httpsCallable(functions, 'bulkInviteUsers');

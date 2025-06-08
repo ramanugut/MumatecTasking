@@ -38,5 +38,18 @@ like job title, phone, timezone, skills, availability status and granular
 notification settings. Password changes are also available from the profile
 screen.
 
+### Role-Based Access Control
+
+The application defines the following roles:
+
+- **superAdmin** – full system access including user management and billing.
+- **admin** – project management, inviting users and managing clients.
+- **projectManager** – manage assigned projects and assign tasks.
+- **teamLead** – lead teams and approve work.
+- **developer** – perform technical tasks and track time.
+- **designer** – handle design tasks and manage assets.
+- **client** – view only their own projects.
+- **guest** – limited read-only access.
+
 ## Workflow Documentation
 For an overview of task statuses, priorities, and categories, see [WORKFLOW.md](./WORKFLOW.md).
