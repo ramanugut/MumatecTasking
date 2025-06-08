@@ -204,3 +204,107 @@ exports.logUserLogin = functions.https.onCall(async (data, context) => {
   await admin.firestore().doc(`users/${uid}`).set({ lastLogin: admin.firestore.FieldValue.serverTimestamp() }, { merge: true });
   return { ok: true };
 });
+
+// Organization Management Extensions
+
+exports.createTeam = functions.https.onCall(async (data, context) => {
+  await checkAdmin(context.auth.uid);
+  const { name } = data;
+  if (!name) {
+    throw new functions.https.HttpsError('invalid-argument', 'Missing team name');
+  }
+  const ref = await admin.firestore().collection('teams').add({
+    name,
+    createdAt: admin.firestore.FieldValue.serverTimestamp()
+  });
+  await logAudit(context.auth.uid, 'createTeam', ref.id);
+  return { id: ref.id };
+});
+
+exports.assignUserToTeam = functions.https.onCall(async (data, context) => {
+  await checkAdmin(context.auth.uid);
+  const { uid, teamId } = data;
+  if (!uid || !teamId) {
+    throw new functions.https.HttpsError('invalid-argument', 'Missing uid or teamId');
+  }
+  const teamMemberRef = admin.firestore().doc(`teams/${teamId}/members/${uid}`);
+  await teamMemberRef.set({ assignedAt: admin.firestore.FieldValue.serverTimestamp() });
+  await admin.firestore().doc(`users/${uid}`).set({
+    teams: admin.firestore.FieldValue.arrayUnion(teamId)
+  }, { merge: true });
+  await logAudit(context.auth.uid, 'assignUserToTeam', uid, { teamId });
+  return { ok: true };
+});
+
+exports.createClient = functions.https.onCall(async (data, context) => {
+  await checkAdmin(context.auth.uid);
+  const { name } = data;
+  if (!name) throw new functions.https.HttpsError('invalid-argument', 'Missing client name');
+  const ref = await admin.firestore().collection('clients').add({
+    name,
+    createdAt: admin.firestore.FieldValue.serverTimestamp()
+  });
+  await logAudit(context.auth.uid, 'createClient', ref.id);
+  return { id: ref.id };
+});
+
+exports.assignUserToClient = functions.https.onCall(async (data, context) => {
+  await checkAdmin(context.auth.uid);
+  const { uid, clientId } = data;
+  if (!uid || !clientId) throw new functions.https.HttpsError('invalid-argument', 'Missing uid or clientId');
+  await admin.firestore().doc(`users/${uid}`).set({
+    clients: admin.firestore.FieldValue.arrayUnion(clientId)
+  }, { merge: true });
+  await logAudit(context.auth.uid, 'assignUserToClient', uid, { clientId });
+  return { ok: true };
+});
+
+exports.createProject = functions.https.onCall(async (data, context) => {
+  await checkAdmin(context.auth.uid);
+  const { name, teamId, clientId } = data;
+  if (!name) throw new functions.https.HttpsError('invalid-argument', 'Missing project name');
+  const ref = await admin.firestore().collection('projects').add({
+    name,
+    teamId: teamId || null,
+    clientId: clientId || null,
+    createdAt: admin.firestore.FieldValue.serverTimestamp()
+  });
+  await logAudit(context.auth.uid, 'createProject', ref.id, { teamId, clientId });
+  return { id: ref.id };
+});
+
+exports.assignUserToProject = functions.https.onCall(async (data, context) => {
+  await checkAdmin(context.auth.uid);
+  const { uid, projectId } = data;
+  if (!uid || !projectId) throw new functions.https.HttpsError('invalid-argument', 'Missing uid or projectId');
+  const projMemberRef = admin.firestore().doc(`projects/${projectId}/members/${uid}`);
+  await projMemberRef.set({ assignedAt: admin.firestore.FieldValue.serverTimestamp() });
+  await admin.firestore().doc(`users/${uid}`).set({
+    projects: admin.firestore.FieldValue.arrayUnion(projectId)
+  }, { merge: true });
+  await logAudit(context.auth.uid, 'assignUserToProject', uid, { projectId });
+  return { ok: true };
+});
+
+exports.setManager = functions.https.onCall(async (data, context) => {
+  await checkAdmin(context.auth.uid);
+  const { subordinateUid, managerUid } = data;
+  if (!subordinateUid || !managerUid) throw new functions.https.HttpsError('invalid-argument', 'Missing uids');
+  await admin.firestore().doc(`users/${subordinateUid}`).set({ managerUid }, { merge: true });
+  await logAudit(context.auth.uid, 'setManager', subordinateUid, { managerUid });
+  return { ok: true };
+});
+
+exports.getTeamWorkload = functions.https.onCall(async (data, context) => {
+  await checkAdmin(context.auth.uid);
+  const { teamId } = data;
+  if (!teamId) throw new functions.https.HttpsError('invalid-argument', 'Missing teamId');
+  const membersSnap = await admin.firestore().collection(`teams/${teamId}/members`).get();
+  const workload = [];
+  for (const docSnap of membersSnap.docs) {
+    const uid = docSnap.id;
+    const tasksSnap = await admin.firestore().collection(`users/${uid}/tasks`).get();
+    workload.push({ uid, taskCount: tasksSnap.size });
+  }
+  return { workload };
+});
