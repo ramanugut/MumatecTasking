@@ -12,6 +12,7 @@ class MumatecTaskManager {
         this.activeFilter = null;
         this.statuses = ['todo', 'inprogress', 'review', 'done', 'blocked', 'cancelled'];
         this.priorities = ['low', 'medium', 'high', 'critical'];
+        this.samplePushed = false;
         
         this.init();
     }
@@ -50,7 +51,14 @@ class MumatecTaskManager {
                 console.log('Subscribing to Firestore collection:', `users/${window.currentUser.uid}/tasks`);
 
                 this.unsubscribe = onSnapshot(col, (snap) => {
-                    this.tasks = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+                    const tasks = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+                    if (tasks.length === 0 && !this.samplePushed) {
+                        this.samplePushed = true;
+                        this.createSampleTasks();
+                        if (loadingEl) loadingEl.style.display = 'none';
+                        return;
+                    }
+                    this.tasks = tasks;
                     this.updateUI();
                     if (loadingEl) loadingEl.style.display = 'none';
                 }, (error) => {
