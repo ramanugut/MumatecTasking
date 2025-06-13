@@ -43,7 +43,7 @@
     /* Layout */
     --sidebar-width: 280px;
     --sidebar-transition: transform 0.3s ease, width 0.3s ease;
-    --top-bar-height: 120px;
+    --top-bar-height: 72px;
     --border-radius: 12px;
     --border-radius-sm: 8px;
     --border-radius-lg: 16px;
@@ -339,8 +339,10 @@ body {
     background: var(--background);
     border-bottom: 1px solid var(--border);
     display: flex;
-    flex-direction: column;
-    justify-content: center;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 24px;
+    gap: 24px;
     z-index: 1000;
 }
 
@@ -469,99 +471,6 @@ body {
 .view-btn.active {
     background: var(--background);
     box-shadow: 0 1px 3px var(--shadow);
-}
-
-/* New header layout */
-.header-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 24px;
-    gap: 12px;
-}
-
-.header-primary {
-    height: 56px;
-}
-
-.header-secondary {
-    height: 64px;
-    border-top: 1px solid var(--border);
-}
-
-.header-left {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
-
-.workspace-select {
-    padding: 4px 8px;
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    background: var(--surface-secondary);
-}
-
-.breadcrumbs {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    font-size: 14px;
-    color: var(--text-secondary);
-}
-
-.breadcrumbs span:not(:last-child)::after {
-    content: '\203A';
-    margin-left: 4px;
-}
-
-.tab-nav {
-    display: flex;
-    gap: 12px;
-}
-
-.tab-btn {
-    background: transparent;
-    border: none;
-    padding: 8px 16px;
-    border-radius: 6px;
-    font-size: 14px;
-    font-weight: 600;
-    color: var(--text-secondary);
-    cursor: pointer;
-    transition: var(--transition);
-}
-
-.tab-btn.active {
-    color: var(--text-primary);
-    background: var(--surface-secondary);
-}
-
-.team-avatars {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-}
-
-.team-avatars .avatar {
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    background: var(--gray-200);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 16px;
-}
-
-.header-actions {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.search-wrapper {
-    flex: 1;
 }
 
 /* Content Area */
@@ -1532,7 +1441,7 @@ body {
 
 @media (max-width: 768px) {
     :root {
-        --top-bar-height: 100px;
+        --top-bar-height: 60px;
     }
     
     .sidebar {
