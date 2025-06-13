@@ -474,6 +474,9 @@ body {
     display: none;
     height: 100%;
     padding: 24px;
+    /* Ensure content starts below the sticky header */
+    padding-top: calc(var(--top-bar-height) + 24px);
+    box-sizing: border-box;
 }
 
 .view-container.active {
