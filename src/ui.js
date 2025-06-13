@@ -1,15 +1,17 @@
 export function setupDragAndDrop(manager) {
   document.addEventListener('dragstart', (e) => {
-    if (e.target.classList.contains('task-card')) {
-      manager.draggedTask = e.target.dataset.taskId;
-      e.target.classList.add('dragging');
+    const card = e.target.closest('.task-card');
+    if (card) {
+      manager.draggedTask = card.dataset.taskId;
+      card.classList.add('dragging');
       e.dataTransfer.effectAllowed = 'move';
     }
   });
 
   document.addEventListener('dragend', (e) => {
-    if (e.target.classList.contains('task-card')) {
-      e.target.classList.remove('dragging');
+    const card = e.target.closest('.task-card');
+    if (card) {
+      card.classList.remove('dragging');
       manager.draggedTask = null;
     }
   });
@@ -50,6 +52,8 @@ export function setupDragAndDrop(manager) {
   });
 }
 
+// Automatically scrolls the kanban and list views when dragging near the
+// viewport edges. Works horizontally and vertically.
 export function setupAutoScroll(manager) {
   const threshold = 40;
   let h = 0;
@@ -59,7 +63,7 @@ export function setupAutoScroll(manager) {
 
   const step = () => {
     if (!active) return;
-    const view = document.querySelector('.view-container.active');
+    const view = document.querySelector('.content-area');
     const kanban = document.querySelector('.kanban-container');
     const horizontal = manager.viewMode === 'kanban' ? kanban : rowTarget;
     if (horizontal && h !== 0) {
