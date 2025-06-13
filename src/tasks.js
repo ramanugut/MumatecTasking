@@ -551,10 +551,14 @@ class MumatecTaskManager {
         taskDiv.draggable = true;
         taskDiv.dataset.taskId = task.id;
 
-        const isOverdue = task.dueDate && new Date(task.dueDate) < new Date() && task.status !== 'done';
-        const dueText = task.dueDate ? this.formatDate(new Date(task.dueDate)) : '';
+        const dueDateObj = task.dueDate ? new Date(task.dueDate) : null;
+        const isOverdue = dueDateObj && dueDateObj < new Date() && task.status !== 'done';
+        const isDueSoon = dueDateObj && !isOverdue && (dueDateObj - new Date()) <= 3 * 24 * 60 * 60 * 1000;
+        const dueText = task.dueDate ? this.formatDate(dueDateObj) : '';
         if (isOverdue) {
             taskDiv.classList.add('overdue-task');
+        } else if (isDueSoon) {
+            taskDiv.classList.add('due-soon-task');
         }
         
         const tagsHtml = task.tags && task.tags.length > 0
@@ -579,7 +583,7 @@ class MumatecTaskManager {
             <div class="task-meta">
                 <span class="task-category">${this.escapeHtml(task.category || 'Work')}</span>
                 <span class="task-type">${this.escapeHtml(task.type || 'General')}</span>
-                ${task.dueDate ? `<span class="task-due ${isOverdue ? 'overdue' : ''}">${dueText}</span>` : ''}
+                ${task.dueDate ? `<span class="task-due ${isOverdue ? 'overdue' : (isDueSoon ? 'soon' : '')}">${dueText}</span>` : ''}
                 ${avatar}
             </div>
         `;
@@ -852,6 +856,30 @@ class MumatecTaskManager {
         document.getElementById('insightsToggle')?.focus();
     }
 
+    applyDateShortcut(type) {
+        const input = document.getElementById('taskDueDate') || document.getElementById('quickTaskDueDate');
+        const now = new Date();
+        let date;
+
+        switch (type) {
+            case 'tomorrow':
+                date = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, now.getHours(), now.getMinutes());
+                break;
+            case 'next-week':
+                date = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 7, now.getHours(), now.getMinutes());
+                break;
+            case 'end-month':
+                date = new Date(now.getFullYear(), now.getMonth() + 1, 0, now.getHours(), now.getMinutes());
+                break;
+            default:
+                return;
+        }
+
+        if (input) {
+            input.value = date.toISOString().slice(0, 16);
+        }
+    }
+
     saveQuickTask() {
         const title = document.getElementById('quickTaskInput').value.trim();
         const dueDate = document.getElementById('quickTaskDueDate').value;
@@ -1078,6 +1106,13 @@ class MumatecTaskManager {
         if (insightsClose) {
             insightsClose.addEventListener('click', () => this.closeInsights());
         }
+
+        // Date shortcuts
+        document.querySelectorAll('.date-shortcut-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                this.applyDateShortcut(btn.dataset.shortcut);
+            });
+        });
 
         // Modal close on outside click
         document.querySelectorAll('.modal-overlay').forEach(modal => {
