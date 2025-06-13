@@ -391,6 +391,12 @@ class MumatecTaskManager {
 
     renderKanbanBoard() {
         const filteredTasks = this.getFilteredTasks();
+        const kanbanEl = document.querySelector('.kanban-container');
+        const rowsEl = document.getElementById('rowsContainer');
+        const gridEl = document.querySelector('.dashboard-grid');
+        if (gridEl) gridEl.style.display = 'grid';
+        if (kanbanEl) kanbanEl.style.display = 'flex';
+        if (rowsEl) rowsEl.style.display = 'none';
         
         // Clear boards
         const statusLabels = {
@@ -426,6 +432,55 @@ class MumatecTaskManager {
             const countElement = document.getElementById(`${status}Count`);
             if (countElement) {
                 countElement.textContent = count;
+            }
+        });
+    }
+
+    renderListView() {
+        const filteredTasks = this.getFilteredTasks();
+        const container = document.getElementById('rowsContainer');
+        const kanbanEl = document.querySelector('.kanban-container');
+        const gridEl = document.querySelector('.dashboard-grid');
+        if (gridEl) gridEl.style.display = 'none';
+        if (kanbanEl) kanbanEl.style.display = 'none';
+        if (!container) return;
+        container.style.display = 'flex';
+        container.innerHTML = '';
+
+        const statusLabels = {
+            todo: 'Todo',
+            inprogress: 'In Progress',
+            review: 'Review',
+            done: 'Done',
+            blocked: 'Blocked',
+            cancelled: 'Cancelled'
+        };
+
+        this.statuses.forEach(status => {
+            const row = document.createElement('div');
+            row.className = 'row-container';
+            row.dataset.status = status;
+            const count = filteredTasks.filter(t => t.status === status).length;
+            row.innerHTML = `
+                <div class="row-header">
+                    <div class="row-title">${statusLabels[status]}</div>
+                    <div class="row-count" id="${status}RowCount">${count}</div>
+                </div>
+                <div class="row-content" id="${status}Row">
+                    <div class="add-task-card" onclick="todoApp.openAddTaskModal('${status}')">
+                        <span class="material-icons add-icon">add</span>
+                        <span>Add task</span>
+                    </div>
+                </div>
+            `;
+            container.appendChild(row);
+        });
+
+        filteredTasks.forEach(task => {
+            const taskElement = this.createTaskCard(task);
+            const target = document.getElementById(`${task.status}Row`);
+            if (target) {
+                target.appendChild(taskElement);
             }
         });
     }
@@ -611,6 +666,14 @@ class MumatecTaskManager {
         }
 
         this.viewMode = mode;
+
+        // Reset scroll positions when switching views
+        const activeView = document.querySelector('.view-container.active');
+        if (activeView) activeView.scrollTop = 0;
+        const kanban = document.querySelector('.kanban-container');
+        if (kanban) kanban.scrollLeft = 0;
+        const rows = document.getElementById('rowsContainer');
+        if (rows) rows.scrollLeft = 0;
         this.renderCurrentView();
         this.updateHeaderShadow();
     }
@@ -1052,16 +1115,16 @@ class MumatecTaskManager {
 
         document.addEventListener('drop', (e) => {
             e.preventDefault();
-            const columnContent = e.target.closest('.column-content');
+            const columnContent = e.target.closest('.column-content, .row-content');
             if (columnContent && this.draggedTask) {
-                const column = columnContent.closest('.kanban-column');
+                const column = columnContent.closest('.kanban-column, .row-container');
                 const newStatus = column.dataset.status;
                 this.moveTask(this.draggedTask, newStatus);
             }
         });
 
         // Visual feedback
-        document.querySelectorAll('.column-content').forEach(column => {
+        document.querySelectorAll('.column-content, .row-content').forEach(column => {
             column.addEventListener('dragenter', (e) => {
                 e.preventDefault();
                 if (this.draggedTask) {
@@ -1087,13 +1150,15 @@ class MumatecTaskManager {
         let h = 0;
         let v = 0;
         let active = false;
+        let rowTarget = null;
 
         const step = () => {
             if (!active) return;
-            const kanban = document.querySelector('.kanban-container');
             const view = document.querySelector('.view-container.active');
-            if (kanban && h !== 0) {
-                kanban.scrollLeft += h;
+            const kanban = document.querySelector('.kanban-container');
+            const horizontal = this.viewMode === 'kanban' ? kanban : rowTarget;
+            if (horizontal && h !== 0) {
+                horizontal.scrollLeft += h;
             }
             if (view && v !== 0) {
                 view.scrollTop += v;
@@ -1127,6 +1192,10 @@ class MumatecTaskManager {
                 v = -10;
             } else if (y > hWin - threshold) {
                 v = 10;
+            }
+
+            if (this.viewMode === 'list') {
+                rowTarget = document.elementFromPoint(x, y)?.closest('.row-content');
             }
 
             if (!active && (h !== 0 || v !== 0)) {

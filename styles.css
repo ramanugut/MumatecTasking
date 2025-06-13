@@ -615,6 +615,70 @@ body {
     gap: 12px;
 }
 
+/* Row View */
+
+.rows-container {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    width: 100%;
+    padding-bottom: 8px;
+}
+
+.row-container {
+    background: var(--background);
+    border: 1px solid var(--border);
+    border-radius: var(--border-radius);
+    display: flex;
+    overflow: hidden;
+}
+
+.row-header {
+    min-width: 180px;
+    padding: 16px;
+    border-right: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-left: 4px solid transparent;
+}
+
+.row-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.row-count {
+    background: var(--surface-secondary);
+    color: var(--text-secondary);
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 700;
+    min-width: 28px;
+    text-align: center;
+}
+
+.row-container[data-status="todo"] .row-header { border-left-color: var(--status-todo); }
+.row-container[data-status="inprogress"] .row-header { border-left-color: var(--status-inprogress); }
+.row-container[data-status="review"] .row-header { border-left-color: var(--status-review); }
+.row-container[data-status="done"] .row-header { border-left-color: var(--status-done); }
+.row-container[data-status="blocked"] .row-header { border-left-color: var(--status-blocked); }
+.row-container[data-status="cancelled"] .row-header { border-left-color: var(--status-cancelled); }
+
+.row-content {
+    flex: 1;
+    padding: 16px;
+    display: flex;
+    gap: 12px;
+    overflow-x: auto;
+}
+
+.row-content.drag-over {
+    background: var(--gray-100);
+}
+
 /* Task Cards */
 .task-card {
     background: var(--background);
