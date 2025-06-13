@@ -469,7 +469,23 @@ body {
 }
 .action-btn::before,
 .action-btn::after {
-    content: none;
+    content: "";
+    position: absolute;
+    pointer-events: none;
+}
+.action-btn::before {
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(to bottom, rgba(255,255,255,0.6), rgba(255,255,255,0));
+}
+.action-btn::after {
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 1px;
+    background: linear-gradient(to right, rgba(255,255,255,0.6), rgba(255,255,255,0));
 }
 
 .action-btn.primary {
