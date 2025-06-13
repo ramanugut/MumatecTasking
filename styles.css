@@ -466,15 +466,13 @@ body {
 .content-area {
     flex: 1;
     overflow-x: hidden;
-    overflow-y: hidden;
+    overflow-y: auto;
     position: relative;
 }
 
 .view-container {
     display: none;
     height: 100%;
-    overflow-y: auto;
-    overflow-x: hidden;
     padding: 24px;
 }
 
@@ -535,19 +533,20 @@ body {
     display: grid;
     grid-template-columns: 1fr;
     gap: 24px;
-    height: calc(100vh - var(--top-bar-height) - 120px);
+    min-height: calc(100vh - var(--top-bar-height) - 120px);
     width: 100%;
-    overflow-x: auto;
+    overflow-x: hidden;
 }
 
 /* Kanban Board */
+
 .kanban-container {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(var(--kanban-column-width), 1fr));
+    display: flex;
+    flex-wrap: nowrap;
     gap: 24px;
-    height: 100%;
     align-items: flex-start;
     width: 100%;
+    overflow-x: auto;
     padding-bottom: 8px;
 }
 
@@ -558,7 +557,7 @@ body {
     display: flex;
     flex-direction: column;
     overflow: hidden;
-    flex: 1 1 var(--kanban-column-width);
+    flex: 0 0 var(--kanban-column-width);
     min-width: var(--kanban-column-width);
     position: relative;
     box-shadow: 0 1px 3px var(--shadow);
@@ -611,7 +610,6 @@ body {
 .column-content {
     flex: 1;
     padding: 16px;
-    overflow-y: auto;
     display: flex;
     flex-direction: column;
     gap: 12px;
@@ -1377,13 +1375,13 @@ body {
     }
     
     .kanban-container {
-        grid-template-columns: 1fr;
+        flex-wrap: nowrap;
+        overflow-x: auto;
         gap: 12px;
-        width: 100%;
     }
     .kanban-column {
-        min-width: 0;
-        width: 100%;
+        flex: 0 0 var(--kanban-column-width);
+        min-width: var(--kanban-column-width);
     }
     .kanban-column:not(:last-child)::after {
         display: none;
@@ -1521,7 +1519,7 @@ body.dark-mode {
   }
 
   .kanban-column {
-    flex: 1 1 var(--kanban-column-width);
+    flex: 0 0 var(--kanban-column-width);
     min-width: var(--kanban-column-width);
   }
 
