@@ -1,5 +1,7 @@
 // Mumatec Task Manager - Professional Application
-import { db } from './firebase.js';
+import { db } from '../firebase.js';
+import { generateId, escapeHtml as escapeHtmlUtil, parseCSVLine as parseCSVLineUtil, formatDate as formatDateUtil, debounce as debounceUtil } from './utils.js';
+import { setupDragAndDrop, setupAutoScroll } from './ui.js';
 import { collection, setDoc, doc, deleteDoc, onSnapshot, getDocs, getDoc } from 'https://www.gstatic.com/firebasejs/11.9.0/firebase-firestore.js';
 class MumatecTaskManager {
     constructor() {
@@ -32,8 +34,8 @@ class MumatecTaskManager {
         this.loadCategoryOrder();
         this.setupEventListeners();
         this.setupSidebarToggle();
-        this.setupDragAndDrop();
-        this.setupAutoScroll();
+        setupDragAndDrop(this);
+        setupAutoScroll(this);
         this.setupKeyboardShortcuts();
         this.requestNotificationPermission();
         this.startReminderSystem();
@@ -216,7 +218,7 @@ class MumatecTaskManager {
     }
 
     generateId() {
-        return Date.now().toString(36) + Math.random().toString(36).substr(2);
+        return generateId();
     }
 
     // Task Operations
@@ -985,31 +987,15 @@ class MumatecTaskManager {
     }
 
     formatDate(date) {
-        const now = new Date();
-        const diffTime = date - now;
-        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-        
-        if (diffDays === 0) return 'Today';
-        if (diffDays === 1) return 'Tomorrow';
-        if (diffDays === -1) return 'Yesterday';
-        if (diffDays > 0 && diffDays <= 7) return `In ${diffDays} days`;
-        if (diffDays < 0 && diffDays >= -7) return `${Math.abs(diffDays)} days ago`;
-        
-        return date.toLocaleDateString();
+        return formatDateUtil(date);
     }
 
     escapeHtml(text) {
-        const div = document.createElement('div');
-        div.textContent = text;
-        return div.innerHTML;
+        return escapeHtmlUtil(text);
     }
 
     debounce(fn, delay = 300) {
-        let timeout;
-        return (...args) => {
-            clearTimeout(timeout);
-            timeout = setTimeout(() => fn.apply(this, args), delay);
-        };
+        return debounceUtil(fn, delay);
     }
 
     lookupUserId(display) {
@@ -1152,126 +1138,7 @@ class MumatecTaskManager {
         });
     }
 
-    setupDragAndDrop() {
-        document.addEventListener('dragstart', (e) => {
-            if (e.target.classList.contains('task-card')) {
-                this.draggedTask = e.target.dataset.taskId;
-                e.target.classList.add('dragging');
-                e.dataTransfer.effectAllowed = 'move';
-            }
-        });
-
-        document.addEventListener('dragend', (e) => {
-            if (e.target.classList.contains('task-card')) {
-                e.target.classList.remove('dragging');
-                this.draggedTask = null;
-            }
-        });
-
-        document.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            e.dataTransfer.dropEffect = 'move';
-        });
-
-        document.addEventListener('drop', (e) => {
-            e.preventDefault();
-            const columnContent = e.target.closest('.column-content, .row-content');
-            if (columnContent && this.draggedTask) {
-                const column = columnContent.closest('.kanban-column, .row-container');
-                const newStatus = column.dataset.status;
-                this.moveTask(this.draggedTask, newStatus);
-            }
-        });
-
-        // Visual feedback
-        document.querySelectorAll('.column-content, .row-content').forEach(column => {
-            column.addEventListener('dragenter', (e) => {
-                e.preventDefault();
-                if (this.draggedTask) {
-                    column.classList.add('drag-over');
-                }
-            });
-
-            column.addEventListener('dragleave', (e) => {
-                e.preventDefault();
-                if (!column.contains(e.relatedTarget)) {
-                    column.classList.remove('drag-over');
-                }
-            });
-
-            column.addEventListener('drop', () => {
-                column.classList.remove('drag-over');
-            });
-        });
-    }
-
-    setupAutoScroll() {
-        const threshold = 40;
-        let h = 0;
-        let v = 0;
-        let active = false;
-        let rowTarget = null;
-
-        const step = () => {
-            if (!active) return;
-            const view = document.querySelector('.view-container.active');
-            const kanban = document.querySelector('.kanban-container');
-            const horizontal = this.viewMode === 'kanban' ? kanban : rowTarget;
-            if (horizontal && h !== 0) {
-                horizontal.scrollLeft += h;
-            }
-            if (view && v !== 0) {
-                view.scrollTop += v;
-            }
-            requestAnimationFrame(step);
-        };
-
-        const update = (e) => {
-            if (!this.draggedTask) {
-                h = 0;
-                v = 0;
-                active = false;
-                return;
-            }
-
-            const x = e.clientX;
-            const y = e.clientY;
-            const w = window.innerWidth;
-            const hWin = window.innerHeight;
-
-            h = 0;
-            v = 0;
-
-            if (x < threshold) {
-                h = -10;
-            } else if (x > w - threshold) {
-                h = 10;
-            }
-
-            if (y < threshold) {
-                v = -10;
-            } else if (y > hWin - threshold) {
-                v = 10;
-            }
-
-            if (this.viewMode === 'list') {
-                rowTarget = document.elementFromPoint(x, y)?.closest('.row-content');
-            }
-
-            if (!active && (h !== 0 || v !== 0)) {
-                active = true;
-                requestAnimationFrame(step);
-            } else if (active && h === 0 && v === 0) {
-                active = false;
-            }
-        };
-
-        document.addEventListener('dragover', update);
-        document.addEventListener('mousemove', update);
-        document.addEventListener('dragend', () => {
-            active = false;
-        });
-    }
+    // Drag and scroll helpers moved to ui.js
 
     setupAutoSave() {
         // Auto-save handled by Firestore real-time sync
@@ -1492,31 +1359,7 @@ class MumatecTaskManager {
     }
 
     parseCSVLine(line) {
-        const result = [];
-        let current = '';
-        let inQuotes = false;
-        
-        for (let i = 0; i < line.length; i++) {
-            const char = line[i];
-            const nextChar = line[i + 1];
-            
-            if (char === '"') {
-                if (inQuotes && nextChar === '"') {
-                    current += '"';
-                    i++;
-                } else {
-                    inQuotes = !inQuotes;
-                }
-            } else if (char === ',' && !inQuotes) {
-                result.push(current.trim());
-                current = '';
-            } else {
-                current += char;
-            }
-        }
-        
-        result.push(current.trim());
-        return result;
+        return parseCSVLineUtil(line);
     }
 
     loadStatusOrder() {
@@ -1657,18 +1500,5 @@ class MumatecTaskManager {
     }
 }
 
-// Initialize the application after authentication
-window.initTodoApp = function () {
-    if (!window.todoApp) {
-        window.todoApp = new MumatecTaskManager();
-        console.log('🚀 Mumatec Task Manager initialized successfully!');
-    }
-};
-
-document.addEventListener('DOMContentLoaded', () => {
-    if (window.currentUser) {
-        window.initTodoApp();
-    }
-
-});
+export default MumatecTaskManager;
 
