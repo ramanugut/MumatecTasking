@@ -12,34 +12,54 @@
     <div id="loadingOverlay" class="loading-overlay" style="display:none;">Loading...</div>
     <!-- Sticky Header -->
     <header class="top-bar" id="mainHeader">
-        <div class="top-bar-left">
-            <button id="sidebarToggle" class="action-btn secondary" aria-label="Toggle navigation menu" aria-expanded="true"><span class="material-icons">menu</span></button>
-            <h1 class="page-title" id="pageTitle">Dashboard</h1>
-
-        </div>
-
-        <div class="top-bar-center">
-            <div class="search-container">
-
-                <input type="text" class="search-input" id="searchInput" placeholder="Search tasks..." aria-label="Search tasks">
-
-                <span class="material-icons search-icon">search</span>
+        <div class="header-row header-primary">
+            <div class="header-left">
+                <button id="sidebarToggle" class="action-btn secondary" aria-label="Toggle navigation menu" aria-expanded="true"><span class="material-icons">menu</span></button>
+                <select id="workspaceSelect" class="workspace-select">
+                    <option>Workspace 1</option>
+                    <option>Workspace 2</option>
+                </select>
+                <div class="breadcrumbs" id="breadcrumbs">
+                    <span id="pageTitle">Dashboard</span>
+                </div>
+            </div>
+            <nav class="tab-nav">
+                <button class="tab-btn active" data-view="kanban">Board</button>
+                <button class="tab-btn" data-view="list">List</button>
+                <button class="tab-btn" data-view="calendar">Calendar</button>
+            </nav>
+            <div class="header-right">
+                <button class="action-btn secondary" id="shareBtn"><span class="material-icons">share</span></button>
+                <div class="filter-badges" id="filterBadges"></div>
+                <select id="groupBySelect" class="group-select">
+                    <option value="">Group by</option>
+                    <option value="status">Status</option>
+                    <option value="assignee">Assignee</option>
+                </select>
             </div>
         </div>
-
-        <div class="top-bar-right">
-            <button class="action-btn secondary" onclick="document.getElementById('csvImport').click()">
-                <span class="material-icons">file_upload</span> Import
-            </button>
-            <button class="action-btn primary" onclick="todoApp.openAddTaskModal()">
-                <span class="material-icons">add</span> New Task
-            </button>
-            <button class="action-btn secondary" id="adminLink" style="display:none;" onclick="window.location.href='admin.html'">Admin</button>
-            <button class="action-btn secondary" id="orgLink" style="display:none;" onclick="window.location.href='org.html'">Org</button>
-            <button class="action-btn secondary" onclick="logout()">Logout</button>
-            <div class="view-controls">
-                <button class="view-btn active material-icons" data-view="kanban" aria-label="Kanban view" aria-pressed="true">view_kanban</button>
-                <button class="view-btn material-icons" data-view="list" aria-label="List view" aria-pressed="false">view_list</button>
+        <div class="header-row header-secondary">
+            <div class="search-wrapper">
+                <div class="search-container">
+                    <input type="text" class="search-input" id="searchInput" placeholder="Search tasks..." aria-label="Search tasks">
+                    <span class="material-icons search-icon">search</span>
+                </div>
+            </div>
+            <div class="team-avatars">
+                <span class="avatar material-icons">person</span>
+                <span class="avatar material-icons">person</span>
+                <span class="avatar material-icons">person</span>
+            </div>
+            <div class="header-actions">
+                <button class="action-btn secondary" onclick="document.getElementById('csvImport').click()">
+                    <span class="material-icons">file_upload</span> Import
+                </button>
+                <button class="action-btn primary" onclick="todoApp.openAddTaskModal()">
+                    <span class="material-icons">add</span> New Task
+                </button>
+                <button class="action-btn secondary" id="adminLink" style="display:none;" onclick="window.location.href='admin.html'">Admin</button>
+                <button class="action-btn secondary" id="orgLink" style="display:none;" onclick="window.location.href='org.html'">Org</button>
+                <button class="action-btn secondary" onclick="logout()">Logout</button>
             </div>
         </div>
     </header>
