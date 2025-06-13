@@ -29,6 +29,7 @@ class MumatecTaskManager {
         this.setupEventListeners();
         this.setupSidebarToggle();
         this.setupDragAndDrop();
+        this.setupAutoScroll();
         this.setupKeyboardShortcuts();
         this.requestNotificationPermission();
         this.startReminderSystem();
@@ -1078,6 +1079,68 @@ class MumatecTaskManager {
             column.addEventListener('drop', () => {
                 column.classList.remove('drag-over');
             });
+        });
+    }
+
+    setupAutoScroll() {
+        const threshold = 40;
+        let h = 0;
+        let v = 0;
+        let active = false;
+
+        const step = () => {
+            if (!active) return;
+            const kanban = document.querySelector('.kanban-container');
+            const view = document.querySelector('.view-container.active');
+            if (kanban && h !== 0) {
+                kanban.scrollLeft += h;
+            }
+            if (view && v !== 0) {
+                view.scrollTop += v;
+            }
+            requestAnimationFrame(step);
+        };
+
+        const update = (e) => {
+            if (!this.draggedTask) {
+                h = 0;
+                v = 0;
+                active = false;
+                return;
+            }
+
+            const x = e.clientX;
+            const y = e.clientY;
+            const w = window.innerWidth;
+            const hWin = window.innerHeight;
+
+            h = 0;
+            v = 0;
+
+            if (x < threshold) {
+                h = -10;
+            } else if (x > w - threshold) {
+                h = 10;
+            }
+
+            if (y < threshold) {
+                v = -10;
+            } else if (y > hWin - threshold) {
+                v = 10;
+            }
+
+            if (!active && (h !== 0 || v !== 0)) {
+                active = true;
+                requestAnimationFrame(step);
+            } else if (active && h === 0 && v === 0) {
+                active = false;
+            }
+        };
+
+        document.addEventListener('dragover', update);
+        document.addEventListener('mousemove', update);
+        document.addEventListener('dragend', () => {
+            active = false;
         });
     }
 
