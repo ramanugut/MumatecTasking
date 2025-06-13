@@ -553,6 +553,9 @@ class MumatecTaskManager {
 
         const isOverdue = task.dueDate && new Date(task.dueDate) < new Date() && task.status !== 'done';
         const dueText = task.dueDate ? this.formatDate(new Date(task.dueDate)) : '';
+        if (isOverdue) {
+            taskDiv.classList.add('overdue-task');
+        }
         
         const tagsHtml = task.tags && task.tags.length > 0
             ? `<div class="task-tags">${task.tags.map(tag => `<span class="task-tag">${this.escapeHtml(tag)}</span>`).join('')}</div>`
@@ -827,12 +830,14 @@ class MumatecTaskManager {
         modal.classList.add('active');
         modal.setAttribute('aria-hidden', 'false');
         document.getElementById('quickTaskInput').focus();
+        document.getElementById('quickTaskDueDate').value = '';
     }
 
 
     closeQuickCapture() {
         document.getElementById('quickCaptureModal').classList.remove('active');
         document.getElementById('quickTaskInput').value = '';
+        document.getElementById('quickTaskDueDate').value = '';
     }
 
     openInsights() {
@@ -849,9 +854,10 @@ class MumatecTaskManager {
 
     saveQuickTask() {
         const title = document.getElementById('quickTaskInput').value.trim();
+        const dueDate = document.getElementById('quickTaskDueDate').value;
         if (!title) return;
 
-        this.addTask({ title, status: 'todo', category: 'Work', type: 'General' });
+        this.addTask({ title, status: 'todo', category: 'Work', type: 'General', dueDate });
         this.closeQuickCapture();
     }
 
