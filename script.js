@@ -393,8 +393,10 @@ class MumatecTaskManager {
         const filteredTasks = this.getFilteredTasks();
         const kanbanEl = document.querySelector('.kanban-container');
         const rowsEl = document.getElementById('rowsContainer');
+        const gridEl = document.querySelector('.dashboard-grid');
 
         if (kanbanEl) kanbanEl.style.display = 'flex';
+        if (gridEl) gridEl.style.display = 'grid';
         if (rowsEl) rowsEl.style.display = 'none';
         
         // Clear boards
@@ -439,8 +441,10 @@ class MumatecTaskManager {
         const filteredTasks = this.getFilteredTasks();
         const container = document.getElementById('rowsContainer');
         const kanbanEl = document.querySelector('.kanban-container');
+        const gridEl = document.querySelector('.dashboard-grid');
 
         if (kanbanEl) kanbanEl.style.display = 'none';
+        if (gridEl) gridEl.style.display = 'none';
         if (!container) return;
         container.style.display = 'flex';
         container.innerHTML = '';
