@@ -461,7 +461,7 @@ class MumatecTaskManager {
         this.statuses.forEach(status => {
             const board = document.getElementById(`${status}Board`);
             board.innerHTML = `
-                <div class="add-task-card" onclick="todoApp.openAddTaskModal('${status}')">
+                <div class="add-task-card glass-accent" onclick="todoApp.openAddTaskModal('${status}')">
                     <span class="material-icons add-icon">add</span>
                     <span>Add to ${statusLabels[status]}</span>
                 </div>
@@ -525,7 +525,7 @@ class MumatecTaskManager {
                     </div>
                 </div>
                 <div class="row-content" id="${status}Row">
-                    <div class="add-task-card" onclick="todoApp.openAddTaskModal('${status}')">
+                    <div class="add-task-card glass-accent" onclick="todoApp.openAddTaskModal('${status}')">
                         <span class="material-icons add-icon">add</span>
                         <span>Add task</span>
                     </div>
@@ -547,7 +547,7 @@ class MumatecTaskManager {
 
     createTaskCard(task) {
         const taskDiv = document.createElement('div');
-        taskDiv.className = 'task-card';
+        taskDiv.className = 'task-card glass-primary';
         taskDiv.draggable = true;
         taskDiv.dataset.taskId = task.id;
 
