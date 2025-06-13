@@ -27,6 +27,8 @@ changes are queued and saved once connectivity returns.
   vertically. Move away from the edge or finish the drag to stop scrolling.
 - Use the arrows in each column or row header to reorder statuses. Your
   preferred order is saved locally and applied on reload.
+- Category links in the sidebar also have up/down arrows. Rearrange them to
+  suit your workflow and the order will persist across sessions.
 
 ### Admin features
 
