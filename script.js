@@ -393,6 +393,7 @@ class MumatecTaskManager {
         const filteredTasks = this.getFilteredTasks();
         const kanbanEl = document.querySelector('.kanban-container');
         const rowsEl = document.getElementById('rowsContainer');
+
         if (kanbanEl) kanbanEl.style.display = 'flex';
         if (rowsEl) rowsEl.style.display = 'none';
         
@@ -438,6 +439,7 @@ class MumatecTaskManager {
         const filteredTasks = this.getFilteredTasks();
         const container = document.getElementById('rowsContainer');
         const kanbanEl = document.querySelector('.kanban-container');
+
         if (kanbanEl) kanbanEl.style.display = 'none';
         if (!container) return;
         container.style.display = 'flex';
@@ -662,6 +664,14 @@ class MumatecTaskManager {
         }
 
         this.viewMode = mode;
+
+        // Reset scroll positions when switching views
+        const activeView = document.querySelector('.view-container.active');
+        if (activeView) activeView.scrollTop = 0;
+        const kanban = document.querySelector('.kanban-container');
+        if (kanban) kanban.scrollLeft = 0;
+        const rows = document.getElementById('rowsContainer');
+        if (rows) rows.scrollLeft = 0;
         this.renderCurrentView();
         this.updateHeaderShadow();
     }
