@@ -81,34 +81,6 @@ body {
     -moz-osx-font-smoothing: grayscale;
 }
 
-/* Stylish scrollbars across the app */
-* {
-    scrollbar-width: thin;
-    scrollbar-color: var(--primary-blue) var(--glass-secondary);
-}
-
-*::-webkit-scrollbar {
-    width: 12px;
-    height: 12px;
-}
-
-*::-webkit-scrollbar-track {
-    background: var(--glass-secondary);
-    backdrop-filter: blur(10px);
-    border-radius: var(--border-radius);
-}
-
-*::-webkit-scrollbar-thumb {
-    background: var(--primary-blue);
-    border-radius: var(--border-radius);
-    border: 3px solid var(--glass-secondary);
-    transition: background 0.3s;
-}
-
-*::-webkit-scrollbar-thumb:hover {
-    background: var(--primary-blue-hover);
-}
-
 /* App Container */
 .app-container {
     display: flex;
