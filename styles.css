@@ -39,6 +39,12 @@
     --border: #E5E5E5;
     --shadow: rgba(0, 0, 0, 0.04);
     --shadow-hover: rgba(0, 0, 0, 0.08);
+
+    /* Liquid Glass Variables */
+    --background-layered: linear-gradient(135deg, rgba(255,255,255,0.6), rgba(255,255,255,0.2)), var(--surface);
+    --glass-primary: rgba(255,255,255,0.25);
+    --glass-secondary: rgba(255,255,255,0.15);
+    --glass-accent: rgba(255,255,255,0.3);
     
     /* Layout */
     --sidebar-width: 280px;
@@ -58,17 +64,17 @@
 
     /* Kanban */
     --kanban-column-width: 320px;
-    --status-todo: var(--gray-300);
-    --status-inprogress: var(--warning-orange);
-    --status-review: var(--purple);
-    --status-done: var(--success-green);
-    --status-blocked: var(--error-red);
-    --status-cancelled: var(--text-tertiary);
+    --status-todo: rgba(90, 200, 250, 0.25);
+    --status-inprogress: rgba(255, 149, 0, 0.25);
+    --status-review: rgba(175, 82, 222, 0.25);
+    --status-done: rgba(52, 199, 89, 0.25);
+    --status-blocked: rgba(255, 59, 48, 0.25);
+    --status-cancelled: rgba(142, 142, 147, 0.25);
 }
 
 body {
     font-family: var(--font-system);
-    background: var(--surface);
+    background: var(--background-layered);
     color: var(--text-primary);
     overflow: hidden;
     -webkit-font-smoothing: antialiased;
@@ -418,7 +424,7 @@ body {
 .action-btn {
     height: 40px;
     padding: 0 20px;
-    border: none;
+    border: 1px solid rgba(255, 255, 255, 0.2);
     border-radius: 20px;
     font-size: 14px;
     font-weight: 600;
@@ -427,6 +433,31 @@ body {
     display: flex;
     align-items: center;
     gap: 8px;
+    background: var(--glass-accent);
+    backdrop-filter: blur(12px);
+    position: relative;
+    will-change: backdrop-filter, transform;
+    transform: translateZ(0);
+}
+.action-btn::before,
+.action-btn::after {
+    content: "";
+    position: absolute;
+    pointer-events: none;
+}
+.action-btn::before {
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(to bottom, rgba(255,255,255,0.6), rgba(255,255,255,0));
+}
+.action-btn::after {
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 1px;
+    background: linear-gradient(to right, rgba(255,255,255,0.6), rgba(255,255,255,0));
 }
 
 .action-btn.primary {
@@ -440,9 +471,9 @@ body {
 }
 
 .action-btn.secondary {
-    background: var(--surface-secondary);
+    background: var(--glass-accent);
     color: var(--text-primary);
-    border: 1px solid var(--border);
+    border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .action-btn.secondary:hover {
@@ -499,14 +530,38 @@ body {
 }
 
 .stat-card {
-    background: var(--background);
-    border: 1px solid var(--border);
+    background: var(--glass-primary);
+    border: 1px solid rgba(255, 255, 255, 0.2);
     border-radius: var(--border-radius);
     padding: 12px;
     display: flex;
     align-items: center;
     gap: 8px;
+    backdrop-filter: blur(20px);
     transition: var(--transition);
+    position: relative;
+    will-change: backdrop-filter, transform;
+    transform: translateZ(0);
+}
+.stat-card::before,
+.stat-card::after {
+    content: "";
+    position: absolute;
+    pointer-events: none;
+}
+.stat-card::before {
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(to bottom, rgba(255,255,255,0.6), rgba(255,255,255,0));
+}
+.stat-card::after {
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 1px;
+    background: linear-gradient(to right, rgba(255,255,255,0.6), rgba(255,255,255,0));
 }
 
 .stat-card:hover {
@@ -561,8 +616,8 @@ body {
 }
 
 .kanban-column {
-    background: var(--background);
-    border: 1px solid var(--border);
+    background: var(--glass-primary);
+    border: 1px solid rgba(255, 255, 255, 0.2);
     border-radius: var(--border-radius);
     display: flex;
     flex-direction: column;
@@ -571,6 +626,29 @@ body {
     min-width: var(--kanban-column-width);
     position: relative;
     box-shadow: 0 1px 3px var(--shadow);
+    backdrop-filter: blur(20px);
+    will-change: backdrop-filter, transform;
+    transform: translateZ(0);
+}
+.kanban-column::before,
+.kanban-column::after {
+    content: "";
+    position: absolute;
+    pointer-events: none;
+}
+.kanban-column::before {
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(to bottom, rgba(255,255,255,0.6), rgba(255,255,255,0));
+}
+.kanban-column::after {
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 1px;
+    background: linear-gradient(to right, rgba(255,255,255,0.6), rgba(255,255,255,0));
 }
 
 .kanban-column:not(:last-child)::after {
@@ -594,7 +672,7 @@ body {
 
 .column-title {
     font-size: 16px;
-    font-weight: 600;
+    font-weight: 700;
     color: var(--text-primary);
 }
 
@@ -666,11 +744,35 @@ body {
 }
 
 .row-container {
-    background: var(--background);
-    border: 1px solid var(--border);
+    background: var(--glass-primary);
+    border: 1px solid rgba(255, 255, 255, 0.2);
     border-radius: var(--border-radius);
     display: flex;
     overflow: hidden;
+    backdrop-filter: blur(20px);
+    position: relative;
+    will-change: backdrop-filter, transform;
+    transform: translateZ(0);
+}
+.row-container::before,
+.row-container::after {
+    content: "";
+    position: absolute;
+    pointer-events: none;
+}
+.row-container::before {
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(to bottom, rgba(255,255,255,0.6), rgba(255,255,255,0));
+}
+.row-container::after {
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 1px;
+    background: linear-gradient(to right, rgba(255,255,255,0.6), rgba(255,255,255,0));
 }
 
 .row-header {
@@ -685,7 +787,7 @@ body {
 
 .row-title {
     font-size: 16px;
-    font-weight: 600;
+    font-weight: 700;
     color: var(--text-primary);
 }
 
@@ -774,7 +876,7 @@ body {
 
 .task-title {
     font-size: 14px;
-    font-weight: 600;
+    font-weight: 700;
     color: var(--text-primary);
     line-height: 1.4;
     flex: 1;
@@ -1091,13 +1193,38 @@ body {
 }
 
 .quick-capture-modal {
-    background: var(--background);
+    background: var(--glass-primary);
     border-radius: var(--border-radius-lg);
     padding: 24px;
     width: 90%;
     max-width: 500px;
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
     animation: modalSlideIn 0.3s ease;
+    backdrop-filter: blur(20px);
+    position: relative;
+    will-change: backdrop-filter, transform;
+    transform: translateZ(0);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+.quick-capture-modal::before,
+.quick-capture-modal::after {
+    content: "";
+    position: absolute;
+    pointer-events: none;
+}
+.quick-capture-modal::before {
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(to bottom, rgba(255,255,255,0.6), rgba(255,255,255,0));
+}
+.quick-capture-modal::after {
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 1px;
+    background: linear-gradient(to right, rgba(255,255,255,0.6), rgba(255,255,255,0));
 }
 
 @keyframes modalSlideIn {
@@ -1170,17 +1297,42 @@ body {
 .quick-btn {
     height: 40px;
     padding: 0 20px;
-    border: none;
+    border: 1px solid rgba(255, 255, 255, 0.2);
     border-radius: var(--border-radius-sm);
     font-size: 14px;
     font-weight: 600;
     cursor: pointer;
     transition: var(--transition);
+    background: var(--glass-accent);
+    backdrop-filter: blur(12px);
+    position: relative;
+    will-change: backdrop-filter, transform;
+    transform: translateZ(0);
+}
+.quick-btn::before,
+.quick-btn::after {
+    content: "";
+    position: absolute;
+    pointer-events: none;
+}
+.quick-btn::before {
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(to bottom, rgba(255,255,255,0.6), rgba(255,255,255,0));
+}
+.quick-btn::after {
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 1px;
+    background: linear-gradient(to right, rgba(255,255,255,0.6), rgba(255,255,255,0));
 }
 
 .quick-btn.primary {
     background: var(--primary-blue);
-    color: white;
+    color: #fff;
 }
 
 .quick-btn.primary:hover {
@@ -1188,17 +1340,18 @@ body {
 }
 
 .quick-btn.secondary {
-    background: var(--surface-secondary);
+    background: var(--glass-accent);
     color: var(--text-primary);
+    border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .quick-btn.secondary:hover {
-    background: var(--gray-200);
+    background: rgba(255,255,255,0.35);
 }
 
 /* Main Task Modal */
 .task-modal {
-    background: var(--background);
+    background: var(--glass-primary);
     border-radius: var(--border-radius-lg);
     width: 90%;
     max-width: 600px;
@@ -1209,11 +1362,36 @@ body {
     overflow-y: auto;
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
     animation: modalSlideIn 0.3s ease;
+    backdrop-filter: blur(20px);
+    position: relative;
+    will-change: backdrop-filter, transform;
+    transform: translateZ(0);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+.task-modal::before,
+.task-modal::after {
+    content: "";
+    position: absolute;
+    pointer-events: none;
+}
+.task-modal::before {
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(to bottom, rgba(255,255,255,0.6), rgba(255,255,255,0));
+}
+.task-modal::after {
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 1px;
+    background: linear-gradient(to right, rgba(255,255,255,0.6), rgba(255,255,255,0));
 }
 
 /* Insights Modal */
 .insights-modal {
-    background: var(--background);
+    background: var(--glass-primary);
     border-radius: var(--border-radius-lg);
     width: 90%;
     max-width: 600px;
@@ -1222,6 +1400,31 @@ body {
     overflow-y: auto;
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
     animation: modalSlideIn 0.3s ease;
+    backdrop-filter: blur(20px);
+    position: relative;
+    will-change: backdrop-filter, transform;
+    transform: translateZ(0);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+.insights-modal::before,
+.insights-modal::after {
+    content: "";
+    position: absolute;
+    pointer-events: none;
+}
+.insights-modal::before {
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(to bottom, rgba(255,255,255,0.6), rgba(255,255,255,0));
+}
+.insights-modal::after {
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 1px;
+    background: linear-gradient(to right, rgba(255,255,255,0.6), rgba(255,255,255,0));
 }
 
 .modal-header {
@@ -1510,6 +1713,14 @@ body {
     }
 }
 
+@media (max-width: 600px) {
+    .glass-primary,
+    .glass-secondary,
+    .glass-accent {
+        backdrop-filter: blur(8px);
+    }
+}
+
 /* Dark mode support */
 @media (prefers-color-scheme: dark) {
     :root {
@@ -1522,6 +1733,10 @@ body {
         --border: #38383A;
         --shadow: rgba(0, 0, 0, 0.2);
         --shadow-hover: rgba(0, 0, 0, 0.4);
+        --background-layered: linear-gradient(135deg, rgba(40,40,40,0.6), rgba(30,30,30,0.2)), var(--surface);
+        --glass-primary: rgba(28,28,30,0.3);
+        --glass-secondary: rgba(44,44,46,0.3);
+        --glass-accent: rgba(60,60,67,0.4);
     }
 }
 
@@ -1536,6 +1751,10 @@ body.dark-mode {
     --border: #38383A;
     --shadow: rgba(0, 0, 0, 0.2);
     --shadow-hover: rgba(0, 0, 0, 0.4);
+    --background-layered: linear-gradient(135deg, rgba(40,40,40,0.6), rgba(30,30,30,0.2)), var(--surface);
+    --glass-primary: rgba(28,28,30,0.3);
+    --glass-secondary: rgba(44,44,46,0.3);
+    --glass-accent: rgba(60,60,67,0.4);
 }
 
 /* Simple board and list styles */
