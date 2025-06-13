@@ -713,11 +713,11 @@ class MumatecTaskManager {
     }
 
     switchViewMode(mode) {
-        document.querySelectorAll('.tab-btn').forEach(btn => {
+        document.querySelectorAll('.view-btn').forEach(btn => {
             btn.classList.remove('active');
             btn.setAttribute('aria-pressed', 'false');
         });
-        const activeBtn = document.querySelector(`.tab-btn[data-view="${mode}"]`);
+        const activeBtn = document.querySelector(`[data-view="${mode}"]`);
         if (activeBtn) {
             activeBtn.classList.add('active');
             activeBtn.setAttribute('aria-pressed', 'true');
@@ -1043,12 +1043,8 @@ class MumatecTaskManager {
         });
 
         // View mode toggles
-        document.querySelectorAll('.tab-btn').forEach(btn => {
+        document.querySelectorAll('.view-btn').forEach(btn => {
             btn.addEventListener('click', () => {
-                if (btn.dataset.view === 'calendar') {
-                    alert('Calendar view coming soon');
-                    return;
-                }
                 this.switchViewMode(btn.dataset.view);
             });
         });
