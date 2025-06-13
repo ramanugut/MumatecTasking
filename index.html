@@ -13,7 +13,7 @@
 <body>
     <div id="loadingOverlay" class="loading-overlay" style="display:none;">Loading...</div>
     <!-- Sticky Header -->
-    <header class="top-bar glass-secondary" id="mainHeader">
+    <header class="top-bar" id="mainHeader">
         <div class="top-bar-left">
             <button id="sidebarToggle" class="action-btn secondary" aria-label="Toggle navigation menu" aria-expanded="true"><span class="material-icons">menu</span></button>
             <h1 class="page-title" id="pageTitle">Dashboard</h1>
@@ -49,7 +49,7 @@
     <!-- App Shell -->
     <div class="app-container">
         <!-- Sidebar -->
-        <div class="sidebar glass-secondary">
+        <div class="sidebar">
             <div class="sidebar-header">
                 <div class="app-logo">
                     <div class="logo-icon"><span class="material-icons">assignment</span></div>
@@ -140,28 +140,28 @@
                 <div class="view-container active" id="dashboardView">
                     <!-- Quick Stats -->
                     <div class="quick-stats">
-                        <div class="stat-card glass-primary">
+                        <div class="stat-card">
                             <div class="stat-icon material-icons">assignment</div>
                             <div class="stat-content">
                                 <div class="stat-number" id="totalTasks">0</div>
                                 <div class="stat-label">Total Tasks</div>
                             </div>
                         </div>
-                        <div class="stat-card glass-primary">
+                        <div class="stat-card">
                             <div class="stat-icon material-icons">check_circle</div>
                             <div class="stat-content">
                                 <div class="stat-number" id="completedTasks">0</div>
                                 <div class="stat-label">Completed</div>
                             </div>
                         </div>
-                        <div class="stat-card glass-primary">
+                        <div class="stat-card">
                             <div class="stat-icon material-icons">hourglass_empty</div>
                             <div class="stat-content">
                                 <div class="stat-number" id="pendingTasks">0</div>
                                 <div class="stat-label">In Progress</div>
                             </div>
                         </div>
-                        <div class="stat-card glass-primary">
+                        <div class="stat-card">
                             <div class="stat-icon material-icons">whatshot</div>
                             <div class="stat-content">
                                 <div class="stat-number" id="streakDays">0</div>
@@ -174,7 +174,7 @@
                     <div class="dashboard-grid">
                         <!-- Kanban Board -->
                         <div class="kanban-container">
-                            <div class="kanban-column glass-primary" data-status="todo">
+                            <div class="kanban-column" data-status="todo">
                                 <div class="column-header">
                                     <div class="column-title">Todo</div>
                                     <div class="column-count" id="todoCount">0</div>
@@ -193,7 +193,7 @@
                                 </div>
                             </div>
 
-                            <div class="kanban-column glass-primary" data-status="inprogress">
+                            <div class="kanban-column" data-status="inprogress">
                                 <div class="column-header">
                                     <div class="column-title">In Progress</div>
                                     <div class="column-count" id="inprogressCount">0</div>
@@ -211,7 +211,7 @@
                                 </div>
                             </div>
 
-                            <div class="kanban-column glass-primary" data-status="done">
+                            <div class="kanban-column" data-status="done">
                                 <div class="column-header">
                                     <div class="column-title">Done</div>
                                     <div class="column-count" id="doneCount">0</div>
@@ -230,7 +230,7 @@
                                 </div>
                             </div>
 
-                            <div class="kanban-column glass-primary" data-status="review">
+                            <div class="kanban-column" data-status="review">
                                 <div class="column-header">
                                     <div class="column-title">Under Review</div>
                                     <div class="column-count" id="reviewCount">0</div>
@@ -249,7 +249,7 @@
                                 </div>
                             </div>
 
-                            <div class="kanban-column glass-primary" data-status="blocked">
+                            <div class="kanban-column" data-status="blocked">
                                 <div class="column-header">
                                     <div class="column-title">Blocked</div>
                                     <div class="column-count" id="blockedCount">0</div>
@@ -268,7 +268,7 @@
                                 </div>
                             </div>
 
-                            <div class="kanban-column glass-primary" data-status="cancelled">
+                            <div class="kanban-column" data-status="cancelled">
                                 <div class="column-header">
                                     <div class="column-title">Cancelled</div>
                                     <div class="column-count" id="cancelledCount">0</div>
@@ -322,7 +322,7 @@
 
     <!-- Quick Capture Modal -->
     <div class="modal-overlay" id="quickCaptureModal" role="dialog" aria-hidden="true">
-        <div class="quick-capture-modal glass-primary">
+        <div class="quick-capture-modal">
             <div class="quick-capture-header">
                 <h3><span class="material-icons">flash_on</span> Quick Capture</h3>
                 <button class="close-btn" onclick="todoApp.closeQuickCapture()"><span class="material-icons">close</span></button>
@@ -337,7 +337,7 @@
 
     <!-- Main Task Modal -->
     <div class="modal-overlay" id="taskModal" role="dialog" aria-hidden="true">
-        <div class="task-modal glass-primary">
+        <div class="task-modal">
             <div class="modal-header">
                 <h3 id="modalTitle">Add New Task</h3>
                 <button class="close-btn" onclick="todoApp.closeModal()"><span class="material-icons">close</span></button>
@@ -446,7 +446,7 @@
 
     <!-- Insights Modal -->
     <div class="modal-overlay" id="insightsModal" role="dialog" aria-modal="true" aria-labelledby="insightsTitle">
-        <div class="insights-modal glass-primary">
+        <div class="insights-modal">
             <div class="modal-header">
                 <h3 id="insightsTitle"><span class="material-icons">bar_chart</span> Insights</h3>
                 <button class="close-btn" id="insightsClose" aria-label="Close insights" onclick="todoApp.closeInsights()"><span class="material-icons">close</span></button>
