@@ -5,6 +5,8 @@ export function setupDragAndDrop(manager) {
       manager.draggedTask = card.dataset.taskId;
       card.classList.add('dragging');
       e.dataTransfer.effectAllowed = 'move';
+      // Some browsers require data to be set for drag to initiate
+      e.dataTransfer.setData('text/plain', card.dataset.taskId);
     }
   });
 
