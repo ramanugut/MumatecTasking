@@ -329,6 +329,11 @@
             </div>
             <input type="text" class="quick-input" id="quickTaskInput" placeholder="What needs to be done?">
             <input type="date" class="quick-input" id="quickTaskDueDate">
+            <div class="date-shortcuts" style="margin-bottom:16px;">
+                <button type="button" class="date-shortcut-btn" data-shortcut="tomorrow">Tomorrow</button>
+                <button type="button" class="date-shortcut-btn" data-shortcut="next-week">Next Week</button>
+                <button type="button" class="date-shortcut-btn" data-shortcut="end-month">End of Month</button>
+            </div>
             <div class="quick-actions">
                 <button class="quick-btn secondary" onclick="todoApp.closeQuickCapture()">Cancel</button>
                 <button class="quick-btn primary" onclick="todoApp.saveQuickTask()">Add Task</button>
@@ -387,6 +392,11 @@
                         <div class="form-field">
                             <label>Due Date</label>
                             <input type="datetime-local" id="taskDueDate">
+                            <div class="date-shortcuts">
+                                <button type="button" class="date-shortcut-btn" data-shortcut="tomorrow">Tomorrow</button>
+                                <button type="button" class="date-shortcut-btn" data-shortcut="next-week">Next Week</button>
+                                <button type="button" class="date-shortcut-btn" data-shortcut="end-month">End of Month</button>
+                            </div>
                         </div>
                         <div class="form-field">
                             <label>Category</label>

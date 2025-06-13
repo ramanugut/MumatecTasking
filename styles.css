@@ -13,6 +13,7 @@
     --secondary-blue: #5AC8FA;
     --success-green: #34C759;
     --warning-orange: #FF9500;
+    --warning-yellow: #FFD60A;
     --error-red: #FF3B30;
     --critical-red: #B00020;
     --purple: #AF52DE;
@@ -864,8 +865,17 @@ body {
     color: white;
 }
 
+.task-due.soon {
+    background: var(--warning-yellow);
+    color: var(--text-primary);
+}
+
 .task-card.overdue-task {
     border-left: 4px solid var(--error-red);
+}
+
+.task-card.due-soon-task {
+    border-left: 4px solid var(--warning-yellow);
 }
 
 .task-tags {
@@ -1265,6 +1275,26 @@ body {
     display: flex;
     flex-direction: column;
     gap: 6px;
+}
+
+.date-shortcuts {
+    display: flex;
+    gap: 8px;
+    margin-top: 4px;
+}
+
+.date-shortcuts button {
+    background: var(--surface-secondary);
+    border: 1px solid var(--border);
+    border-radius: var(--border-radius-sm);
+    padding: 4px 8px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.date-shortcuts button:hover {
+    background: var(--background);
 }
 
 .form-field label {
