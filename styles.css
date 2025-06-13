@@ -864,6 +864,10 @@ body {
     color: white;
 }
 
+.task-card.overdue-task {
+    border-left: 4px solid var(--error-red);
+}
+
 .task-tags {
     display: flex;
     gap: 4px;
