@@ -190,6 +190,10 @@
                                 <div class="column-header">
                                     <div class="column-title">Todo</div>
                                     <div class="column-count" id="todoCount">0</div>
+                                    <div class="column-controls">
+                                        <button class="move-btn move-col" data-status="todo" data-direction="left" aria-label="Move column left"><span class="material-icons">arrow_left</span></button>
+                                        <button class="move-btn move-col" data-status="todo" data-direction="right" aria-label="Move column right"><span class="material-icons">arrow_right</span></button>
+                                    </div>
                                 </div>
                                 <div class="column-content" id="todoBoard">
                                     <div class="add-task-card" onclick="todoApp.openAddTaskModal('todo')">
@@ -205,6 +209,10 @@
                                 <div class="column-header">
                                     <div class="column-title">In Progress</div>
                                     <div class="column-count" id="inprogressCount">0</div>
+                                    <div class="column-controls">
+                                        <button class="move-btn move-col" data-status="inprogress" data-direction="left" aria-label="Move column left"><span class="material-icons">arrow_left</span></button>
+                                        <button class="move-btn move-col" data-status="inprogress" data-direction="right" aria-label="Move column right"><span class="material-icons">arrow_right</span></button>
+                                    </div>
                                 </div>
                                 <div class="column-content" id="inprogressBoard">
                                     <div class="add-task-card" onclick="todoApp.openAddTaskModal('inprogress')">
@@ -219,6 +227,10 @@
                                 <div class="column-header">
                                     <div class="column-title">Done</div>
                                     <div class="column-count" id="doneCount">0</div>
+                                    <div class="column-controls">
+                                        <button class="move-btn move-col" data-status="done" data-direction="left" aria-label="Move column left"><span class="material-icons">arrow_left</span></button>
+                                        <button class="move-btn move-col" data-status="done" data-direction="right" aria-label="Move column right"><span class="material-icons">arrow_right</span></button>
+                                    </div>
                                 </div>
                                 <div class="column-content" id="doneBoard">
                                     <div class="add-task-card" onclick="todoApp.openAddTaskModal('done')">
@@ -234,6 +246,10 @@
                                 <div class="column-header">
                                     <div class="column-title">Under Review</div>
                                     <div class="column-count" id="reviewCount">0</div>
+                                    <div class="column-controls">
+                                        <button class="move-btn move-col" data-status="review" data-direction="left" aria-label="Move column left"><span class="material-icons">arrow_left</span></button>
+                                        <button class="move-btn move-col" data-status="review" data-direction="right" aria-label="Move column right"><span class="material-icons">arrow_right</span></button>
+                                    </div>
                                 </div>
                                 <div class="column-content" id="reviewBoard">
                                     <div class="add-task-card" onclick="todoApp.openAddTaskModal('review')">
@@ -249,6 +265,10 @@
                                 <div class="column-header">
                                     <div class="column-title">Blocked</div>
                                     <div class="column-count" id="blockedCount">0</div>
+                                    <div class="column-controls">
+                                        <button class="move-btn move-col" data-status="blocked" data-direction="left" aria-label="Move column left"><span class="material-icons">arrow_left</span></button>
+                                        <button class="move-btn move-col" data-status="blocked" data-direction="right" aria-label="Move column right"><span class="material-icons">arrow_right</span></button>
+                                    </div>
                                 </div>
                                 <div class="column-content" id="blockedBoard">
                                     <div class="add-task-card" onclick="todoApp.openAddTaskModal('blocked')">
@@ -264,6 +284,10 @@
                                 <div class="column-header">
                                     <div class="column-title">Cancelled</div>
                                     <div class="column-count" id="cancelledCount">0</div>
+                                    <div class="column-controls">
+                                        <button class="move-btn move-col" data-status="cancelled" data-direction="left" aria-label="Move column left"><span class="material-icons">arrow_left</span></button>
+                                        <button class="move-btn move-col" data-status="cancelled" data-direction="right" aria-label="Move column right"><span class="material-icons">arrow_right</span></button>
+                                    </div>
                                 </div>
                                 <div class="column-content" id="cancelledBoard">
                                     <div class="add-task-card" onclick="todoApp.openAddTaskModal('cancelled')">

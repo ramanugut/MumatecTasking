@@ -26,6 +26,7 @@ class MumatecTaskManager {
         await this.loadUsers();
         this.loadTheme();
         this.loadSidebarState();
+        this.loadStatusOrder();
         this.setupEventListeners();
         this.setupSidebarToggle();
         this.setupDragAndDrop();
@@ -398,7 +399,15 @@ class MumatecTaskManager {
         if (kanbanEl) kanbanEl.style.display = 'flex';
         if (gridEl) gridEl.style.display = 'grid';
         if (rowsEl) rowsEl.style.display = 'none';
-        
+
+        // Reorder columns based on saved order
+        if (kanbanEl) {
+            this.statuses.forEach(status => {
+                const col = kanbanEl.querySelector(`.kanban-column[data-status="${status}"]`);
+                if (col) kanbanEl.appendChild(col);
+            });
+        }
+
         // Clear boards
         const statusLabels = {
             todo: 'Todo',
@@ -435,6 +444,8 @@ class MumatecTaskManager {
                 countElement.textContent = count;
             }
         });
+
+        this.attachMoveControls();
     }
 
     renderListView() {
@@ -467,6 +478,10 @@ class MumatecTaskManager {
                 <div class="row-header">
                     <div class="row-title">${statusLabels[status]}</div>
                     <div class="row-count" id="${status}RowCount">${count}</div>
+                    <div class="row-controls">
+                        <button class="move-btn move-row" data-status="${status}" data-direction="up" aria-label="Move row up"><span class="material-icons">arrow_upward</span></button>
+                        <button class="move-btn move-row" data-status="${status}" data-direction="down" aria-label="Move row down"><span class="material-icons">arrow_downward</span></button>
+                    </div>
                 </div>
                 <div class="row-content" id="${status}Row">
                     <div class="add-task-card" onclick="todoApp.openAddTaskModal('${status}')">
@@ -485,6 +500,8 @@ class MumatecTaskManager {
                 target.appendChild(taskElement);
             }
         });
+
+        this.attachMoveControls();
     }
 
     createTaskCard(task) {
@@ -1051,6 +1068,8 @@ class MumatecTaskManager {
             view.addEventListener('scroll', () => this.updateHeaderShadow());
         });
         this.updateHeaderShadow();
+
+        this.attachMoveControls();
     }
 
     setupKeyboardShortcuts() {
@@ -1459,6 +1478,48 @@ class MumatecTaskManager {
         
         result.push(current.trim());
         return result;
+    }
+
+    loadStatusOrder() {
+        const saved = localStorage.getItem('statusOrder');
+        if (saved) {
+            try {
+                const arr = JSON.parse(saved);
+                if (Array.isArray(arr)) {
+                    const valid = arr.filter(s => this.statuses.includes(s));
+                    this.statuses = valid.concat(this.statuses.filter(s => !valid.includes(s)));
+                }
+            } catch (e) {
+                console.warn('Failed to parse status order', e);
+            }
+        }
+    }
+
+    saveStatusOrder() {
+        localStorage.setItem('statusOrder', JSON.stringify(this.statuses));
+    }
+
+    moveStatus(status, direction) {
+        const idx = this.statuses.indexOf(status);
+        if (idx === -1) return;
+        if ((direction === 'left' || direction === 'up') && idx > 0) {
+            [this.statuses[idx - 1], this.statuses[idx]] = [this.statuses[idx], this.statuses[idx - 1]];
+        } else if ((direction === 'right' || direction === 'down') && idx < this.statuses.length - 1) {
+            [this.statuses[idx + 1], this.statuses[idx]] = [this.statuses[idx], this.statuses[idx + 1]];
+        } else {
+            return;
+        }
+        this.saveStatusOrder();
+        this.updateUI();
+    }
+
+    attachMoveControls() {
+        document.querySelectorAll('.move-col').forEach(btn => {
+            btn.onclick = () => this.moveStatus(btn.dataset.status, btn.dataset.direction);
+        });
+        document.querySelectorAll('.move-row').forEach(btn => {
+            btn.onclick = () => this.moveStatus(btn.dataset.status, btn.dataset.direction);
+        });
     }
 
     // Theme Management

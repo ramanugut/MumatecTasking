@@ -25,6 +25,8 @@ changes are queued and saved once connectivity returns.
 - When dragging a task, keeping the pointer near the viewport edges will
   automatically scroll the kanban board horizontally or the current view
   vertically. Move away from the edge or finish the drag to stop scrolling.
+- Use the arrows in each column or row header to reorder statuses. Your
+  preferred order is saved locally and applied on reload.
 
 ### Admin features
 
