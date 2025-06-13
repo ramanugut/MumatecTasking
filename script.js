@@ -16,6 +16,8 @@ class MumatecTaskManager {
         this.customTypes = [];
         this.users = [];
         this.userMap = {};
+        this.categoryOrder = ['Work', 'Personal', 'Development'];
+        this.categoryIcons = { Work: 'work', Personal: 'home', Development: 'code' };
         
         this.init();
     }
@@ -27,6 +29,7 @@ class MumatecTaskManager {
         this.loadTheme();
         this.loadSidebarState();
         this.loadStatusOrder();
+        this.loadCategoryOrder();
         this.setupEventListeners();
         this.setupSidebarToggle();
         this.setupDragAndDrop();
@@ -326,9 +329,45 @@ class MumatecTaskManager {
         document.getElementById('todayCount').textContent = today;
         document.getElementById('upcomingCount').textContent = upcoming;
         document.getElementById('completedNavCount').textContent = completed;
-        document.getElementById('workCount').textContent = categories['Work'] || 0;
-        document.getElementById('personalCount').textContent = categories['Personal'] || 0;
-        document.getElementById('devCount').textContent = categories['Development'] || 0;
+
+        this.renderCategoryNav(categories);
+    }
+
+    renderCategoryNav(categoryCounts = {}) {
+        const container = document.getElementById('categoryNavContainer');
+        if (!container) return;
+        container.innerHTML = '';
+        this.categoryOrder.forEach(cat => {
+            const count = categoryCounts[cat] || 0;
+            const activeClass = this.activeFilter === cat ? 'active' : '';
+            const icon = this.categoryIcons[cat] || 'folder';
+            const item = document.createElement('div');
+            item.className = `nav-item ${activeClass}`;
+            item.dataset.filter = cat;
+            item.innerHTML = `
+                <span class="material-icons nav-icon">${icon}</span>
+                <span class="nav-label">${this.escapeHtml(cat)}</span>
+                <span class="nav-count">${count}</span>
+                <div class="nav-controls">
+                    <button class="move-btn move-cat" data-category="${this.escapeHtml(cat)}" data-direction="up" aria-label="Move category up"><span class="material-icons">arrow_upward</span></button>
+                    <button class="move-btn move-cat" data-category="${this.escapeHtml(cat)}" data-direction="down" aria-label="Move category down"><span class="material-icons">arrow_downward</span></button>
+                </div>`;
+            container.appendChild(item);
+        });
+
+        container.querySelectorAll('.nav-item[data-filter]').forEach(item => {
+            item.addEventListener('click', () => {
+                this.activeFilter = this.activeFilter === item.dataset.filter ? null : item.dataset.filter;
+                this.updateUI();
+            });
+        });
+
+        container.querySelectorAll('.move-cat').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                this.moveCategory(btn.dataset.category, btn.dataset.direction);
+            });
+        });
     }
 
     updateProductivityRing(stats) {
@@ -1499,6 +1538,38 @@ class MumatecTaskManager {
         localStorage.setItem('statusOrder', JSON.stringify(this.statuses));
     }
 
+    loadCategoryOrder() {
+        const saved = localStorage.getItem('categoryOrder');
+        if (saved) {
+            try {
+                const arr = JSON.parse(saved);
+                if (Array.isArray(arr)) {
+                    this.categoryOrder = arr;
+                }
+            } catch (e) {
+                console.warn('Failed to parse category order', e);
+            }
+        }
+    }
+
+    saveCategoryOrder() {
+        localStorage.setItem('categoryOrder', JSON.stringify(this.categoryOrder));
+    }
+
+    moveCategory(cat, direction) {
+        const idx = this.categoryOrder.indexOf(cat);
+        if (idx === -1) return;
+        if (direction === 'up' && idx > 0) {
+            [this.categoryOrder[idx - 1], this.categoryOrder[idx]] = [this.categoryOrder[idx], this.categoryOrder[idx - 1]];
+        } else if (direction === 'down' && idx < this.categoryOrder.length - 1) {
+            [this.categoryOrder[idx + 1], this.categoryOrder[idx]] = [this.categoryOrder[idx], this.categoryOrder[idx + 1]];
+        } else {
+            return;
+        }
+        this.saveCategoryOrder();
+        this.updateUI();
+    }
+
     moveStatus(status, direction) {
         const idx = this.statuses.indexOf(status);
         if (idx === -1) return;
@@ -1519,6 +1590,12 @@ class MumatecTaskManager {
         });
         document.querySelectorAll('.move-row').forEach(btn => {
             btn.onclick = () => this.moveStatus(btn.dataset.status, btn.dataset.direction);
+        });
+        document.querySelectorAll('.move-cat').forEach(btn => {
+            btn.onclick = (e) => {
+                e.stopPropagation();
+                this.moveCategory(btn.dataset.category, btn.dataset.direction);
+            };
         });
     }
 
