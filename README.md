@@ -20,6 +20,12 @@ Firebase is pre-configured with project **mumatectasking**. Update `firebase.js`
 Tasks are stored in **Firebase Firestore** so they sync across devices. Offline
 changes are queued and saved once connectivity returns.
 
+## Usage Notes
+
+- When dragging a task, keeping the pointer near the viewport edges will
+  automatically scroll the kanban board horizontally or the current view
+  vertically. Move away from the edge or finish the drag to stop scrolling.
+
 ### Admin features
 
 Admins can now:
