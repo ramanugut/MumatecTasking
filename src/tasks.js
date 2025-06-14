@@ -145,19 +145,19 @@ class MumatecTaskManager {
     populateTypeDatalist() {
         const list = document.getElementById('typeSuggestions');
         if (!list) return;
-        list.innerHTML = this.customTypes.map(t => `<option value="${this.escapeHtml(t)}"></option>`).join('');
+        list.innerHTML = this.customTypes.map(t => `<option value="${escapeHtmlUtil(t)}"></option>`).join('');
     }
 
     populateAssigneeDatalist() {
         const list = document.getElementById('assigneeSuggestions');
         if (!list) return;
-        list.innerHTML = this.users.map(u => `<option value="${this.escapeHtml(u.displayName || u.email)}" data-uid="${u.id}"></option>`).join('');
+        list.innerHTML = this.users.map(u => `<option value="${escapeHtmlUtil(u.displayName || u.email)}" data-uid="${u.id}"></option>`).join('');
     }
 
     createSampleTasks() {
         const sampleTasks = [
             {
-                id: this.generateId(),
+                id: generateId(),
                 title: 'Review server performance metrics',
                 description: 'Analyze CPU and memory usage across all hosting servers',
                 priority: 'high',
@@ -176,7 +176,7 @@ class MumatecTaskManager {
                 updatedAt: new Date().toISOString()
             },
             {
-                id: this.generateId(),
+                id: generateId(),
                 title: 'Update client documentation',
                 description: 'Revise hosting packages and pricing documentation',
                 priority: 'medium',
@@ -194,7 +194,7 @@ class MumatecTaskManager {
                 updatedAt: new Date().toISOString()
             },
             {
-                id: this.generateId(),
+                id: generateId(),
                 title: 'Team standup meeting',
                 description: 'Weekly team sync and progress review',
                 priority: 'medium',
@@ -217,14 +217,11 @@ class MumatecTaskManager {
         sampleTasks.forEach(task => this.saveTaskToFirestore(task));
     }
 
-    generateId() {
-        return generateId();
-    }
 
     // Task Operations
     async addTask(taskData) {
         const task = {
-            id: this.generateId(),
+            id: generateId(),
             title: taskData.title.trim(),
             description: taskData.description?.trim() || '',
             priority: taskData.priority || 'medium',
@@ -348,11 +345,11 @@ class MumatecTaskManager {
             item.dataset.filter = cat;
             item.innerHTML = `
                 <span class="material-icons nav-icon">${icon}</span>
-                <span class="nav-label">${this.escapeHtml(cat)}</span>
+                <span class="nav-label">${escapeHtmlUtil(cat)}</span>
                 <span class="nav-count">${count}</span>
                 <div class="nav-controls">
-                    <button class="move-btn move-cat" data-category="${this.escapeHtml(cat)}" data-direction="up" aria-label="Move category up"><span class="material-icons">arrow_upward</span></button>
-                    <button class="move-btn move-cat" data-category="${this.escapeHtml(cat)}" data-direction="down" aria-label="Move category down"><span class="material-icons">arrow_downward</span></button>
+                    <button class="move-btn move-cat" data-category="${escapeHtmlUtil(cat)}" data-direction="up" aria-label="Move category up"><span class="material-icons">arrow_upward</span></button>
+                    <button class="move-btn move-cat" data-category="${escapeHtmlUtil(cat)}" data-direction="down" aria-label="Move category down"><span class="material-icons">arrow_downward</span></button>
                 </div>`;
             container.appendChild(item);
         });
@@ -554,7 +551,7 @@ class MumatecTaskManager {
         const dueDateObj = task.dueDate ? new Date(task.dueDate) : null;
         const isOverdue = dueDateObj && dueDateObj < new Date() && task.status !== 'done';
         const isDueSoon = dueDateObj && !isOverdue && (dueDateObj - new Date()) <= 3 * 24 * 60 * 60 * 1000;
-        const dueText = task.dueDate ? this.formatDate(dueDateObj) : '';
+        const dueText = task.dueDate ? formatDateUtil(dueDateObj) : '';
         if (isOverdue) {
             taskDiv.classList.add('overdue-task');
         } else if (isDueSoon) {
@@ -562,27 +559,27 @@ class MumatecTaskManager {
         }
         
         const tagsHtml = task.tags && task.tags.length > 0
-            ? `<div class="task-tags">${task.tags.map(tag => `<span class="task-tag">${this.escapeHtml(tag)}</span>`).join('')}</div>`
+            ? `<div class="task-tags">${task.tags.map(tag => `<span class="task-tag">${escapeHtmlUtil(tag)}</span>`).join('')}</div>`
             : '';
 
         const assignee = this.userMap[task.assignedTo];
-        const avatar = assignee && assignee.photoURL ? `<img src="${assignee.photoURL}" class="task-avatar" alt="${this.escapeHtml(assignee.displayName || '')}">` : '';
+        const avatar = assignee && assignee.photoURL ? `<img src="${assignee.photoURL}" class="task-avatar" alt="${escapeHtmlUtil(assignee.displayName || '')}">` : '';
 
         taskDiv.innerHTML = `
             <div class="task-priority priority-${task.priority}"></div>
             <div class="task-header">
                 <span class="material-icons drag-handle" aria-hidden="true">drag_handle</span>
-                <div class="task-title">${this.escapeHtml(task.title)}</div>
+                <div class="task-title">${escapeHtmlUtil(task.title)}</div>
                 <div class="task-actions">
                     <button class="task-action-btn" onclick="todoApp.openEditTaskModal('${task.id}')" title="Edit"><span class="material-icons">edit</span></button>
                     <button class="task-action-btn" onclick="todoApp.confirmDeleteTask('${task.id}')" title="Delete"><span class="material-icons">delete</span></button>
                 </div>
             </div>
-            ${task.description ? `<div class="task-description">${this.escapeHtml(task.description)}</div>` : ''}
+            ${task.description ? `<div class="task-description">${escapeHtmlUtil(task.description)}</div>` : ''}
             ${tagsHtml}
             <div class="task-meta">
-                <span class="task-category">${this.escapeHtml(task.category || 'Work')}</span>
-                <span class="task-type">${this.escapeHtml(task.type || 'General')}</span>
+                <span class="task-category">${escapeHtmlUtil(task.category || 'Work')}</span>
+                <span class="task-type">${escapeHtmlUtil(task.type || 'General')}</span>
                 ${task.dueDate ? `<span class="task-due ${isOverdue ? 'overdue' : (isDueSoon ? 'soon' : '')}">${dueText}</span>` : ''}
                 ${avatar}
             </div>
@@ -790,9 +787,9 @@ class MumatecTaskManager {
         document.getElementById('taskTimeSpent').value = task.timeSpent || 0;
         document.getElementById('taskAttachments').value = '';
         if (task.attachments && task.attachments.length) {
-            document.getElementById('commentsContainer').insertAdjacentHTML('afterbegin', task.attachments.map(a => `<div class="comment-item">Attachment: ${this.escapeHtml(a.name || '')}</div>`).join(''));
+            document.getElementById('commentsContainer').insertAdjacentHTML('afterbegin', task.attachments.map(a => `<div class="comment-item">Attachment: ${escapeHtmlUtil(a.name || '')}</div>`).join(''));
         }
-        document.getElementById('commentsContainer').innerHTML = (task.comments || []).map(c => `<div class="comment-item"><div class="comment-meta">${this.escapeHtml(c.author)} - ${this.formatDate(new Date(c.timestamp))}</div><div>${this.escapeHtml(c.text)}</div></div>`).join('');
+        document.getElementById('commentsContainer').innerHTML = (task.comments || []).map(c => `<div class="comment-item"><div class="comment-meta">${escapeHtmlUtil(c.author)} - ${formatDateUtil(new Date(c.timestamp))}</div><div>${escapeHtmlUtil(c.text)}</div></div>`).join('');
         document.getElementById('taskComment').value = '';
         document.getElementById('taskTags').value = task.tags?.join(', ') || '';
         
@@ -1020,18 +1017,6 @@ class MumatecTaskManager {
         return highPriority.length > 0 ? Math.round((completedHigh.length / highPriority.length) * 100) : 100;
     }
 
-    formatDate(date) {
-        return formatDateUtil(date);
-    }
-
-    escapeHtml(text) {
-        return escapeHtmlUtil(text);
-    }
-
-    debounce(fn, delay = 300) {
-        return debounceUtil(fn, delay);
-    }
-
     lookupUserId(display) {
         const userEntry = Object.values(this.userMap).find(u =>
             (u.displayName || u.email) === display);
@@ -1070,7 +1055,7 @@ class MumatecTaskManager {
         });
 
         // Search
-        document.getElementById('searchInput').addEventListener('input', this.debounce((e) => {
+        document.getElementById('searchInput').addEventListener('input', debounceUtil((e) => {
             this.searchTerm = e.target.value.trim();
             this.updateUI();
         }, 300));
@@ -1269,8 +1254,8 @@ class MumatecTaskManager {
         notification.className = `notification ${type}`;
         
         notification.innerHTML = `
-            <div class="notification-title">${this.escapeHtml(title)}</div>
-            <div class="notification-body">${this.escapeHtml(message)}</div>
+            <div class="notification-title">${escapeHtmlUtil(title)}</div>
+            <div class="notification-body">${escapeHtmlUtil(message)}</div>
         `;
         
         container.appendChild(notification);
@@ -1356,11 +1341,11 @@ class MumatecTaskManager {
                     if (!line) continue;
 
                     try {
-                        const values = this.parseCSVLine(line);
+                        const values = parseCSVLineUtil(line);
                         if (values.length < headers.length) continue;
 
                         const task = {
-                            id: values[0] || this.generateId(),
+                            id: values[0] || generateId(),
                             title: values[1] || `Imported Task ${i}`,
                             description: values[2] || '',
                             priority: ['low', 'medium', 'high', 'critical'].includes(values[3]) ? values[3] : 'medium',
@@ -1397,10 +1382,6 @@ class MumatecTaskManager {
 
         reader.readAsText(file);
         event.target.value = '';
-    }
-
-    parseCSVLine(line) {
-        return parseCSVLineUtil(line);
     }
 
     loadStatusOrder() {
