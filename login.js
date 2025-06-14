@@ -14,6 +14,7 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
     'auth/user-disabled': 'Account disabled.',
     'auth/user-not-found': 'No account found for this email.',
     'auth/wrong-password': 'Incorrect password.',
+    'auth/invalid-credential': 'Invalid email or password.',
     'auth/network-request-failed': 'Network error. Check your connection.'
   };
   try {
