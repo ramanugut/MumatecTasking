@@ -915,6 +915,51 @@ body {
     flex-wrap: wrap;
 }
 
+.subtask-progress {
+    height: 4px;
+    background: var(--gray-200);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-top: 8px;
+}
+
+.subtask-progress-bar {
+    height: 100%;
+    background: var(--success-green);
+}
+
+.subtasks-container {
+    margin-top: 8px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.subtask-item {
+    font-size: 12px;
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.add-subtask-btn {
+    display: none;
+    position: absolute;
+    top: -4px;
+    right: 0;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    color: var(--text-tertiary);
+    font-size: 16px;
+}
+
+.task-card:hover .add-subtask-btn {
+    display: inline-flex;
+}
+
 .task-tag {
     background: var(--surface-secondary);
     color: var(--text-secondary);
