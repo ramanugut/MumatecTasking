@@ -35,6 +35,7 @@ class MumatecTaskManager {
         this.loadSidebarState();
         this.loadStatusOrder();
         this.loadCategoryOrder();
+        this.loadQuickNotes();
         this.setupEventListeners();
         this.setupSidebarToggle();
         setupDragAndDrop(this);
@@ -174,6 +175,8 @@ class MumatecTaskManager {
                 timeSpent: 0,
                 attachments: [],
                 comments: [],
+                notes: '',
+                activity: [{ action: 'Created task', timestamp: new Date().toISOString() }],
                 dueDate: new Date(Date.now() + 86400000).toISOString(),
                 createdAt: new Date().toISOString(),
                 updatedAt: new Date().toISOString()
@@ -193,6 +196,8 @@ class MumatecTaskManager {
                 timeSpent: 0,
                 attachments: [],
                 comments: [],
+                notes: '',
+                activity: [{ action: 'Created task', timestamp: new Date().toISOString() }],
                 createdAt: new Date().toISOString(),
                 updatedAt: new Date().toISOString()
             },
@@ -211,6 +216,8 @@ class MumatecTaskManager {
                 timeSpent: 0.5,
                 attachments: [],
                 comments: [],
+                notes: '',
+                activity: [{ action: 'Created task', timestamp: new Date().toISOString() }],
                 createdAt: new Date(Date.now() - 86400000).toISOString(),
                 updatedAt: new Date().toISOString()
             }
@@ -227,6 +234,7 @@ class MumatecTaskManager {
             id: generateId(),
             title: taskData.title.trim(),
             description: taskData.description?.trim() || '',
+            notes: taskData.notes?.trim() || '',
             priority: taskData.priority || 'medium',
             status: taskData.status || 'todo',
             dueDate: taskData.dueDate || null,
@@ -239,6 +247,7 @@ class MumatecTaskManager {
             attachments: taskData.attachments || [],
             comments: taskData.comments || [],
             tags: this.parseTags(taskData.tags),
+            activity: [{ action: 'Created task', timestamp: new Date().toISOString() }],
             createdAt: new Date().toISOString(),
             updatedAt: new Date().toISOString(),
             reminderSent: false
@@ -259,6 +268,7 @@ class MumatecTaskManager {
             ...this.tasks[taskIndex],
             title: taskData.title.trim(),
             description: taskData.description?.trim() || '',
+            notes: taskData.notes?.trim() || this.tasks[taskIndex].notes || '',
             priority: taskData.priority || 'medium',
             status: taskData.status || 'todo',
             dueDate: taskData.dueDate || null,
@@ -273,6 +283,8 @@ class MumatecTaskManager {
             tags: this.parseTags(taskData.tags),
             updatedAt: new Date().toISOString()
         };
+        this.tasks[taskIndex].activity = this.tasks[taskIndex].activity || [];
+        this.tasks[taskIndex].activity.push({ action: 'Updated task', timestamp: new Date().toISOString() });
 
         this.saveTaskToFirestore(this.tasks[taskIndex]);
         this.updateUI();
@@ -293,6 +305,8 @@ class MumatecTaskManager {
 
         task.status = newStatus;
         task.updatedAt = new Date().toISOString();
+        task.activity = task.activity || [];
+        task.activity.push({ action: `Moved to ${newStatus}`, timestamp: task.updatedAt });
 
         this.saveTaskToFirestore(task);
         this.updateUI();
@@ -307,6 +321,8 @@ class MumatecTaskManager {
         const nextPriority = this.priorities[(currentIndex + 1) % this.priorities.length];
         this.tasks[idx].priority = nextPriority;
         this.tasks[idx].updatedAt = new Date().toISOString();
+        this.tasks[idx].activity = this.tasks[idx].activity || [];
+        this.tasks[idx].activity.push({ action: `Priority set to ${nextPriority}`, timestamp: this.tasks[idx].updatedAt });
         this.saveTaskToFirestore(this.tasks[idx]);
         this.updateUI();
     }
@@ -603,6 +619,9 @@ class MumatecTaskManager {
             ? `<div class="task-tags">${task.tags.map(tag => `<span class="task-tag">${escapeHtmlUtil(tag)}</span>`).join('')}</div>`
             : '';
 
+        const notesHtml = task.notes ? `<button class="toggle-notes-btn">Notes</button><div class="task-notes collapsed">${escapeHtmlUtil(task.notes)}</div>` : '';
+        const commentsHtml = task.comments && task.comments.length ? `<button class="toggle-comments-btn">Comments (${task.comments.length})</button><div class="card-comments collapsed">${task.comments.map(c => `<div class="comment-item">${escapeHtmlUtil(c.text)}</div>`).join('')}</div>` : '';
+
         const assignee = this.userMap[task.assignedTo];
         const avatar = assignee && assignee.photoURL ? `<img src="${assignee.photoURL}" class="task-avatar" alt="${escapeHtmlUtil(assignee.displayName || '')}">` : '';
 
@@ -620,6 +639,8 @@ class MumatecTaskManager {
             ${task.description ? `<div class="task-description">${escapeHtmlUtil(task.description)}</div>` : ''}
 
             ${tagsHtml}
+            ${notesHtml}
+            ${commentsHtml}
             <div class="task-meta">
                 <span class="task-category">${escapeHtmlUtil(task.category || 'Work')}</span>
                 <span class="task-type">${escapeHtmlUtil(task.type || 'General')}</span>
@@ -646,6 +667,23 @@ class MumatecTaskManager {
             e.stopPropagation();
             this.stopTaskTimer(task.id);
         });
+
+        const notesToggle = taskDiv.querySelector('.toggle-notes-btn');
+        if (notesToggle) {
+            notesToggle.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const notesEl = taskDiv.querySelector('.task-notes');
+                if (notesEl) notesEl.classList.toggle('expanded');
+            });
+        }
+        const commentsToggle = taskDiv.querySelector('.toggle-comments-btn');
+        if (commentsToggle) {
+            commentsToggle.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const comEl = taskDiv.querySelector('.card-comments');
+                if (comEl) comEl.classList.toggle('expanded');
+            });
+        }
 
         if (this.activeTimers[task.id]) {
             startBtn.style.display = 'none';
@@ -832,6 +870,7 @@ class MumatecTaskManager {
         this.clearTaskForm();
         document.getElementById('taskStatus').value = status;
         document.getElementById('commentsContainer').innerHTML = '';
+        document.getElementById('activityFeed').innerHTML = '';
         const modal = document.getElementById('taskModal');
         modal.classList.add('active');
         modal.setAttribute('aria-hidden', 'false');
@@ -863,6 +902,8 @@ class MumatecTaskManager {
         }
         document.getElementById('commentsContainer').innerHTML = (task.comments || []).map(c => `<div class="comment-item"><div class="comment-meta">${escapeHtmlUtil(c.author)} - ${formatDateUtil(new Date(c.timestamp))}</div><div>${escapeHtmlUtil(c.text)}</div></div>`).join('');
         document.getElementById('taskComment').value = '';
+        document.getElementById('taskNotes').value = task.notes || '';
+        document.getElementById('activityFeed').innerHTML = (task.activity || []).slice().reverse().map(a => `<div class="activity-item">${escapeHtmlUtil(a.action)} - ${formatDateUtil(new Date(a.timestamp))}</div>`).join('');
         document.getElementById('taskTags').value = task.tags?.join(', ') || '';
         
         const modal = document.getElementById('taskModal');
@@ -894,6 +935,8 @@ class MumatecTaskManager {
         document.getElementById('taskAttachments').value = '';
         document.getElementById('taskComment').value = '';
         document.getElementById('commentsContainer').innerHTML = '';
+        document.getElementById('taskNotes').value = '';
+        document.getElementById('activityFeed').innerHTML = '';
         document.getElementById('taskTags').value = '';
     }
 
@@ -1297,6 +1340,7 @@ class MumatecTaskManager {
             timeSpent: document.getElementById('taskTimeSpent').value,
             attachments: Array.from(document.getElementById('taskAttachments').files).map(f => ({ name: f.name })),
             comments: this.collectNewComment(),
+            notes: document.getElementById('taskNotes').value,
             tags: document.getElementById('taskTags').value
         };
 
@@ -1676,6 +1720,15 @@ class MumatecTaskManager {
                 btn.setAttribute('aria-expanded', String(!collapsed));
             }
         }
+    }
+
+    loadQuickNotes() {
+        const area = document.getElementById('quickNotes');
+        if (!area) return;
+        area.value = localStorage.getItem('quickNotes') || '';
+        area.addEventListener('input', () => {
+            localStorage.setItem('quickNotes', area.value);
+        });
     }
 }
 

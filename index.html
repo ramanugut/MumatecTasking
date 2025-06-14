@@ -117,7 +117,7 @@
                 </div>
             </div>
 
-            <div class="sidebar-footer">
+                <div class="sidebar-footer">
                 <div class="productivity-ring">
                     <svg class="ring-progress" width="60" height="60">
                         <circle cx="30" cy="30" r="25" fill="none" stroke="#f0f0f0" stroke-width="4"/>
@@ -133,6 +133,9 @@
                 <div class="weekly-time">
                     <span id="weeklyHours">0h</span> this week
                     <button id="weeklyInsightsLink" class="insights-link" aria-haspopup="dialog"><span class="material-icons" style="font-size:16px;vertical-align:middle;">insights</span></button>
+                </div>
+                <div class="quick-notes">
+                    <textarea id="quickNotes" placeholder="Quick notes..."></textarea>
                 </div>
             </div>
         </div>
@@ -446,6 +449,11 @@
                         <label>Add Comment</label>
                         <textarea id="taskComment" rows="2" placeholder="Add a comment"></textarea>
                     </div>
+                    <div class="form-field">
+                        <label>Notes</label>
+                        <textarea id="taskNotes" rows="2" placeholder="Internal notes"></textarea>
+                    </div>
+                    <div class="activity-feed" id="activityFeed"></div>
                     <div class="form-field">
                         <label>Tags</label>
                         <input type="text" id="taskTags" placeholder="urgent, meeting, project">

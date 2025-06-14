@@ -1796,3 +1796,46 @@ body.dark-mode {
   z-index: 1000;
 }
 
+.task-notes,
+.card-comments {
+  display: none;
+  margin-top: 8px;
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+.task-notes.expanded,
+.card-comments.expanded {
+  display: block;
+}
+.toggle-notes-btn,
+.toggle-comments-btn {
+  background: none;
+  border: none;
+  color: var(--primary-blue);
+  font-size: 12px;
+  cursor: pointer;
+  margin-top: 4px;
+}
+.quick-notes {
+  padding: 12px;
+}
+.quick-notes textarea {
+  width: 100%;
+  min-height: 80px;
+  font-size: 12px;
+  padding: 8px;
+  border: 1px solid var(--border);
+  border-radius: var(--border-radius-sm);
+  resize: vertical;
+}
+.activity-feed {
+  margin-top: 8px;
+  max-height: 120px;
+  overflow-y: auto;
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+.activity-item {
+  margin-bottom: 4px;
+}
+
