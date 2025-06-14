@@ -309,7 +309,9 @@ class MumatecTaskManager {
 
             comments: taskData.comments || [],
             tags: this.parseTags(taskData.tags),
-            activity: [{ action: 'Created task', timestamp: new Date().toISOString() }],
+
+            subtasks: taskData.subtasks || [],
+
             createdAt: new Date().toISOString(),
             updatedAt: new Date().toISOString(),
             reminderSent: false
@@ -346,10 +348,14 @@ class MumatecTaskManager {
 
             comments: taskData.comments ? [...(this.tasks[taskIndex].comments || []), ...taskData.comments] : (this.tasks[taskIndex].comments || []),
             tags: this.parseTags(taskData.tags),
+
+            subtasks: Array.isArray(taskData.subtasks) ? taskData.subtasks : (this.tasks[taskIndex].subtasks || []),
+
             updatedAt: new Date().toISOString()
         };
         this.tasks[taskIndex].activity = this.tasks[taskIndex].activity || [];
         this.tasks[taskIndex].activity.push({ action: 'Updated task', timestamp: new Date().toISOString() });
+
 
 
         this.saveTaskToFirestore(this.tasks[taskIndex]);
@@ -379,6 +385,52 @@ class MumatecTaskManager {
         this.updateUI();
         return true;
     }
+
+
+    addSubtask(taskId, text) {
+        const task = this.tasks.find(t => t.id === taskId);
+        if (!task || !text) return;
+        if (!Array.isArray(task.subtasks)) task.subtasks = [];
+        task.subtasks.push({ id: generateId(), text: text.trim(), completed: false });
+        task.updatedAt = new Date().toISOString();
+        this.saveTaskToFirestore(task);
+        this.updateUI();
+    }
+
+    toggleSubtask(taskId, subtaskId) {
+        const task = this.tasks.find(t => t.id === taskId);
+        if (!task || !Array.isArray(task.subtasks)) return;
+        const sub = task.subtasks.find(s => s.id === subtaskId);
+        if (!sub) return;
+        sub.completed = !sub.completed;
+        task.updatedAt = new Date().toISOString();
+        this.saveTaskToFirestore(task);
+        this.updateUI();
+    }
+
+
+    addSubtask(taskId, text) {
+        const task = this.tasks.find(t => t.id === taskId);
+        if (!task || !text) return;
+        if (!Array.isArray(task.subtasks)) task.subtasks = [];
+        task.subtasks.push({ id: generateId(), text: text.trim(), completed: false });
+        task.updatedAt = new Date().toISOString();
+        this.saveTaskToFirestore(task);
+        this.updateUI();
+    }
+
+    toggleSubtask(taskId, subtaskId) {
+        const task = this.tasks.find(t => t.id === taskId);
+        if (!task || !Array.isArray(task.subtasks)) return;
+        const sub = task.subtasks.find(s => s.id === subtaskId);
+        if (!sub) return;
+        sub.completed = !sub.completed;
+        task.updatedAt = new Date().toISOString();
+        this.saveTaskToFirestore(task);
+        this.updateUI();
+    }
+
+
 
     toggleTaskPriority(taskId) {
 
@@ -692,6 +744,7 @@ class MumatecTaskManager {
             ? `<div class="task-tags">${task.tags.map(tag => `<span class="task-tag">${escapeHtmlUtil(tag)}</span>`).join('')}</div>`
             : '';
 
+
         const notesHtml = task.notes ? `<button class="toggle-notes-btn">Notes</button><div class="task-notes collapsed">${escapeHtmlUtil(task.notes)}</div>` : '';
         const commentsHtml = task.comments && task.comments.length ? `<button class="toggle-comments-btn">Comments (${task.comments.length})</button><div class="card-comments collapsed">${task.comments.map(c => `<div class="comment-item">${escapeHtmlUtil(c.text)}</div>`).join('')}</div>` : '';
 
@@ -699,8 +752,16 @@ class MumatecTaskManager {
             ? `<div class="task-labels">${task.labels.map(l => `<span class="task-label" style="background:${this.labelMap[l] || '#888'}">${escapeHtmlUtil(l)}</span>`).join('')}</div>`
             : '';
 
+
         const assignee = this.userMap[task.assignedTo];
         const avatar = assignee && assignee.photoURL ? `<img src="${assignee.photoURL}" class="task-avatar" alt="${escapeHtmlUtil(assignee.displayName || '')}">` : '';
+
+        const subtasks = Array.isArray(task.subtasks) ? task.subtasks : [];
+        const completedSub = subtasks.filter(s => s.completed).length;
+        const progress = subtasks.length ? Math.round((completedSub / subtasks.length) * 100) : 0;
+        const subHtml = subtasks.map(st => `<label class="subtask-item"><input type="checkbox" data-subtask-id="${st.id}" ${st.completed ? 'checked' : ''}>${escapeHtmlUtil(st.text)}</label>`).join('');
+ar = assignee && assignee.photoURL ? `<img src="${assignee.photoURL}" class="task-avatar" alt="${escapeHtmlUtil(assignee.displayName || '')}">` : '';
+
 
         const subtasks = Array.isArray(task.subtasks) ? task.subtasks : [];
         const completedSub = subtasks.filter(s => s.completed).length;
@@ -720,9 +781,12 @@ class MumatecTaskManager {
             </div>
 
 
+            ${task.description ? `<div class="task-description">${escapeHtmlUtil(task.description)}</div>` : ''}
+
             ${tagsHtml}
-            ${notesHtml}
-            ${commentsHtml}
+            ${subtasks.length ? `<div class="subtask-progress"><div class="subtask-progress-bar" style="width:${progress}%"></div></div>` : ''}
+            <div class="subtasks-container">${subHtml}<button class="add-subtask-btn" title="Add subtask"><span class="material-icons">add</span></button></div>
+
             <div class="task-meta">
 
                 <span class="task-category">${escapeHtmlUtil(task.category || 'Work')}</span>
@@ -751,6 +815,7 @@ class MumatecTaskManager {
             this.stopTaskTimer(task.id);
         });
 
+
         const notesToggle = taskDiv.querySelector('.toggle-notes-btn');
         if (notesToggle) {
             notesToggle.addEventListener('click', (e) => {
@@ -767,6 +832,7 @@ class MumatecTaskManager {
                 if (comEl) comEl.classList.toggle('expanded');
             });
         }
+
 
         if (this.activeTimers[task.id]) {
             startBtn.style.display = 'none';
@@ -794,6 +860,7 @@ class MumatecTaskManager {
 
         return taskDiv;
     }
+
 
     renderTodayView() {
         const today = new Date().toDateString();
