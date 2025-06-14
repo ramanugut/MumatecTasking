@@ -14,7 +14,8 @@ class MumatecTaskManager {
         this.searchTerm = '';
         this.activeFilter = null;
         this.statuses = ['todo', 'inprogress', 'review', 'done', 'blocked', 'cancelled'];
-        this.priorities = ['low', 'medium', 'high', 'critical'];
+        // Order from highest to lowest for easy comparison
+        this.priorities = ['critical', 'high', 'medium', 'low'];
         this.samplePushed = false;
         this.customTypes = [];
         this.users = [];
@@ -292,10 +293,22 @@ class MumatecTaskManager {
 
         task.status = newStatus;
         task.updatedAt = new Date().toISOString();
-        
+
         this.saveTaskToFirestore(task);
         this.updateUI();
         return true;
+    }
+
+    toggleTaskPriority(taskId) {
+        const idx = this.tasks.findIndex(t => t.id === taskId);
+        if (idx === -1) return;
+        const current = this.tasks[idx].priority || 'medium';
+        const currentIndex = this.priorities.indexOf(current);
+        const nextPriority = this.priorities[(currentIndex + 1) % this.priorities.length];
+        this.tasks[idx].priority = nextPriority;
+        this.tasks[idx].updatedAt = new Date().toISOString();
+        this.saveTaskToFirestore(this.tasks[idx]);
+        this.updateUI();
     }
 
     parseTags(tagsString) {
@@ -481,18 +494,24 @@ class MumatecTaskManager {
             `;
         });
 
-        // Render tasks
+        const tasksByStatus = {};
         filteredTasks.forEach(task => {
-            const taskElement = this.createTaskCard(task);
-            const targetBoard = document.getElementById(`${task.status}Board`);
-            if (targetBoard) {
-                targetBoard.appendChild(taskElement);
-            }
+            if (!tasksByStatus[task.status]) tasksByStatus[task.status] = [];
+            tasksByStatus[task.status].push(task);
+        });
+
+        this.statuses.forEach(status => {
+            const board = document.getElementById(`${status}Board`);
+            const tasks = (tasksByStatus[status] || []).sort((a, b) => this.comparePriority(a, b));
+            tasks.forEach(t => {
+                const el = this.createTaskCard(t);
+                board.appendChild(el);
+            });
         });
 
         // Update column counts
         this.statuses.forEach(status => {
-            const count = filteredTasks.filter(task => task.status === status).length;
+            const count = (tasksByStatus[status] || []).length;
             const countElement = document.getElementById(`${status}Count`);
             if (countElement) {
                 countElement.textContent = count;
@@ -523,11 +542,17 @@ class MumatecTaskManager {
             cancelled: 'Cancelled'
         };
 
+        const tasksByStatus = {};
+        filteredTasks.forEach(t => {
+            if (!tasksByStatus[t.status]) tasksByStatus[t.status] = [];
+            tasksByStatus[t.status].push(t);
+        });
+
         this.statuses.forEach(status => {
             const row = document.createElement('div');
             row.className = 'row-container';
             row.dataset.status = status;
-            const count = filteredTasks.filter(t => t.status === status).length;
+            const count = (tasksByStatus[status] || []).length;
             row.innerHTML = `
                 <div class="row-header">
                     <div class="row-title">${statusLabels[status]}</div>
@@ -547,12 +572,13 @@ class MumatecTaskManager {
             container.appendChild(row);
         });
 
-        filteredTasks.forEach(task => {
-            const taskElement = this.createTaskCard(task);
-            const target = document.getElementById(`${task.status}Row`);
-            if (target) {
-                target.appendChild(taskElement);
-            }
+        this.statuses.forEach(status => {
+            const row = document.getElementById(`${status}Row`);
+            const tasks = (tasksByStatus[status] || []).sort((a, b) => this.comparePriority(a, b));
+            tasks.forEach(t => {
+                const el = this.createTaskCard(t);
+                if (row) row.appendChild(el);
+            });
         });
 
         this.attachMoveControls();
@@ -582,11 +608,12 @@ class MumatecTaskManager {
         const avatar = assignee && assignee.photoURL ? `<img src="${assignee.photoURL}" class="task-avatar" alt="${escapeHtmlUtil(assignee.displayName || '')}">` : '';
 
         taskDiv.innerHTML = `
-            <div class="task-priority priority-${task.priority}"></div>
+            <div class="task-priority priority-${task.priority}" title="${escapeHtmlUtil(task.priority)}"></div>
             <div class="task-header">
                 <span class="material-icons drag-handle" aria-hidden="true">drag_handle</span>
                 <div class="task-title">${escapeHtmlUtil(task.title)}</div>
                 <div class="task-actions">
+                    <button class="task-action-btn priority-toggle" onclick="todoApp.toggleTaskPriority('${task.id}')" title="Toggle priority"><span class="material-icons">flag</span></button>
                     <button class="task-action-btn" onclick="todoApp.openEditTaskModal('${task.id}')" title="Edit"><span class="material-icons">edit</span></button>
                     <button class="task-action-btn" onclick="todoApp.confirmDeleteTask('${task.id}')" title="Delete"><span class="material-icons">delete</span></button>
                 </div>
@@ -989,6 +1016,10 @@ class MumatecTaskManager {
             totals[cat] = (totals[cat] || 0) + spent;
         }
         return totals;
+    }
+
+    comparePriority(a, b) {
+        return this.priorities.indexOf(a.priority || 'medium') - this.priorities.indexOf(b.priority || 'medium');
     }
 
     getWeeklyData() {
