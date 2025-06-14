@@ -894,6 +894,35 @@ body {
     font-weight: 500;
 }
 
+.task-timer {
+    margin-top: 8px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.timer-btn {
+    border: none;
+    background: var(--surface-secondary);
+    color: var(--text-primary);
+    border-radius: 4px;
+    padding: 2px 6px;
+    font-size: 10px;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.timer-btn:hover {
+    background: var(--gray-200);
+}
+
+.timer-indicator {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--success-green);
+}
+
 .add-task-card {
     background: var(--surface);
     border: 2px dashed var(--border);

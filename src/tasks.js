@@ -1,5 +1,6 @@
 // Mumatec Task Manager - Professional Application
-import { db } from '../firebase.js';
+import { db, functions } from '../firebase.js';
+import { httpsCallable } from 'https://www.gstatic.com/firebasejs/11.9.0/firebase-functions.js';
 import { generateId, escapeHtml as escapeHtmlUtil, parseCSVLine as parseCSVLineUtil, formatDate as formatDateUtil, debounce as debounceUtil } from './utils.js';
 import { setupDragAndDrop, setupAutoScroll } from './ui.js';
 import { collection, setDoc, doc, deleteDoc, onSnapshot, getDocs, getDoc } from 'https://www.gstatic.com/firebasejs/11.9.0/firebase-firestore.js';
@@ -18,6 +19,7 @@ class MumatecTaskManager {
         this.customTypes = [];
         this.users = [];
         this.userMap = {};
+        this.activeTimers = {};
         this.categoryOrder = ['Work', 'Personal', 'Development'];
         this.categoryIcons = { Work: 'work', Personal: 'home', Development: 'code' };
         
@@ -583,7 +585,35 @@ class MumatecTaskManager {
                 ${task.dueDate ? `<span class="task-due ${isOverdue ? 'overdue' : (isDueSoon ? 'soon' : '')}">${dueText}</span>` : ''}
                 ${avatar}
             </div>
+            <div class="task-timer">
+                <span class="timer-indicator" aria-hidden="true"></span>
+                <button class="timer-btn task-start-btn" aria-label="Start timer">Start</button>
+                <button class="timer-btn task-stop-btn" aria-label="Stop timer">Stop</button>
+            </div>
         `;
+
+        const startBtn = taskDiv.querySelector('.task-start-btn');
+        const stopBtn = taskDiv.querySelector('.task-stop-btn');
+        const indicator = taskDiv.querySelector('.timer-indicator');
+
+        startBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            this.startTaskTimer(task.id);
+        });
+        stopBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            this.stopTaskTimer(task.id);
+        });
+
+        if (this.activeTimers[task.id]) {
+            startBtn.style.display = 'none';
+            stopBtn.style.display = 'inline-flex';
+            indicator.style.display = 'inline-block';
+        } else {
+            startBtn.style.display = 'inline-flex';
+            stopBtn.style.display = 'none';
+            indicator.style.display = 'none';
+        }
 
         return taskDiv;
     }
@@ -1462,6 +1492,52 @@ class MumatecTaskManager {
                 this.moveCategory(btn.dataset.category, btn.dataset.direction);
             };
         });
+    }
+
+    updateTaskTimerUI(taskId, running) {
+        const card = document.querySelector(`[data-task-id="${taskId}"]`);
+        if (!card) return;
+        const startBtn = card.querySelector('.task-start-btn');
+        const stopBtn = card.querySelector('.task-stop-btn');
+        const indicator = card.querySelector('.timer-indicator');
+        if (running) {
+            if (startBtn) startBtn.style.display = 'none';
+            if (stopBtn) stopBtn.style.display = 'inline-flex';
+            if (indicator) indicator.style.display = 'inline-block';
+        } else {
+            if (startBtn) startBtn.style.display = 'inline-flex';
+            if (stopBtn) stopBtn.style.display = 'none';
+            if (indicator) indicator.style.display = 'none';
+        }
+    }
+
+    startTaskTimer(taskId) {
+        if (this.activeTimers[taskId]) return;
+        this.activeTimers[taskId] = Date.now();
+        this.updateTaskTimerUI(taskId, true);
+    }
+
+    async stopTaskTimer(taskId) {
+        const start = this.activeTimers[taskId];
+        if (!start) return;
+        const minutes = Math.round((Date.now() - start) / 60000);
+        delete this.activeTimers[taskId];
+        const task = this.tasks.find(t => t.id === taskId);
+        if (task) {
+            task.timeSpent = parseFloat(task.timeSpent || 0) + minutes / 60;
+            task.updatedAt = new Date().toISOString();
+            this.saveTaskToFirestore(task);
+        }
+        try {
+            if (task && task.projectId) {
+                const fn = httpsCallable(functions, 'logTimeEntry');
+                await fn({ projectId: task.projectId, taskId, minutes });
+            }
+        } catch (e) {
+            console.warn('logTimeEntry failed', e);
+        }
+        this.updateTaskTimerUI(taskId, false);
+        this.updateUI();
     }
 
     // Theme Management
