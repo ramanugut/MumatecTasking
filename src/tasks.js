@@ -14,8 +14,8 @@ class MumatecTaskManager {
         this.searchTerm = '';
         this.activeFilter = null;
         this.statuses = ['todo', 'inprogress', 'review', 'done', 'blocked', 'cancelled'];
-        // Order from highest to lowest for easy comparison
-        this.priorities = ['critical', 'high', 'medium', 'low'];
+
+        this.priorities = ['low', 'medium', 'high', 'critical'];
         this.samplePushed = false;
         this.customTypes = [];
         this.users = [];
@@ -317,6 +317,7 @@ class MumatecTaskManager {
     }
 
     // UI Management
+
     updateUI() {
         const stats = this.getTaskStats();
         const timeTotals = this.computeTimeTotals();
@@ -511,7 +512,7 @@ class MumatecTaskManager {
 
         // Update column counts
         this.statuses.forEach(status => {
-            const count = (tasksByStatus[status] || []).length;
+            const count = filteredTasks.filter(task => task.status === status).length;
             const countElement = document.getElementById(`${status}Count`);
             if (countElement) {
                 countElement.textContent = count;
@@ -520,6 +521,7 @@ class MumatecTaskManager {
 
         this.attachMoveControls();
     }
+
 
     renderListView() {
         const filteredTasks = this.getFilteredTasks();
@@ -542,17 +544,12 @@ class MumatecTaskManager {
             cancelled: 'Cancelled'
         };
 
-        const tasksByStatus = {};
-        filteredTasks.forEach(t => {
-            if (!tasksByStatus[t.status]) tasksByStatus[t.status] = [];
-            tasksByStatus[t.status].push(t);
-        });
 
         this.statuses.forEach(status => {
             const row = document.createElement('div');
             row.className = 'row-container';
             row.dataset.status = status;
-            const count = (tasksByStatus[status] || []).length;
+            const count = filteredTasks.filter(t => t.status === status).length;
             row.innerHTML = `
                 <div class="row-header">
                     <div class="row-title">${statusLabels[status]}</div>
@@ -567,22 +564,24 @@ class MumatecTaskManager {
                         <span class="material-icons add-icon">add</span>
                         <span>Add task</span>
                     </div>
+
                 </div>
             `;
             container.appendChild(row);
         });
 
-        this.statuses.forEach(status => {
-            const row = document.getElementById(`${status}Row`);
-            const tasks = (tasksByStatus[status] || []).sort((a, b) => this.comparePriority(a, b));
-            tasks.forEach(t => {
-                const el = this.createTaskCard(t);
-                if (row) row.appendChild(el);
-            });
+
+        filteredTasks.forEach(task => {
+            const taskElement = this.createTaskCard(task);
+            const target = document.getElementById(`${task.status}Row`);
+            if (target) {
+                target.appendChild(taskElement);
+            }
         });
 
         this.attachMoveControls();
     }
+
 
     createTaskCard(task) {
         const taskDiv = document.createElement('div');
@@ -607,18 +606,19 @@ class MumatecTaskManager {
         const assignee = this.userMap[task.assignedTo];
         const avatar = assignee && assignee.photoURL ? `<img src="${assignee.photoURL}" class="task-avatar" alt="${escapeHtmlUtil(assignee.displayName || '')}">` : '';
 
+
         taskDiv.innerHTML = `
-            <div class="task-priority priority-${task.priority}" title="${escapeHtmlUtil(task.priority)}"></div>
+            <div class="task-priority priority-${task.priority}"></div>
             <div class="task-header">
                 <span class="material-icons drag-handle" aria-hidden="true">drag_handle</span>
                 <div class="task-title">${escapeHtmlUtil(task.title)}</div>
                 <div class="task-actions">
-                    <button class="task-action-btn priority-toggle" onclick="todoApp.toggleTaskPriority('${task.id}')" title="Toggle priority"><span class="material-icons">flag</span></button>
                     <button class="task-action-btn" onclick="todoApp.openEditTaskModal('${task.id}')" title="Edit"><span class="material-icons">edit</span></button>
                     <button class="task-action-btn" onclick="todoApp.confirmDeleteTask('${task.id}')" title="Delete"><span class="material-icons">delete</span></button>
                 </div>
             </div>
             ${task.description ? `<div class="task-description">${escapeHtmlUtil(task.description)}</div>` : ''}
+
             ${tagsHtml}
             <div class="task-meta">
                 <span class="task-category">${escapeHtmlUtil(task.category || 'Work')}</span>
@@ -1005,6 +1005,7 @@ class MumatecTaskManager {
             }
         }
 
+
         return stats;
     }
 
@@ -1016,10 +1017,6 @@ class MumatecTaskManager {
             totals[cat] = (totals[cat] || 0) + spent;
         }
         return totals;
-    }
-
-    comparePriority(a, b) {
-        return this.priorities.indexOf(a.priority || 'medium') - this.priorities.indexOf(b.priority || 'medium');
     }
 
     getWeeklyData() {
@@ -1103,6 +1100,30 @@ class MumatecTaskManager {
         return highPriority.length > 0 ? Math.round((completedHigh.length / highPriority.length) * 100) : 100;
     }
 
+    getWeeklyTimeSpent() {
+        const start = new Date();
+        start.setDate(start.getDate() - 6);
+        start.setHours(0, 0, 0, 0);
+        const end = new Date();
+        end.setHours(23, 59, 59, 999);
+        let total = 0;
+        this.tasks.forEach(task => {
+            if (!task.updatedAt) return;
+            const d = new Date(task.updatedAt);
+            if (d >= start && d <= end) {
+                total += parseFloat(task.timeSpent || 0);
+            }
+        });
+        return Math.round(total * 100) / 100;
+    }
+
+    updateWeeklyTime() {
+        const el = document.getElementById('weeklyHours');
+        if (el) {
+            el.textContent = `${this.getWeeklyTimeSpent().toFixed(1)}h`;
+        }
+    }
+
     lookupUserId(display) {
         const userEntry = Object.values(this.userMap).find(u =>
             (u.displayName || u.email) === display);
@@ -1176,6 +1197,10 @@ class MumatecTaskManager {
         const insightsClose = document.getElementById('insightsClose');
         if (insightsClose) {
             insightsClose.addEventListener('click', () => this.closeInsights());
+        }
+        const weeklyInsightsLink = document.getElementById('weeklyInsightsLink');
+        if (weeklyInsightsLink) {
+            weeklyInsightsLink.addEventListener('click', () => this.openInsights());
         }
 
         // Date shortcuts
