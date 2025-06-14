@@ -1,0 +1,10 @@
+{
+  "name": "mumatec-tasking",
+  "private": true,
+  "scripts": {
+    "dev": "serve -l 5000"
+  },
+  "devDependencies": {
+    "serve": "^14.2.0"
+  }
+}

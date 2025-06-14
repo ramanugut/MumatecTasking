@@ -7,11 +7,12 @@ and always has full rights to manage other users.
 
 ## Setup
 
-1. Serve the files using any static server (e.g. `npx serve`).
-2. Visit `login.html` to sign in with your admin credentials.
-3. If you do not have an account, use `signup.html` which will create a client
+1. Install dependencies with `npm install`.
+2. Start the dev server using `npm run dev` (uses `serve` under the hood).
+3. Visit `login.html` to sign in with your admin credentials.
+4. If you do not have an account, use `signup.html` which will create a client
    profile and take you through onboarding.
-4. After signing in you will be redirected to `index.html` where you can manage
+5. After signing in you will be redirected to `index.html` where you can manage
    your tasks.
 
 Firebase is pre-configured with project **mumatectasking**. Update `firebase.js`
