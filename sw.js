@@ -1,4 +1,6 @@
-const CACHE_NAME = 'app-cache-v3';
+const CACHE_VERSION = 'v4';
+const STATIC_CACHE = `static-${CACHE_VERSION}`;
+const RUNTIME_CACHE = `runtime-${CACHE_VERSION}`;
 const ASSETS = [
   './',
   './index.html',
@@ -16,7 +18,7 @@ const ASSETS = [
 
 self.addEventListener('install', event => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then(cache => cache.addAll(ASSETS))
+    caches.open(STATIC_CACHE).then(cache => cache.addAll(ASSETS))
   );
   self.skipWaiting();
 });
@@ -24,21 +26,53 @@ self.addEventListener('install', event => {
 self.addEventListener('activate', event => {
   event.waitUntil(
     caches.keys().then(keys => Promise.all(
-      keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k))
+      keys.filter(k => ![STATIC_CACHE, RUNTIME_CACHE].includes(k))
+        .map(k => caches.delete(k))
     ))
   );
   self.clients.claim();
 });
 
+function limitCacheSize(cacheName, maxItems) {
+  caches.open(cacheName).then(cache => {
+    cache.keys().then(keys => {
+      if (keys.length > maxItems) {
+        cache.delete(keys[0]).then(() => limitCacheSize(cacheName, maxItems));
+      }
+    });
+  });
+}
+
 self.addEventListener('fetch', event => {
   if (event.request.method !== 'GET') return;
-  event.respondWith(
-    fetch(event.request)
-      .then(response => {
-        const clone = response.clone();
-        caches.open(CACHE_NAME).then(cache => cache.put(event.request, clone));
-        return response;
+  const url = new URL(event.request.url);
+  const isSameOrigin = url.origin === self.location.origin;
+
+  // Ignore cross-origin requests like Firebase APIs
+  if (!isSameOrigin) return;
+
+  const isAsset = ASSETS.includes(url.pathname) ||
+    ['document', 'script', 'style'].includes(event.request.destination);
+
+  if (isAsset) {
+    event.respondWith(
+      caches.match(event.request).then(cached => {
+        return cached || fetch(event.request).then(response => {
+          const clone = response.clone();
+          caches.open(STATIC_CACHE).then(cache => cache.put(event.request, clone));
+          return response;
+        });
       })
-      .catch(() => caches.match(event.request))
-  );
+    );
+  } else {
+    event.respondWith(
+      caches.open(RUNTIME_CACHE).then(cache => {
+        return fetch(event.request).then(response => {
+          cache.put(event.request, response.clone());
+          limitCacheSize(RUNTIME_CACHE, 50);
+          return response;
+        }).catch(() => cache.match(event.request));
+      })
+    );
+  }
 });
