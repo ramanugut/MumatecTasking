@@ -34,7 +34,7 @@ document.getElementById('signupForm').addEventListener('submit', async (e) => {
       onboarded: false,
       notifications: { email: emailNotif, push: pushNotif }
     });
-    window.location.href = 'client-onboarding.html';
+    window.location.href = 'index.html';
   } catch (err) {
     errorEl.textContent = err.message;
   }

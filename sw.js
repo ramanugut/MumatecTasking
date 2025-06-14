@@ -7,7 +7,6 @@ const ASSETS = [
   './admin.html',
   './login.html',
   './login.js',
-  './client-portal.html',
   './admin.js',
   './auth.js',
   './firebase.js',
