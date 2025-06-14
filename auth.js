@@ -33,14 +33,6 @@ onAuthStateChanged(auth, async (user) => {
           await signOut(auth);
           return;
         }
-        if (docData.onboarded === false && !location.pathname.endsWith('onboarding.html') && !location.pathname.endsWith('client-onboarding.html')) {
-          if (role === 'client') {
-            window.location.href = 'client-onboarding.html';
-          } else {
-            window.location.href = 'onboarding.html';
-          }
-          return;
-        }
       }
     } catch (e) {
       console.error('Failed to fetch user role', e);

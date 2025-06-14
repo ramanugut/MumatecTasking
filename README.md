@@ -11,7 +11,7 @@ and always has full rights to manage other users.
 2. Start the dev server using `npm run dev` (uses `serve` under the hood).
 3. Visit `login.html` to sign in with your admin credentials.
 4. If you do not have an account, use `signup.html` which will create a client
-   profile and take you through onboarding.
+   profile.
 5. After signing in you will be redirected to `index.html` where you can manage
    your tasks.
 
@@ -48,9 +48,6 @@ Admins can now:
 - Generate password reset links for users
 - Activate or deactivate accounts
 - Impersonate users
-- Bulk update roles and invite users via CSV
-- Invite individual users with pre-assigned roles
-- Temporary guest access with automatic expiration
 - View audit logs of all admin actions
 - Manage teams, projects and client assignments
 
@@ -95,14 +92,6 @@ Administrators can define additional roles with granular permissions using the n
 Create/Read/Update/Delete rights for Projects, Tasks, Users, Reports, Settings,
 Billing and Client Data. Resource level access can be limited to specific
 projects or clients and features may be toggled on or off per role.
-
-## User Invitation & Onboarding
-
-Admins can send invites directly from `invite.html`. Invited users receive a password
-reset link and are assigned a role before their first login. Temporary guest
-accounts can include an expiration date. New users are guided through an
-onboarding checklist on first login and clients are shown a separate tutorial.
-
 
 ## Workflow Documentation
 For an overview of task statuses, priorities, and categories, see [WORKFLOW.md](./WORKFLOW.md).
