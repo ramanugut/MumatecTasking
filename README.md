@@ -20,6 +20,13 @@ Firebase is pre-configured with project **mumatectasking**. Update `firebase.js`
 Tasks are stored in **Firebase Firestore** so they sync across devices. Offline
 changes are queued and saved once connectivity returns.
 
+### Firebase Authorized Domains
+
+If you deploy the app to an external site such as **GitHub Pages**, add that
+domain to Firebase Authentication's allowed list. In the Firebase console open
+**Authentication**, select **Settings**, and enter your site under
+**Authorized domains**.
+
 ## Usage Notes
 
 - When dragging a task, keeping the pointer near the viewport edges will
