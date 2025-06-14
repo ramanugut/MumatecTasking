@@ -304,6 +304,7 @@ class MumatecTaskManager {
     }
 
     // UI Management
+
     updateUI() {
         const stats = this.getTaskStats();
         const timeTotals = this.computeTimeTotals();
@@ -1072,6 +1073,30 @@ class MumatecTaskManager {
         return highPriority.length > 0 ? Math.round((completedHigh.length / highPriority.length) * 100) : 100;
     }
 
+    getWeeklyTimeSpent() {
+        const start = new Date();
+        start.setDate(start.getDate() - 6);
+        start.setHours(0, 0, 0, 0);
+        const end = new Date();
+        end.setHours(23, 59, 59, 999);
+        let total = 0;
+        this.tasks.forEach(task => {
+            if (!task.updatedAt) return;
+            const d = new Date(task.updatedAt);
+            if (d >= start && d <= end) {
+                total += parseFloat(task.timeSpent || 0);
+            }
+        });
+        return Math.round(total * 100) / 100;
+    }
+
+    updateWeeklyTime() {
+        const el = document.getElementById('weeklyHours');
+        if (el) {
+            el.textContent = `${this.getWeeklyTimeSpent().toFixed(1)}h`;
+        }
+    }
+
     lookupUserId(display) {
         const userEntry = Object.values(this.userMap).find(u =>
             (u.displayName || u.email) === display);
@@ -1145,6 +1170,10 @@ class MumatecTaskManager {
         const insightsClose = document.getElementById('insightsClose');
         if (insightsClose) {
             insightsClose.addEventListener('click', () => this.closeInsights());
+        }
+        const weeklyInsightsLink = document.getElementById('weeklyInsightsLink');
+        if (weeklyInsightsLink) {
+            weeklyInsightsLink.addEventListener('click', () => this.openInsights());
         }
 
         // Date shortcuts
