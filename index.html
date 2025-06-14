@@ -27,6 +27,17 @@
 
                 <span class="material-icons search-icon">search</span>
             </div>
+            <div class="label-manager">
+                <button id="labelsToggle" class="action-btn secondary" aria-label="Manage labels"><span class="material-icons">label</span></button>
+                <div class="label-dropdown" id="labelsDropdown">
+                    <div id="labelList"></div>
+                    <div class="label-add">
+                        <input type="text" id="newLabelName" placeholder="Label name">
+                        <input type="color" id="newLabelColor" value="#42a5f5">
+                        <button id="addLabelBtn" class="small-btn">Add</button>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <div class="top-bar-right">
@@ -419,8 +430,9 @@
                     <div class="form-row">
                         <div class="form-field">
                             <label>Assignee</label>
-                            <input type="text" id="taskAssignee" list="assigneeSuggestions" placeholder="Assign user">
-                            <datalist id="assigneeSuggestions"></datalist>
+                            <select id="taskAssignee"></select>
+                            <button type="button" id="assignToMeBtn" class="assign-me-btn">Assign to me</button>
+                            <img id="assigneeAvatarPreview" class="task-avatar" style="display:none;margin-top:4px;" alt="Assignee avatar">
                         </div>
                         <div class="form-field">
                             <label>Dependencies</label>
@@ -457,6 +469,11 @@
                     <div class="form-field">
                         <label>Tags</label>
                         <input type="text" id="taskTags" placeholder="urgent, meeting, project">
+                    </div>
+                    <div class="form-field">
+                        <label>Labels</label>
+                        <input type="text" id="taskLabels" list="labelSuggestions" placeholder="Client Work, Urgent">
+                        <datalist id="labelSuggestions"></datalist>
                     </div>
                 </div>
 

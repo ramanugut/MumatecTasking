@@ -20,6 +20,8 @@ class MumatecTaskManager {
         this.customTypes = [];
         this.users = [];
         this.userMap = {};
+        this.labelsConfig = [];
+        this.labelMap = {};
         this.activeTimers = {};
         this.categoryOrder = ['Work', 'Personal', 'Development'];
         this.categoryIcons = { Work: 'work', Personal: 'home', Development: 'code' };
@@ -31,6 +33,7 @@ class MumatecTaskManager {
         await this.loadTasks();
         await this.loadTaskTypes();
         await this.loadUsers();
+        this.loadLabels();
         this.loadTheme();
         this.loadSidebarState();
         this.loadStatusOrder();
@@ -143,7 +146,7 @@ class MumatecTaskManager {
             this.users = [];
             this.userMap = {};
         }
-        this.populateAssigneeDatalist();
+        this.populateAssigneeDropdown();
     }
 
     populateTypeDatalist() {
@@ -152,10 +155,64 @@ class MumatecTaskManager {
         list.innerHTML = this.customTypes.map(t => `<option value="${escapeHtmlUtil(t)}"></option>`).join('');
     }
 
-    populateAssigneeDatalist() {
-        const list = document.getElementById('assigneeSuggestions');
+    populateAssigneeDropdown() {
+        const select = document.getElementById('taskAssignee');
+        if (!select) return;
+        select.innerHTML = `<option value="">Unassigned</option>` +
+            this.users.map(u => `<option value="${u.id}">${escapeHtmlUtil(u.displayName || u.email)}</option>`).join('');
+    }
+
+    loadLabels() {
+        const saved = localStorage.getItem('taskLabels');
+        if (saved) {
+            try {
+                this.labelsConfig = JSON.parse(saved);
+            } catch (e) {
+                console.warn('Failed to parse labels', e);
+                this.labelsConfig = [];
+            }
+        }
+        if (this.labelsConfig.length === 0) {
+            this.labelsConfig = [
+                { name: 'Client Work', color: '#42a5f5' },
+                { name: 'Internal', color: '#66bb6a' },
+                { name: 'Urgent', color: '#ef5350' }
+            ];
+        }
+        this.labelsConfig.forEach(l => { this.labelMap[l.name] = l.color; });
+        this.populateLabelDatalist();
+        this.renderLabelDropdown();
+    }
+
+    saveLabels() {
+        localStorage.setItem('taskLabels', JSON.stringify(this.labelsConfig));
+    }
+
+    populateLabelDatalist() {
+        const list = document.getElementById('labelSuggestions');
         if (!list) return;
-        list.innerHTML = this.users.map(u => `<option value="${escapeHtmlUtil(u.displayName || u.email)}" data-uid="${u.id}"></option>`).join('');
+        list.innerHTML = this.labelsConfig.map(l => `<option value="${escapeHtmlUtil(l.name)}"></option>`).join('');
+    }
+
+    renderLabelDropdown() {
+        const container = document.getElementById('labelList');
+        if (!container) return;
+        container.innerHTML = '';
+        this.labelsConfig.forEach(l => {
+            const div = document.createElement('div');
+            div.className = 'label-item';
+            div.innerHTML = `<span class="color-box" style="background:${l.color}"></span>${escapeHtmlUtil(l.name)}`;
+            container.appendChild(div);
+        });
+    }
+
+    addLabel(name, color) {
+        if (!name) return;
+        this.labelsConfig.push({ name, color });
+        this.labelMap[name] = color;
+        this.saveLabels();
+        this.populateLabelDatalist();
+        this.renderLabelDropdown();
     }
 
     createSampleTasks() {
@@ -169,6 +226,7 @@ class MumatecTaskManager {
                 category: 'Work',
                 type: 'Maintenance',
                 tags: ['hosting', 'performance'],
+                labels: ['Urgent'],
                 assignedTo: null,
                 dependencies: [],
                 estimate: 2,
@@ -190,6 +248,7 @@ class MumatecTaskManager {
                 category: 'Work',
                 type: 'Compliance',
                 tags: ['documentation', 'clients'],
+                labels: ['Client Work'],
                 assignedTo: null,
                 dependencies: [],
                 estimate: 1,
@@ -210,6 +269,7 @@ class MumatecTaskManager {
                 category: 'Work',
                 type: 'User Account Management',
                 tags: ['meeting', 'team'],
+                labels: ['Internal'],
                 assignedTo: null,
                 dependencies: [],
                 estimate: 0.5,
@@ -244,7 +304,9 @@ class MumatecTaskManager {
             dependencies: this.parseTags(taskData.dependencies),
             estimate: parseFloat(taskData.estimate) || 0,
             timeSpent: parseFloat(taskData.timeSpent) || 0,
+
             attachments: taskData.attachments || [],
+
             comments: taskData.comments || [],
             tags: this.parseTags(taskData.tags),
             activity: [{ action: 'Created task', timestamp: new Date().toISOString() }],
@@ -252,6 +314,7 @@ class MumatecTaskManager {
             updatedAt: new Date().toISOString(),
             reminderSent: false
         };
+
 
         this.tasks.push(task);
         this.saveTaskToFirestore(task);
@@ -278,13 +341,16 @@ class MumatecTaskManager {
             dependencies: this.parseTags(taskData.dependencies),
             estimate: parseFloat(taskData.estimate) || this.tasks[taskIndex].estimate || 0,
             timeSpent: parseFloat(taskData.timeSpent) || this.tasks[taskIndex].timeSpent || 0,
+
             attachments: taskData.attachments && taskData.attachments.length ? [...(this.tasks[taskIndex].attachments || []), ...taskData.attachments] : (this.tasks[taskIndex].attachments || []),
+
             comments: taskData.comments ? [...(this.tasks[taskIndex].comments || []), ...taskData.comments] : (this.tasks[taskIndex].comments || []),
             tags: this.parseTags(taskData.tags),
             updatedAt: new Date().toISOString()
         };
         this.tasks[taskIndex].activity = this.tasks[taskIndex].activity || [];
         this.tasks[taskIndex].activity.push({ action: 'Updated task', timestamp: new Date().toISOString() });
+
 
         this.saveTaskToFirestore(this.tasks[taskIndex]);
         this.updateUI();
@@ -298,6 +364,7 @@ class MumatecTaskManager {
         this.updateUI();
         this.showNotification('Success', 'Task deleted successfully', 'success');
     }
+
 
     async moveTask(taskId, newStatus) {
         const task = this.tasks.find(t => t.id === taskId);
@@ -314,6 +381,7 @@ class MumatecTaskManager {
     }
 
     toggleTaskPriority(taskId) {
+
         const idx = this.tasks.findIndex(t => t.id === taskId);
         if (idx === -1) return;
         const current = this.tasks[idx].priority || 'medium';
@@ -330,6 +398,11 @@ class MumatecTaskManager {
     parseTags(tagsString) {
         if (!tagsString) return [];
         return tagsString.split(',').map(tag => tag.trim()).filter(tag => tag);
+    }
+
+    parseLabels(labelsString) {
+        if (!labelsString) return [];
+        return labelsString.split(',').map(l => l.trim()).filter(l => l);
     }
 
     // UI Management
@@ -622,8 +695,17 @@ class MumatecTaskManager {
         const notesHtml = task.notes ? `<button class="toggle-notes-btn">Notes</button><div class="task-notes collapsed">${escapeHtmlUtil(task.notes)}</div>` : '';
         const commentsHtml = task.comments && task.comments.length ? `<button class="toggle-comments-btn">Comments (${task.comments.length})</button><div class="card-comments collapsed">${task.comments.map(c => `<div class="comment-item">${escapeHtmlUtil(c.text)}</div>`).join('')}</div>` : '';
 
+        const labelsHtml = task.labels && task.labels.length > 0
+            ? `<div class="task-labels">${task.labels.map(l => `<span class="task-label" style="background:${this.labelMap[l] || '#888'}">${escapeHtmlUtil(l)}</span>`).join('')}</div>`
+            : '';
+
         const assignee = this.userMap[task.assignedTo];
         const avatar = assignee && assignee.photoURL ? `<img src="${assignee.photoURL}" class="task-avatar" alt="${escapeHtmlUtil(assignee.displayName || '')}">` : '';
+
+        const subtasks = Array.isArray(task.subtasks) ? task.subtasks : [];
+        const completedSub = subtasks.filter(s => s.completed).length;
+        const progress = subtasks.length ? Math.round((completedSub / subtasks.length) * 100) : 0;
+        const subHtml = subtasks.map(st => `<label class="subtask-item"><input type="checkbox" data-subtask-id="${st.id}" ${st.completed ? 'checked' : ''}>${escapeHtmlUtil(st.text)}</label>`).join('');
 
 
         taskDiv.innerHTML = `
@@ -636,12 +718,13 @@ class MumatecTaskManager {
                     <button class="task-action-btn" onclick="todoApp.confirmDeleteTask('${task.id}')" title="Delete"><span class="material-icons">delete</span></button>
                 </div>
             </div>
-            ${task.description ? `<div class="task-description">${escapeHtmlUtil(task.description)}</div>` : ''}
+
 
             ${tagsHtml}
             ${notesHtml}
             ${commentsHtml}
             <div class="task-meta">
+
                 <span class="task-category">${escapeHtmlUtil(task.category || 'Work')}</span>
                 <span class="task-type">${escapeHtmlUtil(task.type || 'General')}</span>
                 ${task.dueDate ? `<span class="task-due ${isOverdue ? 'overdue' : (isDueSoon ? 'soon' : '')}">${dueText}</span>` : ''}
@@ -693,6 +776,20 @@ class MumatecTaskManager {
             startBtn.style.display = 'inline-flex';
             stopBtn.style.display = 'none';
             indicator.style.display = 'none';
+        }
+
+        taskDiv.querySelectorAll('.subtask-item input').forEach(cb => {
+            cb.addEventListener('change', (e) => {
+                this.toggleSubtask(task.id, cb.dataset.subtaskId);
+            });
+        });
+        const addBtn = taskDiv.querySelector('.add-subtask-btn');
+        if (addBtn) {
+            addBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const text = prompt('New subtask');
+                if (text) this.addSubtask(task.id, text);
+            });
         }
 
         return taskDiv;
@@ -892,11 +989,21 @@ class MumatecTaskManager {
         document.getElementById('taskCategory').value = task.category || '';
         document.getElementById('taskType').value = task.type || '';
         const assignee = this.userMap[task.assignedTo];
-        document.getElementById('taskAssignee').value = assignee ? (assignee.displayName || assignee.email) : '';
+        document.getElementById('taskAssignee').value = task.assignedTo || '';
+        const avatarEl = document.getElementById('assigneeAvatarPreview');
+        if (avatarEl) {
+            if (assignee && assignee.photoURL) {
+                avatarEl.src = assignee.photoURL;
+                avatarEl.style.display = 'block';
+            } else {
+                avatarEl.style.display = 'none';
+            }
+        }
         document.getElementById('taskDependencies').value = (task.dependencies || []).join(', ');
         document.getElementById('taskEstimate').value = task.estimate || 0;
         document.getElementById('taskTimeSpent').value = task.timeSpent || 0;
         document.getElementById('taskAttachments').value = '';
+
         if (task.attachments && task.attachments.length) {
             document.getElementById('commentsContainer').insertAdjacentHTML('afterbegin', task.attachments.map(a => `<div class="comment-item">Attachment: ${escapeHtmlUtil(a.name || '')}</div>`).join(''));
         }
@@ -905,6 +1012,7 @@ class MumatecTaskManager {
         document.getElementById('taskNotes').value = task.notes || '';
         document.getElementById('activityFeed').innerHTML = (task.activity || []).slice().reverse().map(a => `<div class="activity-item">${escapeHtmlUtil(a.action)} - ${formatDateUtil(new Date(a.timestamp))}</div>`).join('');
         document.getElementById('taskTags').value = task.tags?.join(', ') || '';
+
         
         const modal = document.getElementById('taskModal');
         modal.classList.add('active');
@@ -929,9 +1037,12 @@ class MumatecTaskManager {
         document.getElementById('taskCategory').value = '';
         document.getElementById('taskType').value = '';
         document.getElementById('taskAssignee').value = '';
+        const avatarEl = document.getElementById('assigneeAvatarPreview');
+        if (avatarEl) avatarEl.style.display = 'none';
         document.getElementById('taskDependencies').value = '';
         document.getElementById('taskEstimate').value = '';
         document.getElementById('taskTimeSpent').value = '';
+
         document.getElementById('taskAttachments').value = '';
         document.getElementById('taskComment').value = '';
         document.getElementById('commentsContainer').innerHTML = '';
@@ -939,6 +1050,7 @@ class MumatecTaskManager {
         document.getElementById('activityFeed').innerHTML = '';
         document.getElementById('taskTags').value = '';
     }
+
 
     // Quick Capture
     openQuickCapture() {
@@ -1011,7 +1123,8 @@ class MumatecTaskManager {
                 task.title.toLowerCase().includes(search) ||
                 (task.description && task.description.toLowerCase().includes(search)) ||
                 (task.category && task.category.toLowerCase().includes(search)) ||
-                (task.tags && task.tags.some(tag => tag.toLowerCase().includes(search)))
+                (task.tags && task.tags.some(tag => tag.toLowerCase().includes(search))) ||
+                (task.labels && task.labels.some(l => l.toLowerCase().includes(search)))
             );
         }
 
@@ -1167,12 +1280,6 @@ class MumatecTaskManager {
         }
     }
 
-    lookupUserId(display) {
-        const userEntry = Object.values(this.userMap).find(u =>
-            (u.displayName || u.email) === display);
-        return userEntry ? userEntry.id : null;
-    }
-
     collectNewComment() {
         const text = document.getElementById('taskComment').value.trim();
         if (!text) return null;
@@ -1216,6 +1323,28 @@ class MumatecTaskManager {
             this.handleFormSubmit();
         });
 
+        const assignBtn = document.getElementById('assignToMeBtn');
+        if (assignBtn) {
+            assignBtn.addEventListener('click', () => this.assignToMe());
+        }
+
+        const assigneeSelect = document.getElementById('taskAssignee');
+        if (assigneeSelect) {
+            assigneeSelect.addEventListener('change', () => {
+                const uid = assigneeSelect.value;
+                const user = this.userMap[uid];
+                const avatarEl = document.getElementById('assigneeAvatarPreview');
+                if (avatarEl) {
+                    if (user && user.photoURL) {
+                        avatarEl.src = user.photoURL;
+                        avatarEl.style.display = 'block';
+                    } else {
+                        avatarEl.style.display = 'none';
+                    }
+                }
+            });
+        }
+
         // Quick capture
         document.getElementById('quickTaskInput').addEventListener('keypress', (e) => {
             if (e.key === 'Enter') {
@@ -1232,6 +1361,26 @@ class MumatecTaskManager {
         document.getElementById('themeToggle').addEventListener('click', () => {
             this.toggleTheme();
         });
+
+        const labelsToggle = document.getElementById('labelsToggle');
+        const labelsDropdown = document.getElementById('labelsDropdown');
+        if (labelsToggle && labelsDropdown) {
+            labelsToggle.addEventListener('click', (e) => {
+                e.stopPropagation();
+                labelsDropdown.classList.toggle('open');
+            });
+            document.getElementById('addLabelBtn').addEventListener('click', () => {
+                const name = document.getElementById('newLabelName').value.trim();
+                const color = document.getElementById('newLabelColor').value;
+                this.addLabel(name, color);
+                document.getElementById('newLabelName').value = '';
+            });
+            document.addEventListener('click', (e) => {
+                if (!labelsDropdown.contains(e.target) && e.target !== labelsToggle) {
+                    labelsDropdown.classList.remove('open');
+                }
+            });
+        }
 
         const insightsBtn = document.getElementById('insightsToggle');
         if (insightsBtn) {
@@ -1334,15 +1483,17 @@ class MumatecTaskManager {
             dueDate: document.getElementById('taskDueDate').value,
             category: document.getElementById('taskCategory').value,
             type: document.getElementById('taskType').value,
-            assignedTo: this.lookupUserId(document.getElementById('taskAssignee').value),
+            assignedTo: document.getElementById('taskAssignee').value || null,
             dependencies: document.getElementById('taskDependencies').value,
             estimate: document.getElementById('taskEstimate').value,
             timeSpent: document.getElementById('taskTimeSpent').value,
+
             attachments: Array.from(document.getElementById('taskAttachments').files).map(f => ({ name: f.name })),
             comments: this.collectNewComment(),
             notes: document.getElementById('taskNotes').value,
             tags: document.getElementById('taskTags').value
         };
+
 
         if (!formData.title.trim()) {
             this.showNotification('Error', 'Task title is required', 'error');
@@ -1357,6 +1508,23 @@ class MumatecTaskManager {
         }
 
         this.closeModal();
+    }
+
+    assignToMe() {
+        const uid = window.currentUser?.uid;
+        if (!uid) return;
+        const select = document.getElementById('taskAssignee');
+        if (select) select.value = uid;
+        const user = this.userMap[uid];
+        const avatarEl = document.getElementById('assigneeAvatarPreview');
+        if (avatarEl) {
+            if (user && user.photoURL) {
+                avatarEl.src = user.photoURL;
+                avatarEl.style.display = 'block';
+            } else {
+                avatarEl.style.display = 'none';
+            }
+        }
     }
 
     confirmDeleteTask(taskId) {
