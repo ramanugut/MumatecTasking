@@ -14,11 +14,14 @@ class MumatecTaskManager {
         this.searchTerm = '';
         this.activeFilter = null;
         this.statuses = ['todo', 'inprogress', 'review', 'done', 'blocked', 'cancelled'];
+
         this.priorities = ['low', 'medium', 'high', 'critical'];
         this.samplePushed = false;
         this.customTypes = [];
         this.users = [];
         this.userMap = {};
+        this.labelsConfig = [];
+        this.labelMap = {};
         this.activeTimers = {};
         this.categoryOrder = ['Work', 'Personal', 'Development'];
         this.categoryIcons = { Work: 'work', Personal: 'home', Development: 'code' };
@@ -30,6 +33,7 @@ class MumatecTaskManager {
         await this.loadTasks();
         await this.loadTaskTypes();
         await this.loadUsers();
+        this.loadLabels();
         this.loadTheme();
         this.loadSidebarState();
         this.loadStatusOrder();
@@ -141,7 +145,7 @@ class MumatecTaskManager {
             this.users = [];
             this.userMap = {};
         }
-        this.populateAssigneeDatalist();
+        this.populateAssigneeDropdown();
     }
 
     populateTypeDatalist() {
@@ -150,10 +154,64 @@ class MumatecTaskManager {
         list.innerHTML = this.customTypes.map(t => `<option value="${escapeHtmlUtil(t)}"></option>`).join('');
     }
 
-    populateAssigneeDatalist() {
-        const list = document.getElementById('assigneeSuggestions');
+    populateAssigneeDropdown() {
+        const select = document.getElementById('taskAssignee');
+        if (!select) return;
+        select.innerHTML = `<option value="">Unassigned</option>` +
+            this.users.map(u => `<option value="${u.id}">${escapeHtmlUtil(u.displayName || u.email)}</option>`).join('');
+    }
+
+    loadLabels() {
+        const saved = localStorage.getItem('taskLabels');
+        if (saved) {
+            try {
+                this.labelsConfig = JSON.parse(saved);
+            } catch (e) {
+                console.warn('Failed to parse labels', e);
+                this.labelsConfig = [];
+            }
+        }
+        if (this.labelsConfig.length === 0) {
+            this.labelsConfig = [
+                { name: 'Client Work', color: '#42a5f5' },
+                { name: 'Internal', color: '#66bb6a' },
+                { name: 'Urgent', color: '#ef5350' }
+            ];
+        }
+        this.labelsConfig.forEach(l => { this.labelMap[l.name] = l.color; });
+        this.populateLabelDatalist();
+        this.renderLabelDropdown();
+    }
+
+    saveLabels() {
+        localStorage.setItem('taskLabels', JSON.stringify(this.labelsConfig));
+    }
+
+    populateLabelDatalist() {
+        const list = document.getElementById('labelSuggestions');
         if (!list) return;
-        list.innerHTML = this.users.map(u => `<option value="${escapeHtmlUtil(u.displayName || u.email)}" data-uid="${u.id}"></option>`).join('');
+        list.innerHTML = this.labelsConfig.map(l => `<option value="${escapeHtmlUtil(l.name)}"></option>`).join('');
+    }
+
+    renderLabelDropdown() {
+        const container = document.getElementById('labelList');
+        if (!container) return;
+        container.innerHTML = '';
+        this.labelsConfig.forEach(l => {
+            const div = document.createElement('div');
+            div.className = 'label-item';
+            div.innerHTML = `<span class="color-box" style="background:${l.color}"></span>${escapeHtmlUtil(l.name)}`;
+            container.appendChild(div);
+        });
+    }
+
+    addLabel(name, color) {
+        if (!name) return;
+        this.labelsConfig.push({ name, color });
+        this.labelMap[name] = color;
+        this.saveLabels();
+        this.populateLabelDatalist();
+        this.renderLabelDropdown();
     }
 
     createSampleTasks() {
@@ -167,6 +225,7 @@ class MumatecTaskManager {
                 category: 'Work',
                 type: 'Maintenance',
                 tags: ['hosting', 'performance'],
+                labels: ['Urgent'],
                 assignedTo: null,
                 dependencies: [],
                 estimate: 2,
@@ -186,6 +245,7 @@ class MumatecTaskManager {
                 category: 'Work',
                 type: 'Compliance',
                 tags: ['documentation', 'clients'],
+                labels: ['Client Work'],
                 assignedTo: null,
                 dependencies: [],
                 estimate: 1,
@@ -204,6 +264,7 @@ class MumatecTaskManager {
                 category: 'Work',
                 type: 'User Account Management',
                 tags: ['meeting', 'team'],
+                labels: ['Internal'],
                 assignedTo: null,
                 dependencies: [],
                 estimate: 0.5,
@@ -235,6 +296,7 @@ class MumatecTaskManager {
             dependencies: this.parseTags(taskData.dependencies),
             estimate: parseFloat(taskData.estimate) || 0,
             timeSpent: parseFloat(taskData.timeSpent) || 0,
+
             attachments: taskData.attachments || [],
             comments: taskData.comments || [],
             tags: this.parseTags(taskData.tags),
@@ -243,6 +305,7 @@ class MumatecTaskManager {
             updatedAt: new Date().toISOString(),
             reminderSent: false
         };
+
 
         this.tasks.push(task);
         this.saveTaskToFirestore(task);
@@ -268,12 +331,14 @@ class MumatecTaskManager {
             dependencies: this.parseTags(taskData.dependencies),
             estimate: parseFloat(taskData.estimate) || this.tasks[taskIndex].estimate || 0,
             timeSpent: parseFloat(taskData.timeSpent) || this.tasks[taskIndex].timeSpent || 0,
+
             attachments: taskData.attachments && taskData.attachments.length ? [...(this.tasks[taskIndex].attachments || []), ...taskData.attachments] : (this.tasks[taskIndex].attachments || []),
             comments: taskData.comments ? [...(this.tasks[taskIndex].comments || []), ...taskData.comments] : (this.tasks[taskIndex].comments || []),
             tags: this.parseTags(taskData.tags),
             subtasks: Array.isArray(taskData.subtasks) ? taskData.subtasks : (this.tasks[taskIndex].subtasks || []),
             updatedAt: new Date().toISOString()
         };
+
 
         this.saveTaskToFirestore(this.tasks[taskIndex]);
         this.updateUI();
@@ -287,6 +352,7 @@ class MumatecTaskManager {
         this.updateUI();
         this.showNotification('Success', 'Task deleted successfully', 'success');
     }
+
 
     async moveTask(taskId, newStatus) {
         const task = this.tasks.find(t => t.id === taskId);
@@ -321,9 +387,49 @@ class MumatecTaskManager {
         this.updateUI();
     }
 
+
+    addSubtask(taskId, text) {
+        const task = this.tasks.find(t => t.id === taskId);
+        if (!task || !text) return;
+        if (!Array.isArray(task.subtasks)) task.subtasks = [];
+        task.subtasks.push({ id: generateId(), text: text.trim(), completed: false });
+        task.updatedAt = new Date().toISOString();
+        this.saveTaskToFirestore(task);
+        this.updateUI();
+    }
+
+    toggleSubtask(taskId, subtaskId) {
+        const task = this.tasks.find(t => t.id === taskId);
+        if (!task || !Array.isArray(task.subtasks)) return;
+        const sub = task.subtasks.find(s => s.id === subtaskId);
+        if (!sub) return;
+        sub.completed = !sub.completed;
+        task.updatedAt = new Date().toISOString();
+        this.saveTaskToFirestore(task);
+        this.updateUI();
+    }
+
+
+    toggleTaskPriority(taskId) {
+        const idx = this.tasks.findIndex(t => t.id === taskId);
+        if (idx === -1) return;
+        const current = this.tasks[idx].priority || 'medium';
+        const currentIndex = this.priorities.indexOf(current);
+        const nextPriority = this.priorities[(currentIndex + 1) % this.priorities.length];
+        this.tasks[idx].priority = nextPriority;
+        this.tasks[idx].updatedAt = new Date().toISOString();
+        this.saveTaskToFirestore(this.tasks[idx]);
+        this.updateUI();
+    }
+
     parseTags(tagsString) {
         if (!tagsString) return [];
         return tagsString.split(',').map(tag => tag.trim()).filter(tag => tag);
+    }
+
+    parseLabels(labelsString) {
+        if (!labelsString) return [];
+        return labelsString.split(',').map(l => l.trim()).filter(l => l);
     }
 
     // UI Management
@@ -505,13 +611,19 @@ class MumatecTaskManager {
             `;
         });
 
-        // Render tasks
+        const tasksByStatus = {};
         filteredTasks.forEach(task => {
-            const taskElement = this.createTaskCard(task);
-            const targetBoard = document.getElementById(`${task.status}Board`);
-            if (targetBoard) {
-                targetBoard.appendChild(taskElement);
-            }
+            if (!tasksByStatus[task.status]) tasksByStatus[task.status] = [];
+            tasksByStatus[task.status].push(task);
+        });
+
+        this.statuses.forEach(status => {
+            const board = document.getElementById(`${status}Board`);
+            const tasks = (tasksByStatus[status] || []).sort((a, b) => this.comparePriority(a, b));
+            tasks.forEach(t => {
+                const el = this.createTaskCard(t);
+                board.appendChild(el);
+            });
         });
 
         // Update column counts
@@ -525,6 +637,7 @@ class MumatecTaskManager {
 
         this.attachMoveControls();
     }
+
 
     renderListView() {
         const filteredTasks = this.getFilteredTasks();
@@ -547,6 +660,7 @@ class MumatecTaskManager {
             cancelled: 'Cancelled'
         };
 
+
         this.statuses.forEach(status => {
             const row = document.createElement('div');
             row.className = 'row-container';
@@ -566,10 +680,12 @@ class MumatecTaskManager {
                         <span class="material-icons add-icon">add</span>
                         <span>Add task</span>
                     </div>
+
                 </div>
             `;
             container.appendChild(row);
         });
+
 
         filteredTasks.forEach(task => {
             const taskElement = this.createTaskCard(task);
@@ -581,6 +697,7 @@ class MumatecTaskManager {
 
         this.attachMoveControls();
     }
+
 
     createTaskCard(task) {
         const taskDiv = document.createElement('div');
@@ -609,6 +726,14 @@ class MumatecTaskManager {
         const completedSub = subtasks.filter(s => s.completed).length;
         const progress = subtasks.length ? Math.round((completedSub / subtasks.length) * 100) : 0;
         const subHtml = subtasks.map(st => `<label class="subtask-item"><input type="checkbox" data-subtask-id="${st.id}" ${st.completed ? 'checked' : ''}>${escapeHtmlUtil(st.text)}</label>`).join('');
+ar = assignee && assignee.photoURL ? `<img src="${assignee.photoURL}" class="task-avatar" alt="${escapeHtmlUtil(assignee.displayName || '')}">` : '';
+
+
+        const subtasks = Array.isArray(task.subtasks) ? task.subtasks : [];
+        const completedSub = subtasks.filter(s => s.completed).length;
+        const progress = subtasks.length ? Math.round((completedSub / subtasks.length) * 100) : 0;
+        const subHtml = subtasks.map(st => `<label class="subtask-item"><input type="checkbox" data-subtask-id="${st.id}" ${st.completed ? 'checked' : ''}>${escapeHtmlUtil(st.text)}</label>`).join('');
+
 
         taskDiv.innerHTML = `
             <div class="task-priority priority-${task.priority}"></div>
@@ -620,11 +745,14 @@ class MumatecTaskManager {
                     <button class="task-action-btn" onclick="todoApp.confirmDeleteTask('${task.id}')" title="Delete"><span class="material-icons">delete</span></button>
                 </div>
             </div>
+
             ${task.description ? `<div class="task-description">${escapeHtmlUtil(task.description)}</div>` : ''}
+
             ${tagsHtml}
             ${subtasks.length ? `<div class="subtask-progress"><div class="subtask-progress-bar" style="width:${progress}%"></div></div>` : ''}
             <div class="subtasks-container">${subHtml}<button class="add-subtask-btn" title="Add subtask"><span class="material-icons">add</span></button></div>
             <div class="task-meta">
+
                 <span class="task-category">${escapeHtmlUtil(task.category || 'Work')}</span>
                 <span class="task-type">${escapeHtmlUtil(task.type || 'General')}</span>
                 ${task.dueDate ? `<span class="task-due ${isOverdue ? 'overdue' : (isDueSoon ? 'soon' : '')}">${dueText}</span>` : ''}
@@ -650,6 +778,7 @@ class MumatecTaskManager {
             e.stopPropagation();
             this.stopTaskTimer(task.id);
         });
+
 
         if (this.activeTimers[task.id]) {
             startBtn.style.display = 'none';
@@ -677,6 +806,7 @@ class MumatecTaskManager {
 
         return taskDiv;
     }
+
 
     renderTodayView() {
         const today = new Date().toDateString();
@@ -871,7 +1001,16 @@ class MumatecTaskManager {
         document.getElementById('taskCategory').value = task.category || '';
         document.getElementById('taskType').value = task.type || '';
         const assignee = this.userMap[task.assignedTo];
-        document.getElementById('taskAssignee').value = assignee ? (assignee.displayName || assignee.email) : '';
+        document.getElementById('taskAssignee').value = task.assignedTo || '';
+        const avatarEl = document.getElementById('assigneeAvatarPreview');
+        if (avatarEl) {
+            if (assignee && assignee.photoURL) {
+                avatarEl.src = assignee.photoURL;
+                avatarEl.style.display = 'block';
+            } else {
+                avatarEl.style.display = 'none';
+            }
+        }
         document.getElementById('taskDependencies').value = (task.dependencies || []).join(', ');
         document.getElementById('taskEstimate').value = task.estimate || 0;
         document.getElementById('taskTimeSpent').value = task.timeSpent || 0;
@@ -882,6 +1021,7 @@ class MumatecTaskManager {
         document.getElementById('commentsContainer').innerHTML = (task.comments || []).map(c => `<div class="comment-item"><div class="comment-meta">${escapeHtmlUtil(c.author)} - ${formatDateUtil(new Date(c.timestamp))}</div><div>${escapeHtmlUtil(c.text)}</div></div>`).join('');
         document.getElementById('taskComment').value = '';
         document.getElementById('taskTags').value = task.tags?.join(', ') || '';
+        document.getElementById('taskLabels').value = task.labels?.join(', ') || '';
         
         const modal = document.getElementById('taskModal');
         modal.classList.add('active');
@@ -906,6 +1046,8 @@ class MumatecTaskManager {
         document.getElementById('taskCategory').value = '';
         document.getElementById('taskType').value = '';
         document.getElementById('taskAssignee').value = '';
+        const avatarEl = document.getElementById('assigneeAvatarPreview');
+        if (avatarEl) avatarEl.style.display = 'none';
         document.getElementById('taskDependencies').value = '';
         document.getElementById('taskEstimate').value = '';
         document.getElementById('taskTimeSpent').value = '';
@@ -913,6 +1055,7 @@ class MumatecTaskManager {
         document.getElementById('taskComment').value = '';
         document.getElementById('commentsContainer').innerHTML = '';
         document.getElementById('taskTags').value = '';
+        document.getElementById('taskLabels').value = '';
     }
 
     // Quick Capture
@@ -986,7 +1129,8 @@ class MumatecTaskManager {
                 task.title.toLowerCase().includes(search) ||
                 (task.description && task.description.toLowerCase().includes(search)) ||
                 (task.category && task.category.toLowerCase().includes(search)) ||
-                (task.tags && task.tags.some(tag => tag.toLowerCase().includes(search)))
+                (task.tags && task.tags.some(tag => tag.toLowerCase().includes(search))) ||
+                (task.labels && task.labels.some(l => l.toLowerCase().includes(search)))
             );
         }
 
@@ -1022,6 +1166,7 @@ class MumatecTaskManager {
                 else if (due > now && due.toDateString() !== todayStr) stats.upcoming++;
             }
         }
+
 
         return stats;
     }
@@ -1141,12 +1286,6 @@ class MumatecTaskManager {
         }
     }
 
-    lookupUserId(display) {
-        const userEntry = Object.values(this.userMap).find(u =>
-            (u.displayName || u.email) === display);
-        return userEntry ? userEntry.id : null;
-    }
-
     collectNewComment() {
         const text = document.getElementById('taskComment').value.trim();
         if (!text) return null;
@@ -1190,6 +1329,28 @@ class MumatecTaskManager {
             this.handleFormSubmit();
         });
 
+        const assignBtn = document.getElementById('assignToMeBtn');
+        if (assignBtn) {
+            assignBtn.addEventListener('click', () => this.assignToMe());
+        }
+
+        const assigneeSelect = document.getElementById('taskAssignee');
+        if (assigneeSelect) {
+            assigneeSelect.addEventListener('change', () => {
+                const uid = assigneeSelect.value;
+                const user = this.userMap[uid];
+                const avatarEl = document.getElementById('assigneeAvatarPreview');
+                if (avatarEl) {
+                    if (user && user.photoURL) {
+                        avatarEl.src = user.photoURL;
+                        avatarEl.style.display = 'block';
+                    } else {
+                        avatarEl.style.display = 'none';
+                    }
+                }
+            });
+        }
+
         // Quick capture
         document.getElementById('quickTaskInput').addEventListener('keypress', (e) => {
             if (e.key === 'Enter') {
@@ -1206,6 +1367,26 @@ class MumatecTaskManager {
         document.getElementById('themeToggle').addEventListener('click', () => {
             this.toggleTheme();
         });
+
+        const labelsToggle = document.getElementById('labelsToggle');
+        const labelsDropdown = document.getElementById('labelsDropdown');
+        if (labelsToggle && labelsDropdown) {
+            labelsToggle.addEventListener('click', (e) => {
+                e.stopPropagation();
+                labelsDropdown.classList.toggle('open');
+            });
+            document.getElementById('addLabelBtn').addEventListener('click', () => {
+                const name = document.getElementById('newLabelName').value.trim();
+                const color = document.getElementById('newLabelColor').value;
+                this.addLabel(name, color);
+                document.getElementById('newLabelName').value = '';
+            });
+            document.addEventListener('click', (e) => {
+                if (!labelsDropdown.contains(e.target) && e.target !== labelsToggle) {
+                    labelsDropdown.classList.remove('open');
+                }
+            });
+        }
 
         const insightsBtn = document.getElementById('insightsToggle');
         if (insightsBtn) {
@@ -1308,13 +1489,14 @@ class MumatecTaskManager {
             dueDate: document.getElementById('taskDueDate').value,
             category: document.getElementById('taskCategory').value,
             type: document.getElementById('taskType').value,
-            assignedTo: this.lookupUserId(document.getElementById('taskAssignee').value),
+            assignedTo: document.getElementById('taskAssignee').value || null,
             dependencies: document.getElementById('taskDependencies').value,
             estimate: document.getElementById('taskEstimate').value,
             timeSpent: document.getElementById('taskTimeSpent').value,
             attachments: Array.from(document.getElementById('taskAttachments').files).map(f => ({ name: f.name })),
             comments: this.collectNewComment(),
-            tags: document.getElementById('taskTags').value
+            tags: document.getElementById('taskTags').value,
+            labels: document.getElementById('taskLabels').value
         };
 
         if (!formData.title.trim()) {
@@ -1330,6 +1512,23 @@ class MumatecTaskManager {
         }
 
         this.closeModal();
+    }
+
+    assignToMe() {
+        const uid = window.currentUser?.uid;
+        if (!uid) return;
+        const select = document.getElementById('taskAssignee');
+        if (select) select.value = uid;
+        const user = this.userMap[uid];
+        const avatarEl = document.getElementById('assigneeAvatarPreview');
+        if (avatarEl) {
+            if (user && user.photoURL) {
+                avatarEl.src = user.photoURL;
+                avatarEl.style.display = 'block';
+            } else {
+                avatarEl.style.display = 'none';
+            }
+        }
     }
 
     confirmDeleteTask(taskId) {

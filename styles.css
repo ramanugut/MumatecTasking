@@ -784,11 +784,11 @@ body {
 
 .task-priority {
     position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 3px;
-    border-radius: var(--border-radius) var(--border-radius) 0 0;
+    top: 6px;
+    right: 6px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
 }
 
 .priority-critical { background: var(--critical-red); }
@@ -853,6 +853,14 @@ body {
 .task-action-btn:hover {
     background: var(--gray-200);
     transform: scale(1.1);
+}
+
+.priority-toggle {
+    background: var(--surface-secondary);
+}
+
+.priority-toggle:hover {
+    background: var(--gray-200);
 }
 
 .task-description {
@@ -1406,6 +1414,22 @@ body {
     background: var(--background);
 }
 
+.assign-me-btn {
+    background: var(--surface-secondary);
+    border: 1px solid var(--border);
+    border-radius: var(--border-radius-sm);
+    padding: 4px 8px;
+    font-size: 12px;
+    cursor: pointer;
+    margin-top: 4px;
+    align-self: flex-start;
+    transition: var(--transition);
+}
+
+.assign-me-btn:hover {
+    background: var(--background);
+}
+
 .form-field label {
     font-size: 13px;
     font-weight: 600;
@@ -1475,6 +1499,12 @@ body {
 
 .form-btn.secondary:hover {
     background: var(--gray-200);
+}
+
+.small-btn {
+    height: 28px;
+    padding: 0 12px;
+    font-size: 12px;
 }
 
 .comments-container {
@@ -1831,5 +1861,61 @@ body.dark-mode {
   bottom: 20px;
   right: 20px;
   z-index: 1000;
+}
+
+.label-manager {
+  position: relative;
+  margin-left: 12px;
+}
+
+.label-dropdown {
+  display: none;
+  position: absolute;
+  right: 0;
+  top: 100%;
+  background: var(--background);
+  border: 1px solid var(--border);
+  border-radius: var(--border-radius);
+  padding: 8px;
+  min-width: 180px;
+  z-index: 1000;
+}
+
+.label-dropdown.open {
+  display: block;
+}
+
+.label-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 4px;
+  font-size: 14px;
+}
+
+.label-item .color-box {
+  width: 12px;
+  height: 12px;
+  border-radius: 2px;
+}
+
+.label-add {
+  display: flex;
+  gap: 4px;
+  margin-top: 8px;
+}
+
+.task-labels {
+  display: flex;
+  gap: 4px;
+  margin-top: 4px;
+  flex-wrap: wrap;
+}
+
+.task-label {
+  color: #fff;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 10px;
 }
 
