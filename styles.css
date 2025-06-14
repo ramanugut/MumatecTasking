@@ -1863,48 +1863,59 @@ body.dark-mode {
   z-index: 1000;
 }
 
-
-.task-notes,
-.card-comments {
-  display: none;
-  margin-top: 8px;
-  font-size: 12px;
-  color: var(--text-secondary);
+.label-manager {
+  position: relative;
+  margin-left: 12px;
 }
-.task-notes.expanded,
-.card-comments.expanded {
+
+.label-dropdown {
+  display: none;
+  position: absolute;
+  right: 0;
+  top: 100%;
+  background: var(--background);
+  border: 1px solid var(--border);
+  border-radius: var(--border-radius);
+  padding: 8px;
+  min-width: 180px;
+  z-index: 1000;
+}
+
+.label-dropdown.open {
   display: block;
 }
-.toggle-notes-btn,
-.toggle-comments-btn {
-  background: none;
-  border: none;
-  color: var(--primary-blue);
-  font-size: 12px;
-  cursor: pointer;
-  margin-top: 4px;
-}
-.quick-notes {
-  padding: 12px;
-}
-.quick-notes textarea {
-  width: 100%;
-  min-height: 80px;
-  font-size: 12px;
-  padding: 8px;
-  border: 1px solid var(--border);
-  border-radius: var(--border-radius-sm);
-  resize: vertical;
-}
-.activity-feed {
-  margin-top: 8px;
-  max-height: 120px;
-  overflow-y: auto;
-  font-size: 12px;
-  color: var(--text-secondary);
-}
-.activity-item {
-  margin-bottom: 4px;
 
+.label-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 4px;
+  font-size: 14px;
+}
+
+.label-item .color-box {
+  width: 12px;
+  height: 12px;
+  border-radius: 2px;
+}
+
+.label-add {
+  display: flex;
+  gap: 4px;
+  margin-top: 8px;
+}
+
+.task-labels {
+  display: flex;
+  gap: 4px;
+  margin-top: 4px;
+  flex-wrap: wrap;
+}
+
+.task-label {
+  color: #fff;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 10px;
 }
 
