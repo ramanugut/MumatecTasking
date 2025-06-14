@@ -295,10 +295,12 @@ class MumatecTaskManager {
             dependencies: this.parseTags(taskData.dependencies),
             estimate: parseFloat(taskData.estimate) || 0,
             timeSpent: parseFloat(taskData.timeSpent) || 0,
+
             attachments: taskData.attachments || [],
             comments: taskData.comments || [],
             tags: this.parseTags(taskData.tags),
             labels: this.parseLabels(taskData.labels),
+
             createdAt: new Date().toISOString(),
             updatedAt: new Date().toISOString(),
             reminderSent: false
@@ -328,10 +330,12 @@ class MumatecTaskManager {
             dependencies: this.parseTags(taskData.dependencies),
             estimate: parseFloat(taskData.estimate) || this.tasks[taskIndex].estimate || 0,
             timeSpent: parseFloat(taskData.timeSpent) || this.tasks[taskIndex].timeSpent || 0,
+
             attachments: taskData.attachments && taskData.attachments.length ? [...(this.tasks[taskIndex].attachments || []), ...taskData.attachments] : (this.tasks[taskIndex].attachments || []),
             comments: taskData.comments ? [...(this.tasks[taskIndex].comments || []), ...taskData.comments] : (this.tasks[taskIndex].comments || []),
             tags: this.parseTags(taskData.tags),
             labels: this.parseLabels(taskData.labels),
+
             updatedAt: new Date().toISOString()
         };
 
@@ -348,6 +352,7 @@ class MumatecTaskManager {
         this.showNotification('Success', 'Task deleted successfully', 'success');
     }
 
+
     async moveTask(taskId, newStatus) {
         const task = this.tasks.find(t => t.id === taskId);
         if (!task) return false;
@@ -359,6 +364,28 @@ class MumatecTaskManager {
         this.updateUI();
         return true;
     }
+
+    addSubtask(taskId, text) {
+        const task = this.tasks.find(t => t.id === taskId);
+        if (!task || !text) return;
+        if (!Array.isArray(task.subtasks)) task.subtasks = [];
+        task.subtasks.push({ id: generateId(), text: text.trim(), completed: false });
+        task.updatedAt = new Date().toISOString();
+        this.saveTaskToFirestore(task);
+        this.updateUI();
+    }
+
+    toggleSubtask(taskId, subtaskId) {
+        const task = this.tasks.find(t => t.id === taskId);
+        if (!task || !Array.isArray(task.subtasks)) return;
+        const sub = task.subtasks.find(s => s.id === subtaskId);
+        if (!sub) return;
+        sub.completed = !sub.completed;
+        task.updatedAt = new Date().toISOString();
+        this.saveTaskToFirestore(task);
+        this.updateUI();
+    }
+
 
     toggleTaskPriority(taskId) {
         const idx = this.tasks.findIndex(t => t.id === taskId);
@@ -676,6 +703,11 @@ class MumatecTaskManager {
         const assignee = this.userMap[task.assignedTo];
         const avatar = assignee && assignee.photoURL ? `<img src="${assignee.photoURL}" class="task-avatar" alt="${escapeHtmlUtil(assignee.displayName || '')}">` : '';
 
+        const subtasks = Array.isArray(task.subtasks) ? task.subtasks : [];
+        const completedSub = subtasks.filter(s => s.completed).length;
+        const progress = subtasks.length ? Math.round((completedSub / subtasks.length) * 100) : 0;
+        const subHtml = subtasks.map(st => `<label class="subtask-item"><input type="checkbox" data-subtask-id="${st.id}" ${st.completed ? 'checked' : ''}>${escapeHtmlUtil(st.text)}</label>`).join('');
+
 
         taskDiv.innerHTML = `
             <div class="task-priority priority-${task.priority}"></div>
@@ -687,10 +719,12 @@ class MumatecTaskManager {
                     <button class="task-action-btn" onclick="todoApp.confirmDeleteTask('${task.id}')" title="Delete"><span class="material-icons">delete</span></button>
                 </div>
             </div>
-            ${task.description ? `<div class="task-description">${escapeHtmlUtil(task.description)}</div>` : ''}
 
+            ${task.description ? `<div class="task-description">${escapeHtmlUtil(task.description)}</div>` : ''}
             ${tagsHtml}
-            ${labelsHtml}
+            ${subtasks.length ? `<div class="subtask-progress"><div class="subtask-progress-bar" style="width:${progress}%"></div></div>` : ''}
+            <div class="subtasks-container">${subHtml}<button class="add-subtask-btn" title="Add subtask"><span class="material-icons">add</span></button></div>
+
             <div class="task-meta">
                 <span class="task-category">${escapeHtmlUtil(task.category || 'Work')}</span>
                 <span class="task-type">${escapeHtmlUtil(task.type || 'General')}</span>
@@ -726,6 +760,20 @@ class MumatecTaskManager {
             startBtn.style.display = 'inline-flex';
             stopBtn.style.display = 'none';
             indicator.style.display = 'none';
+        }
+
+        taskDiv.querySelectorAll('.subtask-item input').forEach(cb => {
+            cb.addEventListener('change', (e) => {
+                this.toggleSubtask(task.id, cb.dataset.subtaskId);
+            });
+        });
+        const addBtn = taskDiv.querySelector('.add-subtask-btn');
+        if (addBtn) {
+            addBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const text = prompt('New subtask');
+                if (text) this.addSubtask(task.id, text);
+            });
         }
 
         return taskDiv;
