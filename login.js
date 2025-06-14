@@ -9,13 +9,20 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
   const password = document.getElementById('password').value;
   const errorEl = document.getElementById('error');
   errorEl.textContent = '';
+  const messages = {
+    'auth/invalid-email': 'Invalid email address.',
+    'auth/user-disabled': 'Account disabled.',
+    'auth/user-not-found': 'No account found for this email.',
+    'auth/wrong-password': 'Incorrect password.',
+    'auth/network-request-failed': 'Network error. Check your connection.'
+  };
   try {
     await signInWithEmailAndPassword(auth, email, password);
 
     window.location.href = 'index.html';
 
   } catch (err) {
-    errorEl.textContent = err.message;
+    errorEl.textContent = messages[err.code] || err.message;
   }
 });
 
