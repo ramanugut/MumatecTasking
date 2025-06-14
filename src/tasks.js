@@ -14,6 +14,7 @@ class MumatecTaskManager {
         this.searchTerm = '';
         this.activeFilter = null;
         this.statuses = ['todo', 'inprogress', 'review', 'done', 'blocked', 'cancelled'];
+
         this.priorities = ['low', 'medium', 'high', 'critical'];
         this.samplePushed = false;
         this.customTypes = [];
@@ -292,10 +293,22 @@ class MumatecTaskManager {
 
         task.status = newStatus;
         task.updatedAt = new Date().toISOString();
-        
+
         this.saveTaskToFirestore(task);
         this.updateUI();
         return true;
+    }
+
+    toggleTaskPriority(taskId) {
+        const idx = this.tasks.findIndex(t => t.id === taskId);
+        if (idx === -1) return;
+        const current = this.tasks[idx].priority || 'medium';
+        const currentIndex = this.priorities.indexOf(current);
+        const nextPriority = this.priorities[(currentIndex + 1) % this.priorities.length];
+        this.tasks[idx].priority = nextPriority;
+        this.tasks[idx].updatedAt = new Date().toISOString();
+        this.saveTaskToFirestore(this.tasks[idx]);
+        this.updateUI();
     }
 
     parseTags(tagsString) {
@@ -482,13 +495,19 @@ class MumatecTaskManager {
             `;
         });
 
-        // Render tasks
+        const tasksByStatus = {};
         filteredTasks.forEach(task => {
-            const taskElement = this.createTaskCard(task);
-            const targetBoard = document.getElementById(`${task.status}Board`);
-            if (targetBoard) {
-                targetBoard.appendChild(taskElement);
-            }
+            if (!tasksByStatus[task.status]) tasksByStatus[task.status] = [];
+            tasksByStatus[task.status].push(task);
+        });
+
+        this.statuses.forEach(status => {
+            const board = document.getElementById(`${status}Board`);
+            const tasks = (tasksByStatus[status] || []).sort((a, b) => this.comparePriority(a, b));
+            tasks.forEach(t => {
+                const el = this.createTaskCard(t);
+                board.appendChild(el);
+            });
         });
 
         // Update column counts
@@ -502,6 +521,7 @@ class MumatecTaskManager {
 
         this.attachMoveControls();
     }
+
 
     renderListView() {
         const filteredTasks = this.getFilteredTasks();
@@ -524,6 +544,7 @@ class MumatecTaskManager {
             cancelled: 'Cancelled'
         };
 
+
         this.statuses.forEach(status => {
             const row = document.createElement('div');
             row.className = 'row-container';
@@ -543,10 +564,12 @@ class MumatecTaskManager {
                         <span class="material-icons add-icon">add</span>
                         <span>Add task</span>
                     </div>
+
                 </div>
             `;
             container.appendChild(row);
         });
+
 
         filteredTasks.forEach(task => {
             const taskElement = this.createTaskCard(task);
@@ -558,6 +581,7 @@ class MumatecTaskManager {
 
         this.attachMoveControls();
     }
+
 
     createTaskCard(task) {
         const taskDiv = document.createElement('div');
@@ -582,6 +606,7 @@ class MumatecTaskManager {
         const assignee = this.userMap[task.assignedTo];
         const avatar = assignee && assignee.photoURL ? `<img src="${assignee.photoURL}" class="task-avatar" alt="${escapeHtmlUtil(assignee.displayName || '')}">` : '';
 
+
         taskDiv.innerHTML = `
             <div class="task-priority priority-${task.priority}"></div>
             <div class="task-header">
@@ -593,6 +618,7 @@ class MumatecTaskManager {
                 </div>
             </div>
             ${task.description ? `<div class="task-description">${escapeHtmlUtil(task.description)}</div>` : ''}
+
             ${tagsHtml}
             <div class="task-meta">
                 <span class="task-category">${escapeHtmlUtil(task.category || 'Work')}</span>
@@ -978,6 +1004,7 @@ class MumatecTaskManager {
                 else if (due > now && due.toDateString() !== todayStr) stats.upcoming++;
             }
         }
+
 
         return stats;
     }
