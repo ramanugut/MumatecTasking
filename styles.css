@@ -1414,6 +1414,22 @@ body {
     background: var(--background);
 }
 
+.assign-me-btn {
+    background: var(--surface-secondary);
+    border: 1px solid var(--border);
+    border-radius: var(--border-radius-sm);
+    padding: 4px 8px;
+    font-size: 12px;
+    cursor: pointer;
+    margin-top: 4px;
+    align-self: flex-start;
+    transition: var(--transition);
+}
+
+.assign-me-btn:hover {
+    background: var(--background);
+}
+
 .form-field label {
     font-size: 13px;
     font-weight: 600;
