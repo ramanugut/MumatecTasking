@@ -292,6 +292,18 @@ body {
     margin: 16px 4px;
 }
 
+.time-totals {
+    padding: 4px 12px 0;
+    font-size: 12px;
+    color: var(--text-secondary);
+}
+
+.time-totals div {
+    display: flex;
+    justify-content: space-between;
+    margin: 2px 0;
+}
+
 /* Sidebar Footer */
 .sidebar-footer {
     padding: 20px;
@@ -939,6 +951,11 @@ body {
     height: 8px;
     border-radius: 50%;
     background: var(--success-green);
+}
+
+.task-time-spent {
+    font-size: 10px;
+    color: var(--text-secondary);
 }
 
 .add-task-card {

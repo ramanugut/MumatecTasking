@@ -1,7 +1,7 @@
 // Mumatec Task Manager - Professional Application
 import { db, functions } from '../firebase.js';
 import { httpsCallable } from 'https://www.gstatic.com/firebasejs/11.9.0/firebase-functions.js';
-import { generateId, escapeHtml as escapeHtmlUtil, parseCSVLine as parseCSVLineUtil, formatDate as formatDateUtil, debounce as debounceUtil } from './utils.js';
+import { generateId, escapeHtml as escapeHtmlUtil, parseCSVLine as parseCSVLineUtil, formatDate as formatDateUtil, debounce as debounceUtil, formatDuration as formatDurationUtil } from './utils.js';
 import { setupDragAndDrop, setupAutoScroll } from './ui.js';
 import { collection, setDoc, doc, deleteDoc, onSnapshot, getDocs, getDoc } from 'https://www.gstatic.com/firebasejs/11.9.0/firebase-firestore.js';
 class MumatecTaskManager {
@@ -304,12 +304,14 @@ class MumatecTaskManager {
     }
 
     // UI Management
+
     updateUI() {
         const stats = this.getTaskStats();
+        const timeTotals = this.computeTimeTotals();
         this.updateStats(stats);
         this.updateNavigationCounts(stats);
+        this.renderCategoryTimeTotals(timeTotals);
         this.updateProductivityRing(stats);
-        this.updateWeeklyTime();
         this.renderCurrentView();
         this.updateInsights();
     }
@@ -369,6 +371,18 @@ class MumatecTaskManager {
                 e.stopPropagation();
                 this.moveCategory(btn.dataset.category, btn.dataset.direction);
             });
+        });
+    }
+
+    renderCategoryTimeTotals(totals = {}) {
+        const container = document.getElementById('categoryTimeTotals');
+        if (!container) return;
+        container.innerHTML = '';
+        this.categoryOrder.forEach(cat => {
+            const total = totals[cat] || 0;
+            const div = document.createElement('div');
+            div.innerHTML = `<span>${escapeHtmlUtil(cat)}</span><span>${formatDurationUtil(total)}</span>`;
+            container.appendChild(div);
         });
     }
 
@@ -590,6 +604,7 @@ class MumatecTaskManager {
                 <span class="timer-indicator" aria-hidden="true"></span>
                 <button class="timer-btn task-start-btn" aria-label="Start timer">Start</button>
                 <button class="timer-btn task-stop-btn" aria-label="Stop timer">Stop</button>
+                <span class="task-time-spent">${formatDurationUtil(task.timeSpent)}</span>
             </div>
         `;
 
@@ -965,6 +980,16 @@ class MumatecTaskManager {
         }
 
         return stats;
+    }
+
+    computeTimeTotals() {
+        const totals = {};
+        for (const t of this.tasks) {
+            const cat = t.category || 'Uncategorized';
+            const spent = parseFloat(t.timeSpent) || 0;
+            totals[cat] = (totals[cat] || 0) + spent;
+        }
+        return totals;
     }
 
     getWeeklyData() {
