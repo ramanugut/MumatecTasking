@@ -142,7 +142,7 @@ class MumatecTaskManager {
             this.users = [];
             this.userMap = {};
         }
-        this.populateAssigneeDatalist();
+        this.populateAssigneeDropdown();
     }
 
     populateTypeDatalist() {
@@ -151,10 +151,11 @@ class MumatecTaskManager {
         list.innerHTML = this.customTypes.map(t => `<option value="${escapeHtmlUtil(t)}"></option>`).join('');
     }
 
-    populateAssigneeDatalist() {
-        const list = document.getElementById('assigneeSuggestions');
-        if (!list) return;
-        list.innerHTML = this.users.map(u => `<option value="${escapeHtmlUtil(u.displayName || u.email)}" data-uid="${u.id}"></option>`).join('');
+    populateAssigneeDropdown() {
+        const select = document.getElementById('taskAssignee');
+        if (!select) return;
+        select.innerHTML = `<option value="">Unassigned</option>` +
+            this.users.map(u => `<option value="${u.id}">${escapeHtmlUtil(u.displayName || u.email)}</option>`).join('');
     }
 
     createSampleTasks() {
@@ -853,7 +854,16 @@ class MumatecTaskManager {
         document.getElementById('taskCategory').value = task.category || '';
         document.getElementById('taskType').value = task.type || '';
         const assignee = this.userMap[task.assignedTo];
-        document.getElementById('taskAssignee').value = assignee ? (assignee.displayName || assignee.email) : '';
+        document.getElementById('taskAssignee').value = task.assignedTo || '';
+        const avatarEl = document.getElementById('assigneeAvatarPreview');
+        if (avatarEl) {
+            if (assignee && assignee.photoURL) {
+                avatarEl.src = assignee.photoURL;
+                avatarEl.style.display = 'block';
+            } else {
+                avatarEl.style.display = 'none';
+            }
+        }
         document.getElementById('taskDependencies').value = (task.dependencies || []).join(', ');
         document.getElementById('taskEstimate').value = task.estimate || 0;
         document.getElementById('taskTimeSpent').value = task.timeSpent || 0;
@@ -888,6 +898,8 @@ class MumatecTaskManager {
         document.getElementById('taskCategory').value = '';
         document.getElementById('taskType').value = '';
         document.getElementById('taskAssignee').value = '';
+        const avatarEl = document.getElementById('assigneeAvatarPreview');
+        if (avatarEl) avatarEl.style.display = 'none';
         document.getElementById('taskDependencies').value = '';
         document.getElementById('taskEstimate').value = '';
         document.getElementById('taskTimeSpent').value = '';
@@ -1124,12 +1136,6 @@ class MumatecTaskManager {
         }
     }
 
-    lookupUserId(display) {
-        const userEntry = Object.values(this.userMap).find(u =>
-            (u.displayName || u.email) === display);
-        return userEntry ? userEntry.id : null;
-    }
-
     collectNewComment() {
         const text = document.getElementById('taskComment').value.trim();
         if (!text) return null;
@@ -1172,6 +1178,28 @@ class MumatecTaskManager {
             e.preventDefault();
             this.handleFormSubmit();
         });
+
+        const assignBtn = document.getElementById('assignToMeBtn');
+        if (assignBtn) {
+            assignBtn.addEventListener('click', () => this.assignToMe());
+        }
+
+        const assigneeSelect = document.getElementById('taskAssignee');
+        if (assigneeSelect) {
+            assigneeSelect.addEventListener('change', () => {
+                const uid = assigneeSelect.value;
+                const user = this.userMap[uid];
+                const avatarEl = document.getElementById('assigneeAvatarPreview');
+                if (avatarEl) {
+                    if (user && user.photoURL) {
+                        avatarEl.src = user.photoURL;
+                        avatarEl.style.display = 'block';
+                    } else {
+                        avatarEl.style.display = 'none';
+                    }
+                }
+            });
+        }
 
         // Quick capture
         document.getElementById('quickTaskInput').addEventListener('keypress', (e) => {
@@ -1291,7 +1319,7 @@ class MumatecTaskManager {
             dueDate: document.getElementById('taskDueDate').value,
             category: document.getElementById('taskCategory').value,
             type: document.getElementById('taskType').value,
-            assignedTo: this.lookupUserId(document.getElementById('taskAssignee').value),
+            assignedTo: document.getElementById('taskAssignee').value || null,
             dependencies: document.getElementById('taskDependencies').value,
             estimate: document.getElementById('taskEstimate').value,
             timeSpent: document.getElementById('taskTimeSpent').value,
@@ -1313,6 +1341,23 @@ class MumatecTaskManager {
         }
 
         this.closeModal();
+    }
+
+    assignToMe() {
+        const uid = window.currentUser?.uid;
+        if (!uid) return;
+        const select = document.getElementById('taskAssignee');
+        if (select) select.value = uid;
+        const user = this.userMap[uid];
+        const avatarEl = document.getElementById('assigneeAvatarPreview');
+        if (avatarEl) {
+            if (user && user.photoURL) {
+                avatarEl.src = user.photoURL;
+                avatarEl.style.display = 'block';
+            } else {
+                avatarEl.style.display = 'none';
+            }
+        }
     }
 
     confirmDeleteTask(taskId) {

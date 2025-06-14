@@ -416,8 +416,9 @@
                     <div class="form-row">
                         <div class="form-field">
                             <label>Assignee</label>
-                            <input type="text" id="taskAssignee" list="assigneeSuggestions" placeholder="Assign user">
-                            <datalist id="assigneeSuggestions"></datalist>
+                            <select id="taskAssignee"></select>
+                            <button type="button" id="assignToMeBtn" class="assign-me-btn">Assign to me</button>
+                            <img id="assigneeAvatarPreview" class="task-avatar" style="display:none;margin-top:4px;" alt="Assignee avatar">
                         </div>
                         <div class="form-field">
                             <label>Dependencies</label>
