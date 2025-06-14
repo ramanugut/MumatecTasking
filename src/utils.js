@@ -22,6 +22,16 @@ export function formatDate(date) {
   return date.toLocaleDateString();
 }
 
+export function formatDuration(hours) {
+  const totalMinutes = Math.round(parseFloat(hours || 0) * 60);
+  const h = Math.floor(totalMinutes / 60);
+  const m = totalMinutes % 60;
+  if (h > 0) {
+    return `${h}h ${m}m`;
+  }
+  return `${m}m`;
+}
+
 export function debounce(fn, delay = 300) {
   let timeout;
   return (...args) => {
