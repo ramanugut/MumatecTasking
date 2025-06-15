@@ -1,4 +1,4 @@
-// Mumatec Task Manager - Professional Application
+// Mumatec Tasking - Professional Application
 import { db, functions } from '../firebase.js';
 import { httpsCallable } from 'https://www.gstatic.com/firebasejs/11.9.0/firebase-functions.js';
 import { generateId, escapeHtml as escapeHtmlUtil, parseCSVLine as parseCSVLineUtil, formatDate as formatDateUtil, debounce as debounceUtil, formatDuration as formatDurationUtil } from './utils.js';
