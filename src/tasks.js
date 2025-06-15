@@ -25,8 +25,35 @@ class MumatecTaskManager {
         this.activeTimers = {};
         this.categoryOrder = ['Work', 'Personal', 'Development'];
         this.categoryIcons = { Work: 'work', Personal: 'home', Development: 'code' };
-        
+
         this.init();
+    }
+
+    normalizeTask(data) {
+        return {
+            id: data.id || generateId(),
+            title: data.title || '',
+            description: data.description || '',
+            notes: data.notes || '',
+            priority: data.priority || 'medium',
+            status: data.status || 'todo',
+            dueDate: data.dueDate || null,
+            category: data.category || 'Work',
+            type: data.type || 'General',
+            assignedTo: data.assignedTo || null,
+            dependencies: Array.isArray(data.dependencies) ? data.dependencies : [],
+            estimate: Number(data.estimate) || 0,
+            timeSpent: Number(data.timeSpent) || 0,
+            attachments: Array.isArray(data.attachments) ? data.attachments : [],
+            comments: Array.isArray(data.comments) ? data.comments : [],
+            tags: Array.isArray(data.tags) ? data.tags : [],
+            labels: Array.isArray(data.labels) ? data.labels : [],
+            subtasks: Array.isArray(data.subtasks) ? data.subtasks : [],
+            activity: Array.isArray(data.activity) ? data.activity : [],
+            createdAt: data.createdAt || new Date().toISOString(),
+            updatedAt: data.updatedAt || new Date().toISOString(),
+            reminderSent: data.reminderSent || false
+        };
     }
 
     async init() {
@@ -70,7 +97,7 @@ class MumatecTaskManager {
                 console.log('Subscribing to Firestore collection:', `users/${window.currentUser.uid}/tasks`);
 
                 this.unsubscribe = onSnapshot(col, (snap) => {
-                    const tasks = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+                    const tasks = snap.docs.map(d => this.normalizeTask({ id: d.id, ...d.data() }));
                     if (tasks.length === 0 && !this.samplePushed) {
                         this.samplePushed = true;
                         this.createSampleTasks();
@@ -283,14 +310,14 @@ class MumatecTaskManager {
             }
         ];
         
-        this.tasks = sampleTasks;
-        sampleTasks.forEach(task => this.saveTaskToFirestore(task));
+        this.tasks = sampleTasks.map(t => this.normalizeTask(t));
+        this.tasks.forEach(task => this.saveTaskToFirestore(task));
     }
 
 
     // Task Operations
     async addTask(taskData) {
-        const task = {
+        const task = this.normalizeTask({
             id: generateId(),
             title: taskData.title.trim(),
             description: taskData.description?.trim() || '',
@@ -304,16 +331,14 @@ class MumatecTaskManager {
             dependencies: this.parseTags(taskData.dependencies),
             estimate: parseFloat(taskData.estimate) || 0,
             timeSpent: parseFloat(taskData.timeSpent) || 0,
-
             attachments: taskData.attachments || [],
-
             comments: taskData.comments || [],
             tags: this.parseTags(taskData.tags),
             activity: [{ action: 'Created task', timestamp: new Date().toISOString() }],
             createdAt: new Date().toISOString(),
             updatedAt: new Date().toISOString(),
             reminderSent: false
-        };
+        });
 
 
         this.tasks.push(task);
@@ -327,7 +352,7 @@ class MumatecTaskManager {
         const taskIndex = this.tasks.findIndex(task => task.id === taskId);
         if (taskIndex === -1) return false;
 
-        this.tasks[taskIndex] = {
+        this.tasks[taskIndex] = this.normalizeTask({
             ...this.tasks[taskIndex],
             title: taskData.title.trim(),
             description: taskData.description?.trim() || '',
@@ -341,13 +366,11 @@ class MumatecTaskManager {
             dependencies: this.parseTags(taskData.dependencies),
             estimate: parseFloat(taskData.estimate) || this.tasks[taskIndex].estimate || 0,
             timeSpent: parseFloat(taskData.timeSpent) || this.tasks[taskIndex].timeSpent || 0,
-
             attachments: taskData.attachments && taskData.attachments.length ? [...(this.tasks[taskIndex].attachments || []), ...taskData.attachments] : (this.tasks[taskIndex].attachments || []),
-
             comments: taskData.comments ? [...(this.tasks[taskIndex].comments || []), ...taskData.comments] : (this.tasks[taskIndex].comments || []),
             tags: this.parseTags(taskData.tags),
             updatedAt: new Date().toISOString()
-        };
+        });
         this.tasks[taskIndex].activity = this.tasks[taskIndex].activity || [];
         this.tasks[taskIndex].activity.push({ action: 'Updated task', timestamp: new Date().toISOString() });
 
