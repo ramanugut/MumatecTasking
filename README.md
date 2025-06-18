@@ -38,60 +38,12 @@ domain to Firebase Authentication's allowed list. In the Firebase console open
 - Category links in the sidebar also have up/down arrows. Rearrange them to
   suit your workflow and the order will persist across sessions.
 
-### Admin features
+### Simplified Version
 
-Admins can now:
-
-- Create and delete users
-- Grant or revoke admin rights
-- Edit any user's email or display name
-- Generate password reset links for users
-- Activate or deactivate accounts
-- Impersonate users
-- View audit logs of all admin actions
-- Manage teams, projects and client assignments
-
-The admin panel is mobile-friendly. Swipe left on a user row to delete and
-swipe right to quickly disable or enable accounts. Push notifications alert
-admins of new user requests, and a service worker caches admin pages for
-offline management.
-
-### Advanced Admin Features
-
-Admins can also configure organization branding and domain restrictions, set
-security policies like password requirements and session timeouts, manage API
-keys and webhooks, export user data for backups, and handle GDPR data requests
-along with audit log exports.
-
-### User profile features
-
-The profile page now supports avatar upload with cropping and extended details
-like job title, phone, timezone, skills, availability status and granular
-notification settings. Password changes are also available from the profile
-screen.
-
-### Role-Based Access Control
-
-The application defines the following roles:
-
-- **superAdmin** – full system access including user management and billing.
-- **admin** – project management, inviting users and managing clients.
-- **projectManager** – manage assigned projects and assign tasks.
-- **teamLead** – lead teams and approve work.
-- **developer** – perform technical tasks and track time.
-- **designer** – handle design tasks and manage assets.
-- **client** – view only their own projects.
-- **guest** – limited read-only access.
-
-
-
-### Custom Role Builder
-
-Administrators can define additional roles with granular permissions using the new
-**Custom Role Builder** available from the admin panel. Roles can specify
-Create/Read/Update/Delete rights for Projects, Tasks, Users, Reports, Settings,
-Billing and Client Data. Resource level access can be limited to specific
-projects or clients and features may be toggled on or off per role.
+Previous releases included extensive administrative tools, custom roles and a
+profile management system. These features have been removed to keep the project
+lightweight. The current app focuses on basic authentication and task
+management only.
 
 ## Workflow Documentation
 For an overview of task statuses, priorities, and categories, see [WORKFLOW.md](./WORKFLOW.md).

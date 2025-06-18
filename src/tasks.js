@@ -1,6 +1,11 @@
+<<<<<<< ix8hv2-codex/explain-purpose-of-each-file-based-on-code
+// Mumatec Task Manager - Professional Application
+import { db } from '../firebase.js';
+=======
 // Mumatec Tasking - Professional Application
 import { db, functions } from '../firebase.js';
 import { httpsCallable } from 'https://www.gstatic.com/firebasejs/11.9.0/firebase-functions.js';
+>>>>>>> main
 import { generateId, escapeHtml as escapeHtmlUtil, parseCSVLine as parseCSVLineUtil, formatDate as formatDateUtil, debounce as debounceUtil, formatDuration as formatDurationUtil } from './utils.js';
 import { setupDragAndDrop, setupAutoScroll } from './ui.js';
 import { collection, setDoc, doc, deleteDoc, onSnapshot, getDocs, getDoc } from 'https://www.gstatic.com/firebasejs/11.9.0/firebase-firestore.js';
@@ -1844,14 +1849,7 @@ class MumatecTaskManager {
             task.updatedAt = new Date().toISOString();
             this.saveTaskToFirestore(task);
         }
-        try {
-            if (task && task.projectId) {
-                const fn = httpsCallable(functions, 'logTimeEntry');
-                await fn({ projectId: task.projectId, taskId, minutes });
-            }
-        } catch (e) {
-            console.warn('logTimeEntry failed', e);
-        }
+        // Optionally log time entries via Cloud Functions in future
         this.updateTaskTimerUI(taskId, false);
         this.updateUI();
     }
