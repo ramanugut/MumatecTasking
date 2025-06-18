@@ -96,6 +96,7 @@ class MumatecTaskManager {
                 console.log('Subscribing to Firestore collection:', `users/${window.currentUser.uid}/tasks`);
 
                 this.unsubscribe = onSnapshot(col, (snap) => {
+                    // Spread operator ensures all Firestore fields are merged correctly
                     const tasks = snap.docs.map(d => this.normalizeTask({ id: d.id, ...d.data() }));
                     if (tasks.length === 0 && !this.samplePushed) {
                         this.samplePushed = true;
@@ -164,6 +165,7 @@ class MumatecTaskManager {
         if (!db) return;
         try {
             const snap = await getDocs(collection(db, 'users'));
+            // Merge Firestore user data using spread operator
             this.users = snap.docs.map(d => ({ id: d.id, ...d.data() }));
             this.userMap = {};
             this.users.forEach(u => { this.userMap[u.id] = u; });
@@ -903,6 +905,7 @@ class MumatecTaskManager {
 
         const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
         const data = this.getWeeklyData();
+        // Use spread operator to calculate maximum value safely
         const maxValue = Math.max(...data, 5);
 
         chartContainer.innerHTML = days.map((day, index) => {
@@ -1137,6 +1140,7 @@ class MumatecTaskManager {
 
     // Utility Functions
     getFilteredTasks() {
+        // Clone tasks array using the spread operator for filtering
         let filtered = [...this.tasks];
 
         if (this.searchTerm) {
