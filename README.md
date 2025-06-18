@@ -9,9 +9,10 @@ and always has full rights to manage other users.
 
 1. Install dependencies with `npm install`.
 2. Start the dev server using `npm run dev` (uses `serve` under the hood).
-3. Visit `login.html` to sign in with your admin credentials.
-4. If you do not have an account, use `signup.html` which will create a client
-   profile.
+3. With the server running, open `http://localhost:5000/login` to sign in with
+   your admin credentials.
+4. If you do not have an account, open `http://localhost:5000/signup` which will
+   create a client profile.
 5. After signing in you will be redirected to `index.html` where you can manage
    your tasks.
 
