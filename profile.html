@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Profile - Mumatec Tasking</title>
+  <link id="styleLink" rel="stylesheet" href="styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <script src="style.js"></script>
+  <script>applySavedTheme();</script>
+</head>
+<body>
+  <header class="top-bar">
+    <div class="top-bar-left">
+      <a href="index.html" class="action-btn secondary" aria-label="Back to dashboard"><span class="material-icons">arrow_back</span></a>
+      <h1 class="page-title">Profile</h1>
+    </div>
+    <div class="top-bar-right">
+      <div class="user-info" id="userInfo">
+        <div class="user-avatar" id="userAvatar"><span class="material-icons">person</span></div>
+        <div class="profile-dropdown" id="profileDropdown">
+          <button id="themeToggle" class="dropdown-btn"><span class="material-icons">dark_mode</span></button>
+          <button class="dropdown-btn" onclick="logout()">Logout</button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="app-container">
+    <div class="main-content">
+      <div class="content-area" style="padding:20px;">
+        <div class="profile-container">
+          <h2>Personal Info</h2>
+          <form id="profileForm" class="profile-form">
+            <div class="form-row">
+              <div class="form-field">
+                <label for="name">Name</label>
+                <input type="text" id="name" />
+              </div>
+              <div class="form-field">
+                <label for="phone">Phone</label>
+                <input type="tel" id="phone" />
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-field">
+                <label for="language">Language</label>
+                <input type="text" id="language" />
+              </div>
+              <div class="form-field">
+                <label for="timezone">Timezone</label>
+                <input type="text" id="timezone" />
+              </div>
+            </div>
+            <button type="submit" class="action-btn primary">Save Changes</button>
+            <div id="profileMsg" class="error"></div>
+          </form>
+
+          <h2 style="margin-top:2rem;">Reset Password</h2>
+          <form id="pwResetForm">
+            <button type="submit" class="action-btn secondary">Send reset email</button>
+            <div id="pwMsg" class="error"></div>
+          </form>
+
+          <h2 style="margin-top:2rem;">Two-Factor Authentication</h2>
+          <div id="totpSection">
+            <p id="totpStatus"></p>
+            <button id="enableTotp" class="action-btn secondary">Enable 2FA</button>
+            <button id="disableTotp" class="action-btn secondary" style="display:none;">Disable 2FA</button>
+            <div id="totpSetup" style="display:none;margin-top:1rem;">
+              <p>Secret: <span id="totpSecret"></span></p>
+              <form id="totpForm">
+                <div class="form-field">
+                  <label for="totpCode">Enter code</label>
+                  <input type="text" id="totpCode" autocomplete="one-time-code" />
+                </div>
+                <button type="submit" class="action-btn primary">Verify</button>
+                <div id="totpError" class="error"></div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="firebase.js"></script>
+  <script type="module" src="auth.js"></script>
+  <script type="module" src="profile.js"></script>
+</body>
+</html>

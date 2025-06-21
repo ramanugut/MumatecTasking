@@ -12,12 +12,14 @@ This document lists the Firestore collections used by the application and the ma
 - **department**: string *(optional)*
 - **phone**: string *(optional)*
 - **timezone**: string *(optional)*
+- **language**: string *(optional)*
 - **skills**: array of strings *(optional)*
 - **status**: string *(optional)*
 - **notifications**: { email: boolean, push: boolean } *(optional)*
 - **onboarded**: boolean *(optional)*
 - **disabled**: boolean *(optional)*
 - **guestExpiresAt**: timestamp *(optional)*
+- **totpSecret**: string *(optional)*
 - **lastLogin**: timestamp *(optional)*
 - **teams**, **clients**, **projects**: array of ids *(optional)*
 - **managerUid**: string *(optional)*
@@ -25,6 +27,7 @@ This document lists the Firestore collections used by the application and the ma
 ### Subcollections
 - **tasks**: see [Task fields](#tasks-subcollection)
 - **sessions**: { userAgent, startAt, endAt, active }
+- **loginHistory**: { timestamp, userAgent }
 
 ## settings (collection)
 - **taskTypes** document: { types: array of strings }

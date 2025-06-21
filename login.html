@@ -27,6 +27,16 @@
       <button type="submit" class="action-btn primary">Login</button>
       <div id="error" class="error"></div>
     </form>
+    <div id="totpContainer" style="display:none;">
+      <form id="totpForm">
+        <div class="form-field">
+          <label for="totpCode">Authentication code</label>
+          <input type="text" id="totpCode" autocomplete="one-time-code" required />
+        </div>
+        <button type="submit" class="action-btn primary">Verify</button>
+        <div id="totpError" class="error"></div>
+      </form>
+    </div>
     <p style="text-align:center;margin-top:0.5rem;">
       <a href="signup.html">Create account</a> |
       <a href="reset.html">Forgot password?</a>
