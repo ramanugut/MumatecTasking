@@ -1547,6 +1547,7 @@ body {
     padding: 0 12px;
     font-size: 14px;
     color: var(--text-primary);
+    background: var(--surface-secondary);
     outline: none;
     transition: var(--transition);
     font-family: var(--font-system);
@@ -1563,6 +1564,7 @@ body {
 .form-field select:focus,
 .form-field textarea:focus {
     border-color: var(--primary-blue);
+    background: var(--background);
     box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
 }
 
