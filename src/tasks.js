@@ -1881,16 +1881,24 @@ class MumatecTaskManager {
 
     // Theme Management
     loadTheme() {
-        const saved = localStorage.getItem('mumatecTheme');
-        if (saved === 'dark') {
-            document.body.classList.add('dark-mode');
+        if (typeof window.applySavedTheme === 'function') {
+            window.applySavedTheme();
+        } else {
+            const saved = localStorage.getItem('mumatecTheme');
+            if (saved === 'dark') {
+                document.body.classList.add('dark-mode');
+            }
         }
         this.updateThemeToggleIcon();
     }
 
     toggleTheme() {
-        const isDark = document.body.classList.toggle('dark-mode');
-        localStorage.setItem('mumatecTheme', isDark ? 'dark' : 'light');
+        if (typeof window.toggleThemePreference === 'function') {
+            window.toggleThemePreference();
+        } else {
+            const isDark = document.body.classList.toggle('dark-mode');
+            localStorage.setItem('mumatecTheme', isDark ? 'dark' : 'light');
+        }
         this.updateThemeToggleIcon();
     }
 
