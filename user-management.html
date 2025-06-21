@@ -40,10 +40,10 @@
           <span class="material-icons nav-icon">security</span>
           <span class="nav-label">User Roles &amp; Permissions</span>
         </div>
-        <div class="nav-item" aria-label="Departments/Teams">
+        <a href="departments.html" class="nav-item" aria-label="Departments/Teams">
           <span class="material-icons nav-icon">groups</span>
           <span class="nav-label">Departments/Teams</span>
-        </div>
+        </a>
         <div class="nav-item" aria-label="Inactive Users">
           <span class="material-icons nav-icon">person_off</span>
           <span class="nav-label">Inactive Users</span>
@@ -84,10 +84,12 @@
         <table class="user-table">
           <thead>
             <tr>
+              <th><input type="checkbox" id="selectAll"></th>
               <th>Name</th>
               <th>Email</th>
               <th>Role</th>
               <th>Department</th>
+              <th>Team</th>
               <th>Projects</th>
               <th>Last Login</th>
               <th>Status</th>
@@ -96,6 +98,30 @@
           </thead>
           <tbody id="userTableBody"></tbody>
         </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="bulkModal" aria-hidden="true">
+    <div class="task-modal">
+      <div class="modal-header">
+        <h3>Bulk Edit Users</h3>
+        <button class="close-btn" id="bulkClose"><span class="material-icons">close</span></button>
+      </div>
+      <div class="form-field">
+        <label>Assign Roles</label>
+        <select id="bulkRoles" multiple></select>
+      </div>
+      <div class="form-field">
+        <label>Assign Project</label>
+        <select id="bulkProject"></select>
+      </div>
+      <div class="form-field">
+        <label><input type="checkbox" id="bulkDeactivate"> Deactivate Users</label>
+      </div>
+      <div class="quick-actions">
+        <button class="quick-btn secondary" id="bulkCancel">Cancel</button>
+        <button class="quick-btn primary" id="bulkApply">Apply</button>
       </div>
     </div>
   </div>

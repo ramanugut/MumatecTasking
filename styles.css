@@ -1267,6 +1267,7 @@ body {
     max-width: 500px;
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
     animation: modalSlideIn 0.3s ease;
+    color: var(--text-primary);
 }
 
 @keyframes modalSlideIn {
@@ -1378,6 +1379,7 @@ body {
     overflow-y: auto;
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
     animation: modalSlideIn 0.3s ease;
+    color: var(--text-primary);
 }
 
 /* Insights Modal */
@@ -1391,6 +1393,7 @@ body {
     overflow-y: auto;
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
     animation: modalSlideIn 0.3s ease;
+    color: var(--text-primary);
 }
 
 .modal-header {
@@ -2097,7 +2100,7 @@ body.dark-mode {
 .tab-header {
   display: flex;
   gap: 8px;
-  border-bottom: 1px solid var(--border-color);
+  border-bottom: 1px solid var(--border);
   margin-bottom: 8px;
 }
 
@@ -2112,7 +2115,7 @@ body.dark-mode {
 
 .tab-btn.active {
   color: var(--text-primary);
-  border-bottom: 2px solid var(--primary-color);
+  border-bottom: 2px solid var(--primary-blue);
   font-weight: 600;
 }
 
@@ -2125,7 +2128,7 @@ body.dark-mode {
 }
 
 .drop-zone {
-  border: 2px dashed var(--border-color);
+  border: 2px dashed var(--border);
   padding: 20px;
   text-align: center;
   cursor: pointer;

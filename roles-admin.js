@@ -12,8 +12,9 @@ async function loadRoles() {
   snap.forEach(d => {
     const data = d.data();
     const perms = (data.permissions || []).join(', ');
+    const parent = data.parentRole || '';
     const tr = document.createElement('tr');
-    tr.innerHTML = `<td>${d.id}</td><td>${data.description || ''}</td><td>${perms}</td><td><button class="action-btn secondary small" data-id="${d.id}">Edit</button></td>`;
+    tr.innerHTML = `<td>${d.id}</td><td>${data.description || ''}</td><td>${parent}</td><td>${perms}</td><td><button class="action-btn secondary small" data-id="${d.id}">Edit</button></td>`;
     tbody.appendChild(tr);
   });
 }
@@ -27,9 +28,11 @@ tbody.addEventListener('click', async e => {
   if (desc === null) return;
   const permsInput = prompt('Permissions (comma separated):', (data.permissions || []).join(', '));
   if (permsInput === null) return;
+  const parentRole = prompt('Parent role (optional):', data.parentRole || '') || '';
   const permissions = permsInput.split(',').map(p => p.trim()).filter(Boolean);
   await setDoc(doc(db, 'roles', id), { description: desc, permissions }, { merge: true });
   logAuditAction(auth.currentUser?.uid, 'updateRole', id, { description: desc, permissions });
+
   loadRoles();
 });
 
@@ -38,9 +41,11 @@ addBtn.addEventListener('click', async () => {
   if (!name) return;
   const desc = prompt('Description:') || '';
   const permsInput = prompt('Permissions (comma separated):') || '';
+  const parentRole = prompt('Parent role (optional):') || '';
   const permissions = permsInput.split(',').map(p => p.trim()).filter(Boolean);
   await setDoc(doc(db, 'roles', name.trim()), { description: desc, permissions });
   logAuditAction(auth.currentUser?.uid, 'createRole', name.trim(), { description: desc, permissions });
+
   loadRoles();
 });
 

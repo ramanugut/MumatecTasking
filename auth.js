@@ -20,13 +20,20 @@ onAuthStateChanged(auth, async (user) => {
     try {
       const roleSnap = await getDocs(query(collection(db, 'userRoles'), where('userId', '==', user.uid)));
       roles = roleSnap.docs.map(d => d.data().roleId);
-      const docs = await Promise.all(roles.map(id => getDoc(doc(db, 'roles', id))));
-      docs.forEach(r => {
-        if (r.exists()) {
-          const data = r.data();
-          if (Array.isArray(data.permissions)) permissions.push(...data.permissions);
+      const toLoad = new Set(roles);
+      const fetched = {};
+      while (toLoad.size) {
+        const roleId = toLoad.values().next().value;
+        toLoad.delete(roleId);
+        if (fetched[roleId]) continue;
+        const snapRole = await getDoc(doc(db, 'roles', roleId));
+        if (snapRole.exists()) {
+          const rData = snapRole.data();
+          fetched[roleId] = rData;
+          if (Array.isArray(rData.permissions)) permissions.push(...rData.permissions);
+          if (rData.parentRole) toLoad.add(rData.parentRole);
         }
-      });
+      }
     } catch (e) {
       console.error('Failed to fetch user roles', e);
     }

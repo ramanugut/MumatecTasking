@@ -3,19 +3,19 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Role Administration - Mumatec Tasking</title>
+  <title>Departments & Teams - Mumatec Tasking</title>
   <link id="styleLink" rel="stylesheet" href="styles.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
   <script src="style.js"></script>
-  <script>applySavedTheme(); window.REQUIRED_ROLES = ['superAdmin'];</script>
+  <script>applySavedTheme(); window.REQUIRED_ROLES = ['admin','superAdmin'];</script>
 </head>
 <body>
   <header class="top-bar">
     <div class="top-bar-left">
       <a href="index.html" class="action-btn secondary" aria-label="Back to dashboard"><span class="material-icons">arrow_back</span></a>
-      <h1 class="page-title">Role Administration</h1>
+      <h1 class="page-title">Departments & Teams</h1>
     </div>
     <div class="top-bar-right">
       <div class="user-info" id="userInfo">
@@ -32,10 +32,19 @@
   <div class="app-container">
     <div class="main-content">
       <div class="content-area" style="padding:20px;">
-        <button id="addRole" class="action-btn primary" style="margin-bottom:1rem;"><span class="material-icons">add</span> Add Role</button>
+        <div style="margin-bottom:1rem; display:flex; gap:1rem;">
+          <button id="addDepartment" class="action-btn primary"><span class="material-icons">add</span> Add Department</button>
+          <button id="addTeam" class="action-btn primary"><span class="material-icons">add</span> Add Team</button>
+        </div>
+        <h2>Departments</h2>
+        <table class="user-table" style="margin-bottom:2rem;">
+          <thead><tr><th>Name</th><th>Actions</th></tr></thead>
+          <tbody id="departmentsBody"></tbody>
+        </table>
+        <h2>Teams</h2>
         <table class="user-table">
-          <thead><tr><th>Role</th><th>Description</th><th>Parent</th><th>Permissions</th><th>Actions</th></tr></thead>
-          <tbody id="rolesBody"></tbody>
+          <thead><tr><th>Name</th><th>Actions</th></tr></thead>
+          <tbody id="teamsBody"></tbody>
         </table>
       </div>
     </div>
@@ -43,6 +52,6 @@
 
   <script type="module" src="firebase.js"></script>
   <script type="module" src="auth.js"></script>
-  <script type="module" src="roles-admin.js"></script>
+  <script type="module" src="departments.js"></script>
 </body>
 </html>
