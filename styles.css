@@ -1711,28 +1711,32 @@ body {
 /* Dark mode support */
 @media (prefers-color-scheme: dark) {
     :root {
-        --background: #1C1C1E;
-        --surface: #2C2C2E;
-        --surface-secondary: #3A3A3C;
-        --text-primary: rgba(0, 178, 248, 0.973);
-        --text-secondary: #98989D;
-        --text-tertiary: #636366;
-        --border: #38383A;
-        --shadow: rgba(0, 0, 0, 0.2);
+        --background: linear-gradient(135deg, #0e5077 0%, #06315e 100%);
+        --surface: rgba(255, 255, 255, 0.05);
+        --surface-secondary: rgba(255, 255, 255, 0.08);
+        --text-primary: #ffffff;
+        --text-secondary: #a2b1bd;
+        --text-tertiary: #a2b1bd;
+        --border: rgba(255, 255, 255, 0.1);
+        --primary-blue: #24a1c6;
+        --primary-blue-hover: #1d90b6;
+        --shadow: rgba(0, 0, 0, 0.3);
         --shadow-hover: rgba(0, 0, 0, 0.4);
     }
 }
 
 /* Manual dark mode toggle */
 body.dark-mode {
-    --background: #1C1C1E;
-    --surface: #2C2C2E;
-    --surface-secondary: #3A3A3C;
-    --text-primary: rgba(0, 178, 248, 0.973);
-    --text-secondary: #98989D;
-    --text-tertiary: #636366;
-    --border: #38383A;
-    --shadow: rgba(0, 0, 0, 0.2);
+    --background: linear-gradient(135deg, #0e5077 0%, #06315e 100%);
+    --surface: rgba(255, 255, 255, 0.05);
+    --surface-secondary: rgba(255, 255, 255, 0.08);
+    --text-primary: #ffffff;
+    --text-secondary: #a2b1bd;
+    --text-tertiary: #a2b1bd;
+    --border: rgba(255, 255, 255, 0.1);
+    --primary-blue: #24a1c6;
+    --primary-blue-hover: #1d90b6;
+    --shadow: rgba(0, 0, 0, 0.3);
     --shadow-hover: rgba(0, 0, 0, 0.4);
 }
 

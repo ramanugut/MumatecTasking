@@ -64,7 +64,6 @@ class MumatecTaskManager {
         await this.loadUsers();
         await this.loadProjects();
         this.loadLabels();
-        this.loadStyleSheet();
         this.loadTheme();
         this.loadSidebarState();
         this.loadStatusOrder();
@@ -1490,13 +1489,6 @@ class MumatecTaskManager {
             this.toggleTheme();
         });
 
-        const styleBtn = document.getElementById('styleToggle');
-        if (styleBtn) {
-            styleBtn.addEventListener('click', () => {
-                this.toggleStyleSheet();
-            });
-        }
-
         const userInfo = document.getElementById('userInfo');
         const profileDropdown = document.getElementById('profileDropdown');
         if (userInfo && profileDropdown) {
@@ -1999,18 +1991,7 @@ class MumatecTaskManager {
         this.updateThemeToggleIcon();
     }
 
-    // Style sheet management
-    loadStyleSheet() {
-        if (typeof window.loadPreferredStyle === 'function') {
-            window.loadPreferredStyle();
-        }
-    }
 
-    toggleStyleSheet() {
-        if (typeof window.toggleStyleSheet === 'function') {
-            window.toggleStyleSheet();
-        }
-    }
 
     updateThemeToggleIcon() {
         const btn = document.getElementById('themeToggle');
