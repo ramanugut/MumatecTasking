@@ -1,4 +1,5 @@
 import { auth, db } from './firebase.js';
+import { logAuditAction } from './auth.js';
 import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/11.9.0/firebase-auth.js';
 import { collection, getDocs, query, where, addDoc, deleteDoc } from 'https://www.gstatic.com/firebasejs/11.9.0/firebase-firestore.js';
 
@@ -79,6 +80,7 @@ tbody.addEventListener('click', async e => {
     snap.forEach(d => ops.push(deleteDoc(d.ref)));
     roles.forEach(r => ops.push(addDoc(collection(db, 'userRoles'), { userId, roleId: r, assignedAt: new Date() })));
     await Promise.all(ops);
+    logAuditAction(auth.currentUser?.uid, 'setUserRoles', userId, { roles });
     loadUsers();
   } catch (err) {
     console.error('Failed to update roles', err);

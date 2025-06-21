@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Audit Logs - Mumatec Tasking</title>
+  <link id="styleLink" rel="stylesheet" href="styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <script src="style.js"></script>
+  <script>applySavedTheme(); window.REQUIRED_ROLES = ['admin','superAdmin'];</script>
+</head>
+<body>
+  <header class="top-bar">
+    <div class="top-bar-left">
+      <a href="index.html" class="action-btn secondary" aria-label="Back to dashboard"><span class="material-icons">arrow_back</span></a>
+      <h1 class="page-title">Audit Logs</h1>
+    </div>
+    <div class="top-bar-right">
+      <div class="user-info" id="userInfo">
+        <div class="user-avatar" id="userAvatar"><span class="material-icons">person</span></div>
+        <div class="profile-dropdown" id="profileDropdown">
+          <button id="themeToggle" class="dropdown-btn"><span class="material-icons">dark_mode</span></button>
+          <a href="profile.html" class="dropdown-btn"><span class="material-icons">person</span> Profile</a>
+          <button class="dropdown-btn" onclick="logout()">Logout</button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="app-container">
+    <div class="main-content">
+      <div class="content-area" style="padding:20px;">
+        <div class="user-filters" style="margin-bottom:1rem;">
+          <input type="text" id="userFilter" class="search-input" placeholder="Admin UID">
+          <input type="date" id="startDate">
+          <input type="date" id="endDate">
+          <button class="action-btn secondary small" id="loadLogs">Filter</button>
+        </div>
+        <table class="user-table">
+          <thead><tr><th>Timestamp</th><th>Admin</th><th>Action</th><th>Target</th><th>Extra</th></tr></thead>
+          <tbody id="auditBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="firebase.js"></script>
+  <script type="module" src="auth.js"></script>
+  <script type="module" src="audit.js"></script>
+</body>
+</html>
