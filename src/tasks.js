@@ -1063,10 +1063,23 @@ class MumatecTaskManager {
         }
     }
 
+    toggleEditFields(isEdit) {
+        const modal = document.getElementById('taskModal');
+        if (!modal) return;
+        if (isEdit) {
+            modal.classList.add('edit-mode');
+            modal.classList.remove('add-mode');
+        } else {
+            modal.classList.remove('edit-mode');
+            modal.classList.add('add-mode');
+        }
+    }
+
     // Modal Management
     openAddTaskModal(status = 'todo') {
         this.currentEditingTask = null;
         document.getElementById('modalTitle').textContent = 'Add New Task';
+        this.toggleEditFields(false);
         this.clearTaskForm();
         document.getElementById('taskStatus').value = status;
         const projectSelect = document.getElementById('taskProject');
@@ -1088,6 +1101,7 @@ class MumatecTaskManager {
 
         this.currentEditingTask = taskId;
         document.getElementById('modalTitle').textContent = 'Edit Task';
+        this.toggleEditFields(true);
         
         document.getElementById('taskTitle').value = task.title;
         document.getElementById('taskDescription').value = task.description || '';
@@ -1137,6 +1151,7 @@ class MumatecTaskManager {
         const modal = document.getElementById('taskModal');
         modal.classList.remove('active');
         modal.setAttribute('aria-hidden', 'true');
+        modal.classList.remove('edit-mode', 'add-mode');
         this.clearTaskForm();
         this.currentEditingTask = null;
     }
