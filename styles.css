@@ -17,6 +17,12 @@
     --error-red: #FF3B30;
     --critical-red: #B00020;
     --purple: #AF52DE;
+
+    /* Glossy Primary Colors */
+    --primary-deep: #0040A8;
+    --primary-main: #007AFF;
+    --primary-light: #5AC8FA;
+    --primary-glare: rgba(255, 255, 255, 0.4);
     
     /* Neutral Colors */
     --gray-50: #F9F9F9;
@@ -74,6 +80,23 @@ body {
     overflow: hidden;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+}
+
+/* Glassmorphism Utilities */
+.glass-card {
+    background: linear-gradient(135deg, var(--primary-deep), var(--primary-main));
+    border-radius: var(--border-radius);
+    border: 1px solid var(--primary-glare);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    box-shadow: 0 4px 12px var(--shadow-hover);
+}
+
+.glass-sidebar {
+    background: linear-gradient(to bottom, var(--primary-deep), var(--primary-main));
+    border-right: 1px solid var(--border);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
 }
 
 /* App Container */
@@ -1695,6 +1718,10 @@ body {
         --border: #38383A;
         --shadow: rgba(0, 0, 0, 0.2);
         --shadow-hover: rgba(0, 0, 0, 0.4);
+        --primary-deep: #001E40;
+        --primary-main: #0A84FF;
+        --primary-light: #64D2FF;
+        --primary-glare: rgba(255, 255, 255, 0.2);
     }
 }
 
@@ -1709,6 +1736,10 @@ body.dark-mode {
     --border: #38383A;
     --shadow: rgba(0, 0, 0, 0.2);
     --shadow-hover: rgba(0, 0, 0, 0.4);
+    --primary-deep: #001E40;
+    --primary-main: #0A84FF;
+    --primary-light: #64D2FF;
+    --primary-glare: rgba(255, 255, 255, 0.2);
 }
 
 /* Simple board and list styles */

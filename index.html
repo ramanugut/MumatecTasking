@@ -48,7 +48,7 @@
     <!-- App Shell -->
     <div class="app-container">
         <!-- Sidebar -->
-        <div class="sidebar">
+        <div class="sidebar glass-sidebar">
             <div class="sidebar-header">
                 <div class="app-logo">
                     <div class="logo-icon"><span class="material-icons">assignment</span></div>
@@ -143,28 +143,28 @@
                 <div class="view-container active" id="dashboardView">
                     <!-- Quick Stats -->
                     <div class="quick-stats">
-                        <div class="stat-card">
+                        <div class="stat-card glass-card">
                             <div class="stat-icon material-icons">assignment</div>
                             <div class="stat-content">
                                 <div class="stat-number" id="totalTasks">0</div>
                                 <div class="stat-label">Total Tasks</div>
                             </div>
                         </div>
-                        <div class="stat-card">
+                        <div class="stat-card glass-card">
                             <div class="stat-icon material-icons">check_circle</div>
                             <div class="stat-content">
                                 <div class="stat-number" id="completedTasks">0</div>
                                 <div class="stat-label">Completed</div>
                             </div>
                         </div>
-                        <div class="stat-card">
+                        <div class="stat-card glass-card">
                             <div class="stat-icon material-icons">hourglass_empty</div>
                             <div class="stat-content">
                                 <div class="stat-number" id="pendingTasks">0</div>
                                 <div class="stat-label">In Progress</div>
                             </div>
                         </div>
-                        <div class="stat-card">
+                        <div class="stat-card glass-card">
                             <div class="stat-icon material-icons">whatshot</div>
                             <div class="stat-content">
                                 <div class="stat-number" id="streakDays">0</div>
@@ -325,7 +325,7 @@
 
     <!-- Quick Capture Modal -->
     <div class="modal-overlay" id="quickCaptureModal" role="dialog" aria-hidden="true">
-        <div class="quick-capture-modal">
+        <div class="quick-capture-modal glass-card">
             <div class="quick-capture-header">
                 <h3><span class="material-icons">flash_on</span> Quick Capture</h3>
                 <button class="close-btn" onclick="todoApp.closeQuickCapture()"><span class="material-icons">close</span></button>
@@ -346,7 +346,7 @@
 
     <!-- Main Task Modal -->
     <div class="modal-overlay" id="taskModal" role="dialog" aria-hidden="true">
-        <div class="task-modal">
+        <div class="task-modal glass-card">
             <div class="modal-header">
                 <h3 id="modalTitle">Add New Task</h3>
                 <button class="close-btn" onclick="todoApp.closeModal()"><span class="material-icons">close</span></button>
