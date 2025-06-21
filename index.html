@@ -336,7 +336,14 @@
                 <button class="close-btn" onclick="todoApp.closeModal()"><span class="material-icons">close</span></button>
             </div>
             <div class="hint-banner">Fill in the essentials. You can edit details later.</div>
+            <div class="tab-header" role="tablist">
+                <button type="button" class="tab-btn active" data-tab="detailsTab">Details</button>
+                <button type="button" class="tab-btn" data-tab="commentsTab">Comments <span id="commentsCount"></span></button>
+                <button type="button" class="tab-btn" data-tab="activityTab">Activity</button>
+                <button type="button" class="tab-btn" data-tab="attachmentsTab">Attachments</button>
+            </div>
             <form id="taskForm" class="task-form">
+                <div id="detailsTab" class="tab-content active">
                 <div class="form-field">
                     <label>Task Title<span class="required">*</span></label>
                     <input type="text" id="taskTitle" placeholder="Brief summary" required>
@@ -394,10 +401,25 @@
                         <input type="text" id="taskTags" placeholder="urgent, meeting, project">
                     </div>
                 </div>
+                </div> <!-- end detailsTab -->
+                <div id="commentsTab" class="tab-content">
+                    <div id="commentsContainer" class="comments-container"></div>
+                    <div class="comment-editor">
+                        <textarea id="taskComment" rows="2" placeholder="Add a comment"></textarea>
+                        <button type="button" id="addCommentBtn" class="form-btn primary">Add Comment</button>
+                    </div>
+                </div>
+                <div id="activityTab" class="tab-content">
+                    <div id="activityFeed" class="activity-feed"></div>
+                </div>
+                <div id="attachmentsTab" class="tab-content">
+                    <div id="attachmentDropZone" class="drop-zone">Drop files here or click to browse<input type="file" id="taskAttachments" multiple style="display:none;"></div>
+                    <div id="attachmentsList" class="attachments-list"></div>
+                </div>
                 <input type="hidden" id="taskStatus" value="todo">
                 <div class="form-actions">
                     <button type="button" class="form-btn secondary" onclick="todoApp.closeModal()">Cancel</button>
-                    <button type="submit" class="form-btn primary">Create Task</button>
+                    <button type="submit" class="form-btn primary">Save</button>
                 </div>
             </form>
         </div>
