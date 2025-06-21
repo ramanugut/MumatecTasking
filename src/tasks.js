@@ -429,6 +429,11 @@ class MumatecTaskManager {
         return labelsString.split(',').map(l => l.trim()).filter(l => l);
     }
 
+    comparePriority(a, b) {
+        const rank = { critical: 0, high: 1, medium: 2, low: 3 };
+        return (rank[a.priority] ?? 4) - (rank[b.priority] ?? 4);
+    }
+
     // UI Management
 
     updateUI() {
