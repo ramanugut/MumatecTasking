@@ -86,6 +86,7 @@ Used for admin notifications.
 - Document id: role identifier (e.g. `admin`)
 - **description**: string *(optional)*
 - **permissions**: array of strings *(optional)*
+- **parentRole**: string *(optional)* – id of another role this one inherits from
 Stores all available roles in the system. `permissions` holds identifiers used
 by the UI and middleware to restrict access to certain actions.
 
@@ -99,9 +100,12 @@ Example:
 ```
 
 ## userRoles (collection)
-Mapping between users and roles.
+Mapping between users and roles. Roles may optionally be scoped to a specific
+project or department.
 - **userId**: string
 - **roleId**: string (matches role document id)
+- **projectId**: string *(optional)*
+- **department**: string *(optional)*
 - **assignedAt**: timestamp
 Links a user to one or more roles. A user may have multiple documents in this
 collection, one for each assigned role.
