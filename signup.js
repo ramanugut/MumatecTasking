@@ -1,6 +1,6 @@
 import { auth, db } from './firebase.js';
 import { createUserWithEmailAndPassword, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/11.9.0/firebase-auth.js';
-import { doc, setDoc } from 'https://www.gstatic.com/firebasejs/11.9.0/firebase-firestore.js';
+import { doc, setDoc, collection, addDoc } from 'https://www.gstatic.com/firebasejs/11.9.0/firebase-firestore.js';
 
 document.getElementById('signupForm').addEventListener('submit', async (e) => {
   e.preventDefault();
@@ -33,6 +33,11 @@ document.getElementById('signupForm').addEventListener('submit', async (e) => {
       role: 'client',
       onboarded: false,
       notifications: { email: emailNotif, push: pushNotif }
+    });
+    await addDoc(collection(db, 'userRoles'), {
+      userId: cred.user.uid,
+      roleId: 'client',
+      assignedAt: new Date()
     });
     window.location.href = 'index.html';
   } catch (err) {

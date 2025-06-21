@@ -79,6 +79,17 @@ Used for admin notifications.
 - **message**: string *(optional)*
 - other arbitrary fields
 
+## roles (collection)
+- Document id: role identifier (e.g. `admin`)
+- **description**: string *(optional)*
+- **permissions**: array of strings *(optional)*
+
+## userRoles (collection)
+Mapping between users and roles.
+- **userId**: string
+- **roleId**: string (matches role document id)
+- **assignedAt**: timestamp
+
 ## tasks (collection)
 Top-level storage for tasks. Each document mirrors the fields listed in the
 [Tasks subcollection](#tasks-subcollection) and may be referenced from other

@@ -27,6 +27,8 @@ const collections = [
   'apiKeys',
   'rateLimits',
   'userRequests',
+  'roles',
+  'userRoles',
   // Task management
   'tasks',
   'taskComments',
