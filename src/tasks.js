@@ -1401,6 +1401,20 @@ class MumatecTaskManager {
             });
         }
 
+        const userInfo = document.getElementById('userInfo');
+        const profileDropdown = document.getElementById('profileDropdown');
+        if (userInfo && profileDropdown) {
+            userInfo.addEventListener('click', (e) => {
+                e.stopPropagation();
+                profileDropdown.classList.toggle('open');
+            });
+            document.addEventListener('click', (e) => {
+                if (!profileDropdown.contains(e.target) && e.target !== userInfo && !userInfo.contains(e.target)) {
+                    profileDropdown.classList.remove('open');
+                }
+            });
+        }
+
         const labelsToggle = document.getElementById('labelsToggle');
         const labelsDropdown = document.getElementById('labelsDropdown');
         if (labelsToggle && labelsDropdown) {

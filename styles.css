@@ -161,6 +161,10 @@ body {
     z-index: 1000;
 }
 
+.profile-dropdown.open {
+    display: flex;
+}
+
 .user-info:hover .profile-dropdown {
     display: flex;
 }
