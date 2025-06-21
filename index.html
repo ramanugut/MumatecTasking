@@ -39,7 +39,17 @@
             <button class="action-btn primary" onclick="todoApp.openAddTaskModal()">
                 <span class="material-icons">add</span> New Task
             </button>
-            <button class="action-btn secondary" onclick="logout()">Logout</button>
+            <div class="user-info" id="userInfo">
+                <div class="user-avatar" id="userAvatar"><span class="material-icons">person</span></div>
+                <div class="user-details">
+                    <div class="user-name" id="userName">User</div>
+                    <div class="user-role" id="userRole">&nbsp;</div>
+                </div>
+                <div class="profile-dropdown" id="profileDropdown">
+                    <button id="themeToggle" class="dropdown-btn"><span class="material-icons">dark_mode</span></button>
+                    <button class="dropdown-btn" onclick="logout()">Logout</button>
+                </div>
+            </div>
             <div class="view-controls">
                 <button class="view-btn active material-icons" data-view="kanban" aria-label="Kanban view" aria-pressed="true">view_kanban</button>
                 <button class="view-btn material-icons" data-view="list" aria-label="List view" aria-pressed="false">view_list</button>
@@ -55,16 +65,6 @@
                 <div class="app-logo">
                     <div class="logo-icon"><span class="material-icons">assignment</span></div>
                     <div class="logo-text">Mumatec Tasking</div>
-                </div>
-                <div class="user-info" id="userInfo">
-                    <div class="user-avatar" id="userAvatar"><span class="material-icons">person</span></div>
-                    <div class="user-details">
-                        <div class="user-name" id="userName">User</div>
-                        <div class="user-role" id="userRole">&nbsp;</div>
-                    </div>
-                    <div class="profile-dropdown" id="profileDropdown">
-                        <button id="themeToggle" class="dropdown-btn"><span class="material-icons">dark_mode</span></button>
-                    </div>
                 </div>
             </div>
 
