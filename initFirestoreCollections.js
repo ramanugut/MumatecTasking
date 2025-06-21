@@ -14,6 +14,8 @@ if (fs.existsSync(credentialsPath)) {
 
 const db = getFirestore(app);
 
+// Base collections used throughout the app. Additional collections for the
+// advanced task features are appended below.
 const collections = [
   'users',
   'settings',
@@ -24,7 +26,15 @@ const collections = [
   'invoices',
   'apiKeys',
   'rateLimits',
-  'userRequests'
+  'userRequests',
+  // Task management
+  'tasks',
+  'taskComments',
+  'taskActivity',
+  'taskAttachments',
+  'timeLogs',
+  'taskRelations',
+  'notifications'
 ];
 
 async function ensureCollection(col) {
