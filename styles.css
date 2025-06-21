@@ -1434,6 +1434,27 @@ body {
     background: var(--background);
 }
 
+.project-select {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.new-project-btn {
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    border: 1px solid var(--border);
+    background: var(--surface-secondary);
+    border-radius: var(--border-radius-sm);
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.new-project-btn:hover {
+    background: var(--background);
+}
+
 .form-field label {
     font-size: 13px;
     font-weight: 600;
