@@ -1409,6 +1409,46 @@ body {
     color: var(--text-primary);
 }
 
+/* Quick hint banner in add task modal */
+.hint-banner {
+    background: var(--surface-secondary);
+    border: 1px dashed var(--border);
+    border-radius: var(--border-radius-sm);
+    padding: 8px 12px;
+    margin-bottom: 16px;
+    font-size: 13px;
+    color: var(--text-secondary);
+}
+
+/* Priority badge selector */
+.priority-badges {
+    display: flex;
+    gap: 8px;
+}
+
+.priority-badge {
+    padding: 6px 12px;
+    border-radius: 16px;
+    cursor: pointer;
+    font-size: 13px;
+    user-select: none;
+    border: 2px solid transparent;
+    transition: var(--transition);
+}
+
+.priority-badge.high { background: var(--error-red); color: #fff; }
+.priority-badge.medium { background: var(--warning-yellow); color: #000; }
+.priority-badge.low { background: var(--success-green); color: #fff; }
+
+.priority-badge.active {
+    border-color: var(--primary-blue);
+}
+
+.required {
+    color: var(--error-red);
+    margin-left: 4px;
+}
+
 .task-form {
     display: flex;
     flex-direction: column;

@@ -201,7 +201,8 @@ class MumatecTaskManager {
         if (!select) return;
         select.innerHTML = this.projects.map(p => `<option value="${p.id}">${escapeHtmlUtil(p.name)}</option>`).join('');
         if (this.projects.length) {
-            select.value = this.projects[0].id;
+            const saved = localStorage.getItem('lastProject');
+            select.value = (saved && this.projectMap[saved]) ? saved : this.projects[0].id;
         }
         this.handleProjectChange();
     }
@@ -1084,7 +1085,28 @@ class MumatecTaskManager {
         document.getElementById('taskStatus').value = status;
         const projectSelect = document.getElementById('taskProject');
         if (projectSelect && this.projects.length) {
-            projectSelect.value = this.projects[0].id;
+            const saved = localStorage.getItem('lastProject');
+            projectSelect.value = (saved && this.projectMap[saved]) ? saved : this.projects[0].id;
+        }
+        const draftStr = localStorage.getItem('taskDraft');
+        if (draftStr) {
+            try {
+                const d = JSON.parse(draftStr);
+                document.getElementById('taskTitle').value = d.title || '';
+                document.getElementById('taskProject').value = d.projectId || projectSelect.value;
+                document.getElementById('taskAssignee').value = d.assignee || '';
+                this.updatePriorityBadges(d.priority || 'medium');
+                document.getElementById('taskDueDate').value = d.dueDate || '';
+                document.getElementById('taskCategory').value = d.category || '';
+                document.getElementById('taskType').value = d.type || '';
+                document.getElementById('taskDescription').value = d.description || '';
+                document.getElementById('taskEstimate').value = d.estimate || '';
+                document.getElementById('taskTags').value = d.tags || '';
+            } catch (e) {
+                console.warn('Failed to parse draft', e);
+            }
+        } else {
+            this.updatePriorityBadges('medium');
         }
         this.handleProjectChange();
         document.getElementById('commentsContainer').innerHTML = '';
@@ -1105,7 +1127,7 @@ class MumatecTaskManager {
         
         document.getElementById('taskTitle').value = task.title;
         document.getElementById('taskDescription').value = task.description || '';
-        document.getElementById('taskPriority').value = task.priority;
+        this.updatePriorityBadges(task.priority || 'medium');
         document.getElementById('taskStatus').value = task.status;
         document.getElementById('taskDueDate').value = task.dueDate || '';
         document.getElementById('taskCategory').value = task.category || '';
@@ -1157,31 +1179,34 @@ class MumatecTaskManager {
     }
 
     clearTaskForm() {
-        document.getElementById('taskTitle').value = '';
-        document.getElementById('taskDescription').value = '';
-        document.getElementById('taskPriority').value = 'medium';
-        document.getElementById('taskStatus').value = 'todo';
-        document.getElementById('taskDueDate').value = '';
-        document.getElementById('taskCategory').value = '';
-        document.getElementById('taskType').value = '';
+        const get = id => document.getElementById(id);
+        get('taskTitle').value = '';
+        get('taskDescription').value = '';
+        this.updatePriorityBadges('medium');
+        get('taskStatus').value = 'todo';
+        get('taskDueDate').value = '';
+        get('taskCategory').value = '';
+        get('taskType').value = '';
         if (this.projects.length) {
-            document.getElementById('taskProject').value = this.projects[0].id;
+            get('taskProject').value = this.projects[0].id;
         } else {
-            document.getElementById('taskProject').value = '';
+            get('taskProject').value = '';
         }
-        document.getElementById('taskAssignee').value = '';
-        const avatarEl = document.getElementById('assigneeAvatarPreview');
+        if (get('taskAssignee')) get('taskAssignee').value = '';
+        const avatarEl = get('assigneeAvatarPreview');
         if (avatarEl) avatarEl.style.display = 'none';
-        document.getElementById('taskDependencies').value = '';
-        document.getElementById('taskEstimate').value = '';
-        document.getElementById('taskTimeSpent').value = '';
-
-        document.getElementById('taskAttachments').value = '';
-        document.getElementById('taskComment').value = '';
-        document.getElementById('commentsContainer').innerHTML = '';
-        document.getElementById('taskNotes').value = '';
-        document.getElementById('activityFeed').innerHTML = '';
-        document.getElementById('taskTags').value = '';
+        if (get('taskDependencies')) get('taskDependencies').value = '';
+        get('taskEstimate').value = '';
+        if (get('taskTimeSpent')) get('taskTimeSpent').value = '';
+        if (get('taskAttachments')) get('taskAttachments').value = '';
+        if (get('taskComment')) get('taskComment').value = '';
+        const comments = get('commentsContainer');
+        if (comments) comments.innerHTML = '';
+        if (get('taskNotes')) get('taskNotes').value = '';
+        const act = get('activityFeed');
+        if (act) act.innerHTML = '';
+        get('taskTags').value = '';
+        localStorage.removeItem('taskDraft');
         this.handleProjectChange();
     }
 
@@ -1505,6 +1530,25 @@ class MumatecTaskManager {
             this.handleFormSubmit();
         });
 
+        document.getElementById('taskForm').addEventListener('keydown', (e) => {
+            if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+                e.preventDefault();
+                this.handleFormSubmit();
+            }
+        });
+
+        document.getElementById('taskForm').addEventListener('input', () => this.saveDraft());
+
+        const titleInput = document.getElementById('taskTitle');
+        if (titleInput) {
+            titleInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    projectSelect?.focus();
+                }
+            });
+        }
+
         const assignBtn = document.getElementById('assignToMeBtn');
         if (assignBtn) {
             assignBtn.addEventListener('click', () => this.assignToMe());
@@ -1516,7 +1560,10 @@ class MumatecTaskManager {
         }
         const projectSelect = document.getElementById('taskProject');
         if (projectSelect) {
-            projectSelect.addEventListener('change', () => this.handleProjectChange());
+            projectSelect.addEventListener('change', () => {
+                this.handleProjectChange();
+                localStorage.setItem('lastProject', projectSelect.value);
+            });
         }
 
         const assigneeSelect = document.getElementById('taskAssignee');
@@ -1566,6 +1613,10 @@ class MumatecTaskManager {
                 }
             });
         }
+
+        document.querySelectorAll('#priorityBadges .priority-badge').forEach(b => {
+            b.addEventListener('click', () => this.updatePriorityBadges(b.dataset.value));
+        });
 
         const labelsToggle = document.getElementById('labelsToggle');
         const labelsDropdown = document.getElementById('labelsDropdown');
@@ -1690,13 +1741,7 @@ class MumatecTaskManager {
             type: document.getElementById('taskType').value,
             projectId: document.getElementById('taskProject').value,
             assignedTo: document.getElementById('taskAssignee').value || null,
-            dependencies: document.getElementById('taskDependencies').value,
             estimate: document.getElementById('taskEstimate').value,
-            timeSpent: document.getElementById('taskTimeSpent').value,
-
-            attachments: Array.from(document.getElementById('taskAttachments').files).map(f => ({ name: f.name })),
-            comments: this.collectNewComment(),
-            notes: document.getElementById('taskNotes').value,
             tags: document.getElementById('taskTags').value
         };
 
@@ -1712,7 +1757,7 @@ class MumatecTaskManager {
         } else {
             this.addTask(formData);
         }
-
+        localStorage.removeItem('taskDraft');
         this.closeModal();
     }
 
@@ -1731,6 +1776,35 @@ class MumatecTaskManager {
                 avatarEl.style.display = 'none';
             }
         }
+    }
+
+    updatePriorityBadges(value) {
+        const badges = document.querySelectorAll('#priorityBadges .priority-badge');
+        badges.forEach(b => {
+            if (b.dataset.value === value) {
+                b.classList.add('active');
+            } else {
+                b.classList.remove('active');
+            }
+        });
+        const input = document.getElementById('taskPriority');
+        if (input) input.value = value;
+    }
+
+    saveDraft() {
+        const draft = {
+            title: document.getElementById('taskTitle').value,
+            projectId: document.getElementById('taskProject').value,
+            assignee: document.getElementById('taskAssignee').value,
+            priority: document.getElementById('taskPriority').value,
+            dueDate: document.getElementById('taskDueDate').value,
+            category: document.getElementById('taskCategory').value,
+            type: document.getElementById('taskType').value,
+            description: document.getElementById('taskDescription').value,
+            estimate: document.getElementById('taskEstimate').value,
+            tags: document.getElementById('taskTags').value
+        };
+        localStorage.setItem('taskDraft', JSON.stringify(draft));
     }
 
     confirmDeleteTask(taskId) {
