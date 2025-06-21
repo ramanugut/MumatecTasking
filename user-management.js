@@ -35,7 +35,11 @@ async function loadUsers() {
     roleSnap.forEach(d => {
       const data = d.data();
       if (!userRolesMap[data.userId]) userRolesMap[data.userId] = [];
-      userRolesMap[data.userId].push(data.roleId);
+      userRolesMap[data.userId].push({
+        roleId: data.roleId,
+        projectId: data.projectId || '',
+        department: data.department || ''
+      });
     });
     const snap = await getDocs(collection(db, 'users'));
     tbody.innerHTML = '';
@@ -43,7 +47,11 @@ async function loadUsers() {
       const data = doc.data();
       const tr = document.createElement('tr');
       const name = data.displayName || data.name || '';
-      const role = (userRolesMap[doc.id] || []).join(', ');
+      const role = (userRolesMap[doc.id] || []).map(r => {
+        if (r.projectId) return `${r.roleId}:${r.projectId}`;
+        if (r.department) return `${r.roleId}@${r.department}`;
+        return r.roleId;
+      }).join(', ');
       const dept = data.department || '';
       const projects = (data.projects || []).length;
       const last = formatDate(data.lastLogin);
@@ -69,15 +77,35 @@ tbody.addEventListener('click', async e => {
   const btn = e.target.closest('button[data-id]');
   if (!btn) return;
   const userId = btn.dataset.id;
-  const current = (userRolesMap[userId] || []).join(', ');
-  const input = prompt(`Assign roles (comma separated). Available: ${availableRoles.join(', ')}`, current);
+  const current = (userRolesMap[userId] || []).map(r => {
+    if (r.projectId) return `${r.roleId}:${r.projectId}`;
+    if (r.department) return `${r.roleId}@${r.department}`;
+    return r.roleId;
+  }).join(', ');
+  const input = prompt(`Assign roles (comma separated). Use role:projectId or role@department. Available roles: ${availableRoles.join(', ')}`, current);
   if (input === null) return;
   const roles = input.split(',').map(r => r.trim()).filter(Boolean);
   try {
     const snap = await getDocs(query(collection(db, 'userRoles'), where('userId', '==', userId)));
     const ops = [];
     snap.forEach(d => ops.push(deleteDoc(d.ref)));
-    roles.forEach(r => ops.push(addDoc(collection(db, 'userRoles'), { userId, roleId: r, assignedAt: new Date() })));
+    roles.forEach(r => {
+      let roleId = r;
+      let projectId = '';
+      let department = '';
+      if (r.includes(':')) {
+        [roleId, projectId] = r.split(':', 2);
+      } else if (r.includes('@')) {
+        [roleId, department] = r.split('@', 2);
+      }
+      ops.push(addDoc(collection(db, 'userRoles'), {
+        userId,
+        roleId: roleId.trim(),
+        projectId: projectId.trim() || null,
+        department: department.trim() || null,
+        assignedAt: new Date()
+      }));
+    });
     await Promise.all(ops);
     loadUsers();
   } catch (err) {
