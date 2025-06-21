@@ -12,11 +12,13 @@ and always has full rights to manage other users.
 ## Setup
 
 1. Install dependencies with `npm install`.
-2. Start the dev server using `npm run dev` (uses `serve` under the hood).
-3. Visit `login.html` to sign in with your admin credentials.
-4. If you do not have an account, use `signup.html` which will create a client
+2. Initialize Firestore collections with `npm run init:collections` (requires a
+   Firebase service account key).
+3. Start the dev server using `npm run dev` (uses `serve` under the hood).
+4. Visit `login.html` to sign in with your admin credentials.
+5. If you do not have an account, use `signup.html` which will create a client
    profile.
-5. After signing in you will be redirected to `index.html` where you can manage
+6. After signing in you will be redirected to `index.html` where you can manage
    your tasks.
 
 Firebase is pre-configured with project **mumatectasking**. Update `firebase.js`

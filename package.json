@@ -2,9 +2,13 @@
   "name": "mumatec-tasking",
   "private": true,
   "scripts": {
-    "dev": "serve -l 5000"
+    "dev": "serve -l 5000",
+    "init:collections": "node initFirestoreCollections.js"
   },
   "devDependencies": {
     "serve": "^14.2.0"
+  },
+  "dependencies": {
+    "firebase-admin": "^11.10.1"
   }
 }
