@@ -1904,8 +1904,8 @@ class MumatecTaskManager {
 
     // Style sheet management
     loadStyleSheet() {
-        if (typeof loadPreferredStyle === 'function') {
-            loadPreferredStyle();
+        if (typeof window.loadPreferredStyle === 'function') {
+            window.loadPreferredStyle();
         }
     }
 
