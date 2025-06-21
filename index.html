@@ -333,6 +333,7 @@
         <div class="task-modal">
             <div class="modal-header">
                 <h3 id="modalTitle">Add New Task</h3>
+                <button type="button" id="watchTaskBtn" class="watch-btn" aria-label="Watch task"><span class="material-icons">notifications_off</span></button>
                 <button class="close-btn" onclick="todoApp.closeModal()"><span class="material-icons">close</span></button>
             </div>
             <div class="hint-banner">Fill in the essentials. You can edit details later.</div>
@@ -399,6 +400,15 @@
                     <div class="form-field">
                         <label>Tags</label>
                         <input type="text" id="taskTags" placeholder="urgent, meeting, project">
+                    </div>
+                </div>
+                <div class="form-field">
+                    <label>Time Tracking</label>
+                    <div class="modal-timer">
+                        <span class="timer-indicator" id="modalTimerIndicator"></span>
+                        <button type="button" id="modalTimerStart" class="timer-btn">Start</button>
+                        <button type="button" id="modalTimerStop" class="timer-btn">Stop</button>
+                        <span id="modalTimeSpent"></span>
                     </div>
                 </div>
                 </div> <!-- end detailsTab -->
