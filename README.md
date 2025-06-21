@@ -19,8 +19,11 @@ and always has full rights to manage other users.
 4. Visit `login.html` to sign in with your admin credentials.
 5. If you do not have an account, use `signup.html` which will create a client
    profile.
+   You can also provide an invitation token during sign up to automatically
+   assign a role and project.
 6. After signing in you will be redirected to `index.html` where you can manage
    your tasks.
+7. Administrators can manage pending invitations via `invite.html`.
 
 Firebase is pre-configured with project **mumatectasking**. Update `firebase.js`
  if you need to change configuration.

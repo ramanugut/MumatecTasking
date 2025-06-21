@@ -90,6 +90,17 @@ Mapping between users and roles.
 - **roleId**: string (matches role document id)
 - **assignedAt**: timestamp
 
+## invites (collection)
+Pending invitations waiting for sign up.
+- **email**: string
+- **roleId**: string
+- **projectId**: string *(optional)*
+- **token**: string
+- **status**: `sent` | `accepted` | `expired`
+- **createdAt**: timestamp
+- **acceptedAt**: timestamp *(optional)*
+- **acceptedBy**: string *(optional)*
+
 ## tasks (collection)
 Top-level storage for tasks. Each document mirrors the fields listed in the
 [Tasks subcollection](#tasks-subcollection) and may be referenced from other

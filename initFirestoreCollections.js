@@ -29,6 +29,7 @@ const collections = [
   'userRequests',
   'roles',
   'userRoles',
+  'invites',
   // Task management
   'tasks',
   'taskComments',
