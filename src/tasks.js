@@ -60,6 +60,7 @@ class MumatecTaskManager {
         await this.loadTaskTypes();
         await this.loadUsers();
         this.loadLabels();
+        this.loadStyleSheet();
         this.loadTheme();
         this.loadSidebarState();
         this.loadStatusOrder();
@@ -1393,6 +1394,13 @@ class MumatecTaskManager {
             this.toggleTheme();
         });
 
+        const styleBtn = document.getElementById('styleToggle');
+        if (styleBtn) {
+            styleBtn.addEventListener('click', () => {
+                this.toggleStyleSheet();
+            });
+        }
+
         const labelsToggle = document.getElementById('labelsToggle');
         const labelsDropdown = document.getElementById('labelsDropdown');
         if (labelsToggle && labelsDropdown) {
@@ -1870,6 +1878,19 @@ class MumatecTaskManager {
         const isDark = document.body.classList.toggle('dark-mode');
         localStorage.setItem('mumatecTheme', isDark ? 'dark' : 'light');
         this.updateThemeToggleIcon();
+    }
+
+    // Style sheet management
+    loadStyleSheet() {
+        if (typeof loadPreferredStyle === 'function') {
+            loadPreferredStyle();
+        }
+    }
+
+    toggleStyleSheet() {
+        if (typeof toggleStyleSheet === 'function') {
+            toggleStyleSheet();
+        }
     }
 
     updateThemeToggleIcon() {
