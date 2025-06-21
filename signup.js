@@ -10,6 +10,7 @@ document.getElementById('signupForm').addEventListener('submit', async (e) => {
   const photoURL = document.getElementById('photoURL').value.trim();
   const jobTitle = document.getElementById('jobTitle').value.trim();
   const department = document.getElementById('department').value.trim();
+  const team = document.getElementById('team').value.trim();
   const phone = document.getElementById('phone').value.trim();
   const timezone = document.getElementById('timezone').value.trim();
   const skills = document.getElementById('skills').value.split(',').map(s => s.trim()).filter(Boolean);
@@ -38,6 +39,7 @@ document.getElementById('signupForm').addEventListener('submit', async (e) => {
       photoURL: photoURL || null,
       jobTitle,
       department,
+      team,
       phone,
       timezone,
       skills,
@@ -51,6 +53,14 @@ document.getElementById('signupForm').addEventListener('submit', async (e) => {
       roleId: assignedRole,
       assignedAt: new Date()
     });
+    if (department) {
+      await setDoc(doc(db, 'departments', department), { createdAt: new Date() }, { merge: true });
+      await setDoc(doc(db, 'departments', department, 'members', cred.user.uid), { assignedAt: new Date() });
+    }
+    if (team) {
+      await setDoc(doc(db, 'teams', team), { createdAt: new Date() }, { merge: true });
+      await setDoc(doc(db, 'teams', team, 'members', cred.user.uid), { assignedAt: new Date() });
+    }
     if (inviteData) {
       if (inviteData.projectId) {
         await updateDoc(doc(db, 'users', cred.user.uid), { projects: [inviteData.projectId] });

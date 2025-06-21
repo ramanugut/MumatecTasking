@@ -20,6 +20,7 @@ const collections = [
   'users',
   'settings',
   'auditLogs',
+  'departments',
   'teams',
   'clients',
   'projects',

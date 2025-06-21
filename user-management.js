@@ -2,6 +2,7 @@ import { auth, db } from './firebase.js';
 import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/11.9.0/firebase-auth.js';
 import { collection, getDocs, query, where, addDoc, deleteDoc, doc, writeBatch, updateDoc } from 'https://www.gstatic.com/firebasejs/11.9.0/firebase-firestore.js';
 
+
 const tbody = document.getElementById('userTableBody');
 const searchInput = document.getElementById('userSearch');
 const bulkBtn = document.getElementById('bulkEditBtn');
@@ -17,6 +18,7 @@ let userRolesMap = {};
 let availableRoles = [];
 let availableProjects = [];
 const selectedUsers = new Set();
+
 
 async function fetchRoles() {
   const snap = await getDocs(collection(db, 'roles'));
@@ -81,18 +83,30 @@ async function loadUsers() {
     roleSnap.forEach(d => {
       const data = d.data();
       if (!userRolesMap[data.userId]) userRolesMap[data.userId] = [];
-      userRolesMap[data.userId].push(data.roleId);
+      userRolesMap[data.userId].push({
+        roleId: data.roleId,
+        projectId: data.projectId || '',
+        department: data.department || ''
+      });
     });
     const snap = await getDocs(collection(db, 'users'));
     tbody.innerHTML = '';
     selectedUsers.clear();
     if (selectAll) selectAll.checked = false;
+
     snap.forEach(doc => {
       const data = doc.data();
+      userDeptMap[doc.id] = data.department || '';
+      userTeamMap[doc.id] = data.team || '';
       const tr = document.createElement('tr');
       const name = data.displayName || data.name || '';
-      const role = (userRolesMap[doc.id] || []).join(', ');
+      const role = (userRolesMap[doc.id] || []).map(r => {
+        if (r.projectId) return `${r.roleId}:${r.projectId}`;
+        if (r.department) return `${r.roleId}@${r.department}`;
+        return r.roleId;
+      }).join(', ');
       const dept = data.department || '';
+      const team = data.team || '';
       const projects = (data.projects || []).length;
       const last = formatDate(data.lastLogin);
       const status = data.status || (data.disabled ? 'Suspended' : (data.emailVerified ? 'Active' : 'Pending'));
@@ -102,6 +116,7 @@ async function loadUsers() {
         <td>${data.email || ''}</td>
         <td>${role}</td>
         <td>${dept}</td>
+        <td>${team}</td>
         <td>${projects}</td>
         <td>${last}</td>
         <td>${status}</td>
@@ -118,15 +133,34 @@ tbody.addEventListener('click', async e => {
   const btn = e.target.closest('button[data-id]');
   if (!btn) return;
   const userId = btn.dataset.id;
-  const current = (userRolesMap[userId] || []).join(', ');
-  const input = prompt(`Assign roles (comma separated). Available: ${availableRoles.join(', ')}`, current);
+  const current = (userRolesMap[userId] || []).map(r => {
+    if (r.projectId) return `${r.roleId}:${r.projectId}`;
+    if (r.department) return `${r.roleId}@${r.department}`;
+    return r.roleId;
+  }).join(', ');
+  const input = prompt(`Assign roles (comma separated). Use role:projectId or role@department. Available roles: ${availableRoles.join(', ')}`, current);
   if (input === null) return;
   const roles = input.split(',').map(r => r.trim()).filter(Boolean);
+  const dept = prompt('Department:', userDeptMap[userId] || '')
+  if (dept === null) return;
+  const team = prompt('Team:', userTeamMap[userId] || '')
+  if (team === null) return;
   try {
     const snap = await getDocs(query(collection(db, 'userRoles'), where('userId', '==', userId)));
     const ops = [];
     snap.forEach(d => ops.push(deleteDoc(d.ref)));
+
     roles.forEach(r => ops.push(addDoc(collection(db, 'userRoles'), { userId, roleId: r, assignedAt: new Date() })));
+    ops.push(updateDoc(doc(db, 'users', userId), { department: dept.trim() || null, team: team.trim() || null }));
+    if (dept.trim()) {
+      ops.push(setDoc(doc(db, 'departments', dept.trim()), { createdAt: new Date() }, { merge: true }));
+      ops.push(setDoc(doc(db, 'departments', dept.trim(), 'members', userId), { assignedAt: new Date() }));
+    }
+    if (team.trim()) {
+      ops.push(setDoc(doc(db, 'teams', team.trim()), { createdAt: new Date() }, { merge: true }));
+      ops.push(setDoc(doc(db, 'teams', team.trim(), 'members', userId), { assignedAt: new Date() }));
+    }
+
     await Promise.all(ops);
     loadUsers();
   } catch (err) {
