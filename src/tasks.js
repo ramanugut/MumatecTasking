@@ -78,6 +78,7 @@ class MumatecTaskManager {
         this.startReminderSystem();
         this.updateUI();
         this.setupAutoSave();
+        this.setupModalTabs();
         
         // Set today's date
         document.getElementById('todayDate').textContent = new Date().toLocaleDateString('en-US', {
@@ -1113,6 +1114,11 @@ class MumatecTaskManager {
         if (commentsEl) commentsEl.innerHTML = '';
         const activityEl = document.getElementById('activityFeed');
         if (activityEl) activityEl.innerHTML = '';
+        const attList = document.getElementById('attachmentsList');
+        if (attList) attList.innerHTML = '';
+        const count = document.getElementById('commentsCount');
+        if (count) count.textContent = '';
+        this.showModalTab(localStorage.getItem('taskModalTab') || 'detailsTab');
         const modal = document.getElementById('taskModal');
         modal.classList.add('active');
         modal.setAttribute('aria-hidden', 'false');
@@ -1163,18 +1169,14 @@ class MumatecTaskManager {
         if (typeof this.renderComments === 'function') {
             this.renderComments(task);
         }
-        if (task.attachments && task.attachments.length) {
-            const commentsEl = document.getElementById('commentsContainer');
-            if (commentsEl) {
-                commentsEl.insertAdjacentHTML('afterbegin', task.attachments.map(a => `<div class="comment-item">Attachment: ${escapeHtmlUtil(a.name || '')}</div>`).join(''));
-            }
-        }
+        this.renderAttachments(task);
         const commentInput = document.getElementById('taskComment');
         if (commentInput) commentInput.value = '';
         const notesEl = document.getElementById('taskNotes');
         if (notesEl) notesEl.value = task.notes || '';
-        const activityEl = document.getElementById('activityFeed');
-        if (activityEl) activityEl.innerHTML = (task.activity || []).slice().reverse().map(a => `<div class="activity-item">${escapeHtmlUtil(a.action)} - ${formatDateUtil(new Date(a.timestamp))}</div>`).join('');
+        this.renderActivity(task);
+        this.updateCommentsCount(task);
+        this.showModalTab(localStorage.getItem('taskModalTab') || 'detailsTab');
         const tagsEl = document.getElementById('taskTags');
         if (tagsEl) tagsEl.value = task.tags?.join(', ') || '';
 
@@ -1215,9 +1217,13 @@ class MumatecTaskManager {
         get('taskEstimate').value = '';
         if (get('taskTimeSpent')) get('taskTimeSpent').value = '';
         if (get('taskAttachments')) get('taskAttachments').value = '';
+        const attList = get('attachmentsList');
+        if (attList) attList.innerHTML = '';
         if (get('taskComment')) get('taskComment').value = '';
         const comments = get('commentsContainer');
         if (comments) comments.innerHTML = '';
+        const comCount = document.getElementById('commentsCount');
+        if (comCount) comCount.textContent = '';
         if (get('taskNotes')) get('taskNotes').value = '';
         const act = get('activityFeed');
         if (act) act.innerHTML = '';
@@ -1719,15 +1725,33 @@ class MumatecTaskManager {
                         break;
                     case '1':
                         e.preventDefault();
-                        this.switchView('dashboard');
+                        if (document.getElementById('taskModal').classList.contains('active')) {
+                            this.showModalTab('detailsTab');
+                        } else {
+                            this.switchView('dashboard');
+                        }
                         break;
                     case '2':
                         e.preventDefault();
-                        this.switchView('today');
+                        if (document.getElementById('taskModal').classList.contains('active')) {
+                            this.showModalTab('commentsTab');
+                        } else {
+                            this.switchView('today');
+                        }
                         break;
                     case '3':
                         e.preventDefault();
-                        this.switchView('upcoming');
+                        if (document.getElementById('taskModal').classList.contains('active')) {
+                            this.showModalTab('activityTab');
+                        } else {
+                            this.switchView('upcoming');
+                        }
+                        break;
+                    case '4':
+                        if (document.getElementById('taskModal').classList.contains('active')) {
+                            e.preventDefault();
+                            this.showModalTab('attachmentsTab');
+                        }
                         break;
                 }
             }
@@ -2198,6 +2222,124 @@ class MumatecTaskManager {
         area.addEventListener('input', () => {
             localStorage.setItem('quickNotes', area.value);
         });
+    }
+
+    // ----------------- Modal Enhancements -----------------
+    setupModalTabs() {
+        const buttons = document.querySelectorAll('#taskModal .tab-btn');
+        const tabs = document.querySelectorAll('#taskModal .tab-content');
+        const show = (id) => {
+            tabs.forEach(t => {
+                t.classList.toggle('active', t.id === id);
+            });
+            buttons.forEach(b => {
+                b.classList.toggle('active', b.dataset.tab === id);
+            });
+            localStorage.setItem('taskModalTab', id);
+        };
+        buttons.forEach(btn => {
+            btn.addEventListener('click', () => show(btn.dataset.tab));
+        });
+        const stored = localStorage.getItem('taskModalTab');
+        if (stored && document.getElementById(stored)) {
+            show(stored);
+        } else if (tabs[0]) {
+            show(tabs[0].id);
+        }
+
+        const attachmentInput = document.getElementById('taskAttachments');
+        const dropZone = document.getElementById('attachmentDropZone');
+        if (attachmentInput && dropZone) {
+            dropZone.addEventListener('click', () => attachmentInput.click());
+            dropZone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                dropZone.classList.add('dragover');
+            });
+            dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+            dropZone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                dropZone.classList.remove('dragover');
+                if (e.dataTransfer.files.length) {
+                    this.addAttachments(this.currentEditingTask, e.dataTransfer.files);
+                }
+            });
+            attachmentInput.addEventListener('change', () => {
+                if (attachmentInput.files.length) {
+                    this.addAttachments(this.currentEditingTask, attachmentInput.files);
+                    attachmentInput.value = '';
+                }
+            });
+        }
+
+        const commentBtn = document.getElementById('addCommentBtn');
+        if (commentBtn) {
+            commentBtn.addEventListener('click', () => {
+                if (this.currentEditingTask) {
+                    this.addComment(this.currentEditingTask);
+                }
+            });
+        }
+    }
+
+    showModalTab(id) {
+        const btn = document.querySelector(`#taskModal .tab-btn[data-tab="${id}"]`);
+        if (btn) btn.click();
+    }
+
+    addComment(taskId) {
+        const newCom = this.collectNewComment();
+        if (!newCom) return;
+        const task = this.tasks.find(t => t.id === taskId);
+        if (!task) return;
+        task.comments = task.comments || [];
+        task.comments.push(...newCom);
+        task.activity = task.activity || [];
+        task.activity.push({ action: 'Added comment', timestamp: new Date().toISOString() });
+        document.getElementById('taskComment').value = '';
+        this.saveTaskToFirestore(task);
+        this.renderComments(task);
+        this.renderActivity(task);
+        this.updateCommentsCount(task);
+        this.updateUI();
+    }
+
+    addAttachments(taskId, files) {
+        const task = this.tasks.find(t => t.id === taskId);
+        if (!task) return;
+        task.attachments = task.attachments || [];
+        Array.from(files).forEach(f => {
+            const url = URL.createObjectURL(f);
+            task.attachments.push({ name: f.name, url, size: f.size });
+            task.activity = task.activity || [];
+            task.activity.push({ action: `Attached ${f.name}`, timestamp: new Date().toISOString() });
+        });
+        this.saveTaskToFirestore(task);
+        this.renderAttachments(task);
+        this.renderActivity(task);
+        this.updateUI();
+    }
+
+    renderAttachments(task) {
+        const list = document.getElementById('attachmentsList');
+        if (!list) return;
+        list.innerHTML = (task.attachments || []).map(a =>
+            `<div class="attachment-item"><a href="${escapeHtmlUtil(a.url)}" target="_blank">${escapeHtmlUtil(a.name)}</a></div>`
+        ).join('');
+        const count = document.querySelector('button.tab-btn[data-tab="attachmentsTab"] span');
+        if (count) count.textContent = task.attachments ? `(${task.attachments.length})` : '';
+    }
+
+    renderActivity(task) {
+        const feed = document.getElementById('activityFeed');
+        if (!feed) return;
+        feed.innerHTML = (task.activity || []).slice().reverse().map(a =>
+            `<div class="activity-item">${escapeHtmlUtil(a.action)} - ${formatDateUtil(new Date(a.timestamp))}</div>`
+        ).join('');
+    }
+
+    updateCommentsCount(task) {
+        const label = document.getElementById('commentsCount');
+        if (label) label.textContent = task.comments ? `(${task.comments.length})` : '';
     }
 }
 
