@@ -8,10 +8,10 @@
 
 :root {
     /* Modern Apple Color Palette */
-    --primary-blue: #007AFF;
-    --primary-blue-hover: #0056CC;
-    --secondary-blue: #5AC8FA;
-    --success-green: #34C759;
+    --primary-blue: #24a1c6;
+    --primary-blue-hover: #4db8d9;
+    --secondary-blue: #0e5077;
+    --success-green: #10b981;
     --warning-orange: #FF9500;
     --warning-yellow: #FFD60A;
     --error-red: #FF3B30;
@@ -31,15 +31,17 @@
     --gray-900: #171717;
     
     /* Semantic Colors */
-    --background: #FFFFFF;
-    --surface: #FAFAFA;
-    --surface-secondary: #F5F5F5;
-    --text-primary: #1D1D1F;
-    --text-secondary: #86868B;
-    --text-tertiary: #B0B0B0;
-    --border: #E5E5E5;
-    --shadow: rgba(0, 0, 0, 0.04);
-    --shadow-hover: rgba(0, 0, 0, 0.08);
+    --background: rgba(255, 255, 255, 0.7);
+    --surface: radial-gradient(circle at 20% 20%, rgba(36, 161, 198, 0.1) 0%, transparent 50%),
+               radial-gradient(circle at 80% 80%, rgba(14, 80, 119, 0.08) 0%, transparent 50%),
+               linear-gradient(135deg, #f0f7fa 0%, #e6f3f8 50%, #ddeef5 100%);
+    --surface-secondary: rgba(255, 255, 255, 0.5);
+    --text-primary: #06315e;
+    --text-secondary: #5a7a8a;
+    --text-tertiary: #7d9aaa;
+    --border: rgba(255, 255, 255, 0.9);
+    --shadow: rgba(14, 80, 119, 0.05);
+    --shadow-hover: rgba(14, 80, 119, 0.12);
     
     /* Layout */
     --sidebar-width: 280px;
@@ -90,6 +92,7 @@ body {
     width: var(--sidebar-width);
     background: var(--background);
     border-right: 1px solid var(--border);
+    backdrop-filter: blur(15px);
     display: flex;
     flex-direction: column;
     overflow: hidden;
@@ -373,6 +376,7 @@ body {
     height: var(--top-bar-height);
     background: var(--background);
     border-bottom: 1px solid var(--border);
+    backdrop-filter: blur(20px);
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -767,6 +771,7 @@ body {
     display: flex;
     flex-direction: column;
     min-height: 160px;
+    backdrop-filter: blur(10px);
 }
 
 .task-card:hover {
