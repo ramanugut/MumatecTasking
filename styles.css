@@ -1589,6 +1589,26 @@ body {
     margin-bottom: 4px;
 }
 
+.comment-reactions {
+    margin-top: 4px;
+    display: flex;
+    gap: 4px;
+}
+
+.emoji-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    color: var(--text-secondary);
+}
+.emoji-btn span {
+    font-size: 12px;
+}
+
 .task-avatar {
     width: 24px;
     height: 24px;

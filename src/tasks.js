@@ -1115,10 +1115,10 @@ class MumatecTaskManager {
         document.getElementById('taskTimeSpent').value = task.timeSpent || 0;
         document.getElementById('taskAttachments').value = '';
 
+        this.renderComments(task);
         if (task.attachments && task.attachments.length) {
             document.getElementById('commentsContainer').insertAdjacentHTML('afterbegin', task.attachments.map(a => `<div class="comment-item">Attachment: ${escapeHtmlUtil(a.name || '')}</div>`).join(''));
         }
-        document.getElementById('commentsContainer').innerHTML = (task.comments || []).map(c => `<div class="comment-item"><div class="comment-meta">${escapeHtmlUtil(c.author)} - ${formatDateUtil(new Date(c.timestamp))}</div><div>${escapeHtmlUtil(c.text)}</div></div>`).join('');
         document.getElementById('taskComment').value = '';
         document.getElementById('taskNotes').value = task.notes || '';
         document.getElementById('activityFeed').innerHTML = (task.activity || []).slice().reverse().map(a => `<div class="activity-item">${escapeHtmlUtil(a.action)} - ${formatDateUtil(new Date(a.timestamp))}</div>`).join('');
@@ -1398,11 +1398,58 @@ class MumatecTaskManager {
         }
     }
 
+    renderReactionButton(type, emoji, count) {
+        return `<button type="button" class="emoji-btn" data-emoji="${type}">${emoji} <span>${count}</span></button>`;
+    }
+
+    renderComments(task) {
+        const container = document.getElementById('commentsContainer');
+        if (!container) return;
+        container.innerHTML = (task.comments || []).map((c, idx) => {
+            const reactions = c.reactions || { like: 0, love: 0, laugh: 0, wow: 0 };
+            return `
+                <div class="comment-item" data-comment-index="${idx}">
+                    <div class="comment-meta">${escapeHtmlUtil(c.author)} - ${formatDateUtil(new Date(c.timestamp))}</div>
+                    <div>${escapeHtmlUtil(c.text)}</div>
+                    <div class="comment-reactions">
+                        ${this.renderReactionButton('like','👍', reactions.like || 0)}
+                        ${this.renderReactionButton('love','❤️', reactions.love || 0)}
+                        ${this.renderReactionButton('laugh','😂', reactions.laugh || 0)}
+                        ${this.renderReactionButton('wow','😮', reactions.wow || 0)}
+                    </div>
+                </div>`;
+        }).join('');
+
+        container.querySelectorAll('.emoji-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const idx = parseInt(btn.closest('.comment-item').dataset.commentIndex, 10);
+                this.addReaction(task.id, idx, btn.dataset.emoji);
+            });
+        });
+    }
+
+    addReaction(taskId, index, key) {
+        const task = this.tasks.find(t => t.id === taskId);
+        if (!task || !task.comments || !task.comments[index]) return;
+        task.comments[index].reactions = task.comments[index].reactions || { like: 0, love: 0, laugh: 0, wow: 0 };
+        task.comments[index].reactions[key] = (task.comments[index].reactions[key] || 0) + 1;
+        this.saveTaskToFirestore(task);
+        this.renderComments(task);
+        this.updateUI();
+    }
+
     collectNewComment() {
         const text = document.getElementById('taskComment').value.trim();
         if (!text) return null;
         const author = window.currentUser?.displayName || 'Me';
-        return [{ text, author, timestamp: new Date().toISOString() }];
+        const userId = window.currentUser?.uid || 'anonymous';
+        return [{
+            text,
+            author,
+            userId,
+            timestamp: new Date().toISOString(),
+            reactions: { like: 0, love: 0, laugh: 0, wow: 0 }
+        }];
     }
 
     // Event Listeners
