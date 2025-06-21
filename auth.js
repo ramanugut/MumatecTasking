@@ -1,6 +1,6 @@
 import { auth, db } from './firebase.js';
 import { onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/11.9.0/firebase-auth.js';
-import { doc, getDoc, collection, getDocs, query, where } from 'https://www.gstatic.com/firebasejs/11.9.0/firebase-firestore.js';
+import { doc, getDoc, collection, getDocs, query, where, addDoc } from 'https://www.gstatic.com/firebasejs/11.9.0/firebase-firestore.js';
 
 onAuthStateChanged(auth, async (user) => {
   window.currentUser = user;
@@ -60,3 +60,18 @@ onAuthStateChanged(auth, async (user) => {
 });
 
 window.logout = () => signOut(auth);
+
+export async function logAuditAction(adminUid, action, targetUid = null, extra = null) {
+  if (!adminUid) return;
+  try {
+    await addDoc(collection(db, 'auditLogs'), {
+      adminUid,
+      action,
+      targetUid: targetUid || null,
+      extra: extra || null,
+      timestamp: new Date()
+    });
+  } catch (err) {
+    console.error('Failed to log audit action', err);
+  }
+}

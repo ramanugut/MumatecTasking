@@ -1,4 +1,5 @@
 import { auth, db } from './firebase.js';
+import { logAuditAction } from './auth.js';
 import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/11.9.0/firebase-auth.js';
 import { collection, getDocs, setDoc, doc, getDoc } from 'https://www.gstatic.com/firebasejs/11.9.0/firebase-firestore.js';
 
@@ -29,7 +30,9 @@ tbody.addEventListener('click', async e => {
   if (permsInput === null) return;
   const parentRole = prompt('Parent role (optional):', data.parentRole || '') || '';
   const permissions = permsInput.split(',').map(p => p.trim()).filter(Boolean);
-  await setDoc(doc(db, 'roles', id), { description: desc, permissions, parentRole: parentRole || null }, { merge: true });
+  await setDoc(doc(db, 'roles', id), { description: desc, permissions }, { merge: true });
+  logAuditAction(auth.currentUser?.uid, 'updateRole', id, { description: desc, permissions });
+
   loadRoles();
 });
 
@@ -40,7 +43,9 @@ addBtn.addEventListener('click', async () => {
   const permsInput = prompt('Permissions (comma separated):') || '';
   const parentRole = prompt('Parent role (optional):') || '';
   const permissions = permsInput.split(',').map(p => p.trim()).filter(Boolean);
-  await setDoc(doc(db, 'roles', name.trim()), { description: desc, permissions, parentRole: parentRole || null });
+  await setDoc(doc(db, 'roles', name.trim()), { description: desc, permissions });
+  logAuditAction(auth.currentUser?.uid, 'createRole', name.trim(), { description: desc, permissions });
+
   loadRoles();
 });
 

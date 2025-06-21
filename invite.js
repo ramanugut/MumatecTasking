@@ -1,4 +1,5 @@
 import { auth, db } from './firebase.js';
+import { logAuditAction } from './auth.js';
 import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/11.9.0/firebase-auth.js';
 import { collection, getDocs, addDoc, deleteDoc, doc, updateDoc } from 'https://www.gstatic.com/firebasejs/11.9.0/firebase-firestore.js';
 
@@ -39,6 +40,7 @@ tbody.addEventListener('click', async e => {
   const id = e.target.closest('button[data-id]')?.dataset.id;
   if (!id) return;
   await deleteDoc(doc(db, 'invites', id));
+  logAuditAction(auth.currentUser?.uid, 'inviteDeleted', null, { inviteId: id });
   loadInvites();
 });
 
@@ -55,6 +57,7 @@ addBtn.addEventListener('click', async () => {
     status: 'sent',
     createdAt: new Date()
   });
+  logAuditAction(auth.currentUser?.uid, 'inviteSent', null, { email: email.trim(), roleId: roleId.trim(), projectId: projectId ? projectId.trim() : null });
   loadInvites();
 });
 
