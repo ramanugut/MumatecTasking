@@ -65,6 +65,10 @@
     --status-done: var(--success-green);
     --status-blocked: var(--error-red);
     --status-cancelled: var(--text-tertiary);
+    /* Scrollbar Colors */
+    --scrollbar-bg: var(--surface-secondary);
+    --scrollbar-thumb: var(--primary-blue);
+    --scrollbar-thumb-hover: var(--primary-blue-hover);
 }
 
 body {
@@ -74,6 +78,31 @@ body {
     overflow: hidden;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+}
+
+/* Global Scrollbar Styling */
+* {
+    scrollbar-width: thin;
+    scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-bg);
+}
+
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: var(--scrollbar-thumb);
+    border-radius: 8px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background-color: var(--scrollbar-thumb-hover);
+}
+
+::-webkit-scrollbar-track {
+    background: var(--scrollbar-bg);
+    border-radius: 8px;
 }
 
 /* App Container */
@@ -1722,6 +1751,9 @@ body {
         --primary-blue-hover: #1d90b6;
         --shadow: rgba(0, 0, 0, 0.3);
         --shadow-hover: rgba(0, 0, 0, 0.4);
+        --scrollbar-bg: var(--surface-secondary);
+        --scrollbar-thumb: var(--primary-blue);
+        --scrollbar-thumb-hover: var(--primary-blue-hover);
     }
 }
 
@@ -1738,6 +1770,9 @@ body.dark-mode {
     --primary-blue-hover: #1d90b6;
     --shadow: rgba(0, 0, 0, 0.3);
     --shadow-hover: rgba(0, 0, 0, 0.4);
+    --scrollbar-bg: var(--surface-secondary);
+    --scrollbar-thumb: var(--primary-blue);
+    --scrollbar-thumb-hover: var(--primary-blue-hover);
 }
 
 /* Simple board and list styles */
