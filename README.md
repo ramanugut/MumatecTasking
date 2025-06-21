@@ -24,6 +24,8 @@ and always has full rights to manage other users.
 6. After signing in you will be redirected to `index.html` where you can manage
    your tasks.
 7. Administrators can manage pending invitations via `invite.html`.
+8. Roles can be created in `roles-admin.html` and assigned to users through
+   `user-management.html`.
 
 Firebase is pre-configured with project **mumatectasking**. Update `firebase.js`
  if you need to change configuration.
