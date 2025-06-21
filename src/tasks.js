@@ -589,14 +589,16 @@ class MumatecTaskManager {
     }
 
     updateProductivityRing(stats) {
-        const percentage = stats.total > 0 ? Math.round((stats.completed / stats.total) * 100) : 0;
-        
         const ring = document.getElementById('progressRing');
+        const percentEl = document.getElementById('productivityPercent');
+        if (!ring || !percentEl) return;
+
+        const percentage = stats.total > 0 ? Math.round((stats.completed / stats.total) * 100) : 0;
         const circumference = 2 * Math.PI * 25; // radius = 25
         const offset = circumference - (percentage / 100) * circumference;
-        
+
         ring.style.strokeDashoffset = offset;
-        document.getElementById('productivityPercent').textContent = `${percentage}%`;
+        percentEl.textContent = `${percentage}%`;
     }
 
     renderCurrentView() {
