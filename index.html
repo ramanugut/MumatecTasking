@@ -328,127 +328,69 @@
                 <h3 id="modalTitle">Add New Task</h3>
                 <button class="close-btn" onclick="todoApp.closeModal()"><span class="material-icons">close</span></button>
             </div>
-
+            <div class="hint-banner">Fill in the essentials. You can edit details later.</div>
             <form id="taskForm" class="task-form">
-                <div class="form-section">
+                <div class="form-field">
+                    <label>Task Title<span class="required">*</span></label>
+                    <input type="text" id="taskTitle" placeholder="Brief summary" required>
+                </div>
+                <div class="form-row">
                     <div class="form-field">
-                        <label>Task Title</label>
-                        <input type="text" id="taskTitle" required>
-                    </div>
-
-                    <div class="form-field">
-                        <label>Project</label>
+                        <label>Project<span class="required">*</span></label>
                         <div class="project-select">
                             <select id="taskProject"></select>
                             <button type="button" id="newProjectBtn" class="new-project-btn">+</button>
                         </div>
                     </div>
-
-                    <div class="form-row">
-                        <div class="form-field">
-                            <label>Priority</label>
-                            <select id="taskPriority">
-                                <option value="low">Low</option>
-                                <option value="medium" selected>Medium</option>
-                                <option value="high">High</option>
-                                <option value="critical">Critical</option>
-                            </select>
-                        </div>
-                        <div class="form-field">
-                            <label>Status</label>
-                            <select id="taskStatus">
-                                <option value="todo">Todo</option>
-                                <option value="inprogress">In Progress</option>
-                                <option value="review">Under Review</option>
-                                <option value="done">Done</option>
-                                <option value="blocked">Blocked</option>
-                                <option value="cancelled">Cancelled</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="form-section">
                     <div class="form-field">
-                        <label>Description</label>
-                        <textarea id="taskDescription" rows="3"></textarea>
+                        <label>Assignee</label>
+                        <select id="taskAssignee"></select>
                     </div>
                 </div>
-
-                <div class="form-section">
-                    <div class="form-row">
-                        <div class="form-field">
-                            <label>Due Date</label>
-                            <input type="datetime-local" id="taskDueDate">
-                            <div class="date-shortcuts">
-                                <button type="button" class="date-shortcut-btn" data-shortcut="tomorrow">Tomorrow</button>
-                                <button type="button" class="date-shortcut-btn" data-shortcut="next-week">Next Week</button>
-                                <button type="button" class="date-shortcut-btn" data-shortcut="end-month">End of Month</button>
-                            </div>
+                <div class="form-row">
+                    <div class="form-field">
+                        <label>Priority</label>
+                        <div id="priorityBadges" class="priority-badges">
+                            <span class="priority-badge high" data-value="high">High</span>
+                            <span class="priority-badge medium active" data-value="medium">Medium</span>
+                            <span class="priority-badge low" data-value="low">Low</span>
                         </div>
-                        <div class="form-field" id="taskCategoryField">
-                            <label>Category</label>
-                            <input type="text" id="taskCategory" placeholder="e.g., Work, Personal">
-                        </div>
-                        <div class="form-field" id="taskTypeField">
-                            <label>Type</label>
-                            <input type="text" id="taskType" list="typeSuggestions" placeholder="e.g., Bug">
-                            <datalist id="typeSuggestions"></datalist>
-                        </div>
+                        <input type="hidden" id="taskPriority" value="medium">
                     </div>
-                    <div class="form-row">
-                        <div class="form-field">
-                            <label>Assignee</label>
-                            <select id="taskAssignee"></select>
-                            <button type="button" id="assignToMeBtn" class="assign-me-btn">Assign to me</button>
-                            <img id="assigneeAvatarPreview" class="task-avatar" style="display:none;margin-top:4px;" alt="Assignee avatar">
-                        </div>
-                        <div class="form-field">
-                            <label>Dependencies</label>
-                            <input type="text" id="taskDependencies" placeholder="Task IDs comma separated">
-                        </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-field">
-                            <label>Est. Hours</label>
-                            <input type="number" id="taskEstimate" min="0" step="0.1">
-                        </div>
-                        <div class="form-field edit-only">
-                            <label>Time Spent</label>
-                            <input type="number" id="taskTimeSpent" min="0" step="0.1">
-                        </div>
-                    </div>
-                    <div class="form-field edit-only">
-                        <label>Attachments</label>
-                        <input type="file" id="taskAttachments" multiple>
+                    <div class="form-field">
+                        <label>Due Date</label>
+                        <input type="datetime-local" id="taskDueDate">
                     </div>
                 </div>
-
-                <div class="form-section">
-                    <div class="form-field edit-only">
-                        <label>Notes</label>
-                        <textarea id="taskNotes" rows="2" placeholder="Internal notes"></textarea>
+                <div class="form-row">
+                    <div class="form-field" id="taskCategoryField">
+                        <label>Category</label>
+                        <input type="text" id="taskCategory" placeholder="e.g., Work, Personal">
                     </div>
-                    <div class="activity-feed edit-only" id="activityFeed"></div>
+                    <div class="form-field" id="taskTypeField">
+                        <label>Type</label>
+                        <input type="text" id="taskType" list="typeSuggestions" placeholder="e.g., Bug">
+                        <datalist id="typeSuggestions"></datalist>
+                    </div>
+                </div>
+                <div class="form-field">
+                    <label>Description</label>
+                    <textarea id="taskDescription" rows="3" placeholder="Add more context"></textarea>
+                </div>
+                <div class="form-row">
+                    <div class="form-field">
+                        <label>Est. Hours</label>
+                        <input type="number" id="taskEstimate" min="0" step="0.1">
+                    </div>
                     <div class="form-field">
                         <label>Tags</label>
                         <input type="text" id="taskTags" placeholder="urgent, meeting, project">
                     </div>
-                    <div class="form-field">
-                        <label>Labels</label>
-                        <input type="text" id="taskLabels" list="labelSuggestions" placeholder="Client Work, Urgent">
-                        <datalist id="labelSuggestions"></datalist>
-                    </div>
-                    <div id="commentsContainer" class="comments-container edit-only"></div>
-                    <div class="form-field edit-only">
-                        <label>Add Comment</label>
-                        <textarea id="taskComment" rows="2" placeholder="Add a comment"></textarea>
-                    </div>
                 </div>
-
+                <input type="hidden" id="taskStatus" value="todo">
                 <div class="form-actions">
                     <button type="button" class="form-btn secondary" onclick="todoApp.closeModal()">Cancel</button>
-                    <button type="submit" class="form-btn primary">Save Task</button>
+                    <button type="submit" class="form-btn primary">Create Task</button>
                 </div>
             </form>
         </div>
