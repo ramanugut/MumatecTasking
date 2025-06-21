@@ -1985,6 +1985,18 @@ body.dark-mode {
   width: 100%;
 }
 
+/* User management table */
+.user-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.user-table th,
+.user-table td {
+  padding: 8px;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+}
+
 #installButton {
   position: fixed;
   bottom: 20px;
