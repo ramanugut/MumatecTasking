@@ -96,7 +96,7 @@ Fields are normalised in code and may include:
 - **estimate**: number *(optional)*
 - **timeSpent**: number *(optional)*
 - **attachments**: array *(optional)*
-- **comments**: array *(optional)*
+- **comments**: array *(optional)* – each item `{ text, author, userId, timestamp, reactions }`
 - **tags**: array *(optional)*
 - **labels**: array *(optional)*
 - **subtasks**: array *(optional)*
