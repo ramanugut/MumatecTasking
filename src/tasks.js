@@ -613,13 +613,13 @@ class MumatecTaskManager {
 
         // Update page title
         const titles = {
-            dashboard: 'Dashboard',
+            dashboard: 'Mumatec Tasking',
             today: 'Today\'s Tasks',
             upcoming: 'Upcoming Tasks',
             completed: 'Completed Tasks'
         };
-        
-        document.getElementById('pageTitle').textContent = titles[this.currentView] || 'Dashboard';
+
+        document.getElementById('pageTitle').textContent = titles[this.currentView] || 'Mumatec Tasking';
 
         // Render view content
         switch (this.currentView) {

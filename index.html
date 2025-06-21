@@ -18,7 +18,7 @@
     <header class="top-bar" id="mainHeader">
         <div class="top-bar-left">
             <button id="sidebarToggle" class="action-btn secondary" aria-label="Toggle navigation menu" aria-expanded="true"><span class="material-icons">menu</span></button>
-            <h1 class="page-title" id="pageTitle">Dashboard</h1>
+            <h1 class="page-title" id="pageTitle">Mumatec Tasking</h1>
 
         </div>
 
@@ -33,9 +33,6 @@
         </div>
 
         <div class="top-bar-right">
-            <button class="action-btn secondary" onclick="document.getElementById('csvImport').click()">
-                <span class="material-icons">file_upload</span> Import
-            </button>
             <button class="action-btn primary" onclick="todoApp.openAddTaskModal()">
                 <span class="material-icons">add</span> New Task
             </button>
@@ -47,6 +44,9 @@
                 </div>
                 <div class="profile-dropdown" id="profileDropdown">
                     <button id="themeToggle" class="dropdown-btn"><span class="material-icons">dark_mode</span></button>
+                    <button class="dropdown-btn" onclick="document.getElementById('csvImport').click()">
+                        <span class="material-icons">file_upload</span> Import
+                    </button>
                     <button class="dropdown-btn" onclick="logout()">Logout</button>
                 </div>
             </div>
@@ -64,15 +64,14 @@
             <div class="sidebar-header">
                 <div class="app-logo">
                     <div class="logo-icon"><span class="material-icons">assignment</span></div>
-                    <div class="logo-text">Mumatec Tasking</div>
                 </div>
             </div>
 
             <div class="sidebar-nav">
                 <div class="nav-section">
-                    <div class="nav-item active" data-view="dashboard" aria-label="Dashboard">
+                    <div class="nav-item active" data-view="dashboard" aria-label="Mumatec Tasking">
                         <span class="material-icons nav-icon">dashboard</span>
-                        <span class="nav-label">Dashboard</span>
+                        <span class="nav-label">Mumatec Tasking</span>
                         <span class="nav-count" id="dashboardCount">0</span>
                     </div>
                     <div class="nav-item" data-view="today" aria-label="Today">
