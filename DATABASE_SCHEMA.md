@@ -79,6 +79,63 @@ Used for admin notifications.
 - **message**: string *(optional)*
 - other arbitrary fields
 
+## tasks (collection)
+Top-level storage for tasks. Each document mirrors the fields listed in the
+[Tasks subcollection](#tasks-subcollection) and may be referenced from other
+collections.
+
+## taskComments (collection)
+Stores threaded comments for tasks.
+- **taskId**: string
+- **authorId**: string
+- **text**: string
+- **createdAt**: timestamp
+- **updatedAt**: timestamp *(optional)*
+- **internal**: boolean *(optional)*
+- **reactions**: map *(optional)*
+
+## taskActivity (collection)
+Historical activity records for tasks.
+- **taskId**: string
+- **action**: string
+- **actorId**: string *(optional)*
+- **timestamp**: timestamp
+- **extra**: object *(optional)*
+
+## taskAttachments (collection)
+Metadata for files attached to tasks.
+- **taskId**: string
+- **name**: string
+- **size**: number
+- **contentType**: string
+- **url**: string
+- **uploadedBy**: uid
+- **createdAt**: timestamp
+
+## timeLogs (collection)
+Time tracking entries.
+- **taskId**: string
+- **userId**: string
+- **minutes**: number
+- **description**: string *(optional)*
+- **billable**: boolean *(optional)*
+- **createdAt**: timestamp
+
+## taskRelations (collection)
+Defines dependencies and relationships between tasks.
+- **taskId**: string
+- **relatedTaskId**: string
+- **type**: `blocks` | `blockedBy` | `relatesTo` | `subtask`
+- **createdAt**: timestamp
+
+## notifications (collection)
+User notifications and watch records.
+- **taskId**: string *(optional)*
+- **recipientId**: string
+- **type**: string
+- **read**: boolean
+- **createdAt**: timestamp
+
 ## Tasks subcollection
 Each user document has a `tasks` subcollection.
 Fields are normalised in code and may include:

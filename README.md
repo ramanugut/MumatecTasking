@@ -13,7 +13,8 @@ and always has full rights to manage other users.
 
 1. Install dependencies with `npm install`.
 2. Initialize Firestore collections with `npm run init:collections` (requires a
-   Firebase service account key).
+   Firebase service account key). The script now provisions additional
+   collections for comments, activity logs, attachments, and time tracking.
 3. Start the dev server using `npm run dev` (uses `serve` under the hood).
 4. Visit `login.html` to sign in with your admin credentials.
 5. If you do not have an account, use `signup.html` which will create a client
