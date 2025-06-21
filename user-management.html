@@ -27,16 +27,81 @@
       </div>
     </div>
   </header>
-  <div class="app-container" style="padding:20px;">
-    <table class="user-table">
-      <thead>
-        <tr><th>Name</th><th>Email</th></tr>
-      </thead>
-      <tbody id="userTableBody"></tbody>
-    </table>
+
+  <div class="app-container">
+    <div class="sidebar">
+      <div class="sidebar-nav">
+        <div class="nav-item active" aria-label="All Users">
+          <span class="material-icons nav-icon">people</span>
+          <span class="nav-label">All Users</span>
+        </div>
+        <div class="nav-item" aria-label="User Roles &amp; Permissions">
+          <span class="material-icons nav-icon">security</span>
+          <span class="nav-label">User Roles &amp; Permissions</span>
+        </div>
+        <div class="nav-item" aria-label="Departments/Teams">
+          <span class="material-icons nav-icon">groups</span>
+          <span class="nav-label">Departments/Teams</span>
+        </div>
+        <div class="nav-item" aria-label="Inactive Users">
+          <span class="material-icons nav-icon">person_off</span>
+          <span class="nav-label">Inactive Users</span>
+        </div>
+        <div class="nav-item" aria-label="Pending Invitations">
+          <span class="material-icons nav-icon">mail</span>
+          <span class="nav-label">Pending Invitations</span>
+        </div>
+        <div class="nav-item" aria-label="Audit Logs">
+          <span class="material-icons nav-icon">list_alt</span>
+          <span class="nav-label">Audit Logs</span>
+        </div>
+        <div class="nav-item" aria-label="Bulk Actions">
+          <span class="material-icons nav-icon">playlist_add_check</span>
+          <span class="nav-label">Bulk Actions</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="main-content">
+      <div class="content-area" style="padding:20px;">
+        <div class="user-actions">
+          <button class="action-btn primary" id="inviteBtn"><span class="material-icons">person_add</span> Invite</button>
+          <button class="action-btn secondary" id="bulkEditBtn"><span class="material-icons">edit</span> Bulk Edit</button>
+          <button class="action-btn secondary" id="exportBtn"><span class="material-icons">download</span> Export</button>
+        </div>
+
+        <div class="user-filters">
+          <input type="text" id="userSearch" class="search-input" placeholder="Search users...">
+        </div>
+
+        <div class="user-stats">
+          <div class="stat-card"><div class="stat-number" id="totalUsers">0</div><div class="stat-label">Total Users</div></div>
+          <div class="stat-card"><div class="stat-number" id="activeUsers">0</div><div class="stat-label">Active</div></div>
+          <div class="stat-card"><div class="stat-number" id="inactiveUsers">0</div><div class="stat-label">Inactive</div></div>
+        </div>
+
+        <table class="user-table">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Role</th>
+              <th>Department</th>
+              <th>Projects</th>
+              <th>Last Login</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="userTableBody"></tbody>
+        </table>
+      </div>
+    </div>
   </div>
+
   <script type="module" src="firebase.js"></script>
   <script type="module" src="auth.js"></script>
   <script type="module" src="user-management.js"></script>
 </body>
 </html>
+
