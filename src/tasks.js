@@ -1109,8 +1109,10 @@ class MumatecTaskManager {
             this.updatePriorityBadges('medium');
         }
         this.handleProjectChange();
-        document.getElementById('commentsContainer').innerHTML = '';
-        document.getElementById('activityFeed').innerHTML = '';
+        const commentsEl = document.getElementById('commentsContainer');
+        if (commentsEl) commentsEl.innerHTML = '';
+        const activityEl = document.getElementById('activityFeed');
+        if (activityEl) activityEl.innerHTML = '';
         const modal = document.getElementById('taskModal');
         modal.classList.add('active');
         modal.setAttribute('aria-hidden', 'false');
@@ -1138,7 +1140,8 @@ class MumatecTaskManager {
         }
         this.handleProjectChange();
         const assignee = this.userMap[task.assignedTo];
-        document.getElementById('taskAssignee').value = task.assignedTo || '';
+        const assigneeSelect = document.getElementById('taskAssignee');
+        if (assigneeSelect) assigneeSelect.value = task.assignedTo || '';
         const avatarEl = document.getElementById('assigneeAvatarPreview');
         if (avatarEl) {
             if (assignee && assignee.photoURL) {
@@ -1148,19 +1151,32 @@ class MumatecTaskManager {
                 avatarEl.style.display = 'none';
             }
         }
-        document.getElementById('taskDependencies').value = (task.dependencies || []).join(', ');
-        document.getElementById('taskEstimate').value = task.estimate || 0;
-        document.getElementById('taskTimeSpent').value = task.timeSpent || 0;
-        document.getElementById('taskAttachments').value = '';
+        const depEl = document.getElementById('taskDependencies');
+        if (depEl) depEl.value = (task.dependencies || []).join(', ');
+        const estEl = document.getElementById('taskEstimate');
+        if (estEl) estEl.value = task.estimate || 0;
+        const timeEl = document.getElementById('taskTimeSpent');
+        if (timeEl) timeEl.value = task.timeSpent || 0;
+        const attachEl = document.getElementById('taskAttachments');
+        if (attachEl) attachEl.value = '';
 
-        this.renderComments(task);
-        if (task.attachments && task.attachments.length) {
-            document.getElementById('commentsContainer').insertAdjacentHTML('afterbegin', task.attachments.map(a => `<div class="comment-item">Attachment: ${escapeHtmlUtil(a.name || '')}</div>`).join(''));
+        if (typeof this.renderComments === 'function') {
+            this.renderComments(task);
         }
-        document.getElementById('taskComment').value = '';
-        document.getElementById('taskNotes').value = task.notes || '';
-        document.getElementById('activityFeed').innerHTML = (task.activity || []).slice().reverse().map(a => `<div class="activity-item">${escapeHtmlUtil(a.action)} - ${formatDateUtil(new Date(a.timestamp))}</div>`).join('');
-        document.getElementById('taskTags').value = task.tags?.join(', ') || '';
+        if (task.attachments && task.attachments.length) {
+            const commentsEl = document.getElementById('commentsContainer');
+            if (commentsEl) {
+                commentsEl.insertAdjacentHTML('afterbegin', task.attachments.map(a => `<div class="comment-item">Attachment: ${escapeHtmlUtil(a.name || '')}</div>`).join(''));
+            }
+        }
+        const commentInput = document.getElementById('taskComment');
+        if (commentInput) commentInput.value = '';
+        const notesEl = document.getElementById('taskNotes');
+        if (notesEl) notesEl.value = task.notes || '';
+        const activityEl = document.getElementById('activityFeed');
+        if (activityEl) activityEl.innerHTML = (task.activity || []).slice().reverse().map(a => `<div class="activity-item">${escapeHtmlUtil(a.action)} - ${formatDateUtil(new Date(a.timestamp))}</div>`).join('');
+        const tagsEl = document.getElementById('taskTags');
+        if (tagsEl) tagsEl.value = task.tags?.join(', ') || '';
 
         
         const modal = document.getElementById('taskModal');
@@ -1481,7 +1497,9 @@ class MumatecTaskManager {
     }
 
     collectNewComment() {
-        const text = document.getElementById('taskComment').value.trim();
+        const commentEl = document.getElementById('taskComment');
+        if (!commentEl) return null;
+        const text = commentEl.value.trim();
         if (!text) return null;
         const author = window.currentUser?.displayName || 'Me';
         const userId = window.currentUser?.uid || 'anonymous';
