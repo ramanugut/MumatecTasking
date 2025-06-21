@@ -362,6 +362,14 @@
                         <input type="text" id="taskTitle" required>
                     </div>
 
+                    <div class="form-field">
+                        <label>Project</label>
+                        <div class="project-select">
+                            <select id="taskProject"></select>
+                            <button type="button" id="newProjectBtn" class="new-project-btn">+</button>
+                        </div>
+                    </div>
+
                     <div class="form-row">
                         <div class="form-field">
                             <label>Priority</label>
@@ -404,11 +412,11 @@
                                 <button type="button" class="date-shortcut-btn" data-shortcut="end-month">End of Month</button>
                             </div>
                         </div>
-                        <div class="form-field">
+                        <div class="form-field" id="taskCategoryField">
                             <label>Category</label>
                             <input type="text" id="taskCategory" placeholder="e.g., Work, Personal">
                         </div>
-                        <div class="form-field">
+                        <div class="form-field" id="taskTypeField">
                             <label>Type</label>
                             <input type="text" id="taskType" list="typeSuggestions" placeholder="e.g., Bug">
                             <datalist id="typeSuggestions"></datalist>

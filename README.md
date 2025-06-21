@@ -2,6 +2,10 @@
 
 Simple task manager app with Firebase authentication and Firestore storage.
 
+The task modal now includes a **Project** selector. Projects can be created on
+the fly and may define a type (e.g. *software* or *marketing*) which controls
+which fields are shown when creating issues.
+
 The account **mumatechosting@gmail.com** is considered the super administrator
 and always has full rights to manage other users.
 

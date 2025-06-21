@@ -21,6 +21,8 @@ class MumatecTaskManager {
         this.userMap = {};
         this.labelsConfig = [];
         this.labelMap = {};
+        this.projects = [];
+        this.projectMap = {};
         this.activeTimers = {};
         this.categoryOrder = ['Work', 'Personal', 'Development'];
         this.categoryIcons = { Work: 'work', Personal: 'home', Development: 'code' };
@@ -39,6 +41,7 @@ class MumatecTaskManager {
             dueDate: data.dueDate || null,
             category: data.category || 'Work',
             type: data.type || 'General',
+            projectId: data.projectId || null,
             assignedTo: data.assignedTo || null,
             dependencies: Array.isArray(data.dependencies) ? data.dependencies : [],
             estimate: Number(data.estimate) || 0,
@@ -59,6 +62,7 @@ class MumatecTaskManager {
         await this.loadTasks();
         await this.loadTaskTypes();
         await this.loadUsers();
+        await this.loadProjects();
         this.loadLabels();
         this.loadStyleSheet();
         this.loadTheme();
@@ -176,6 +180,71 @@ class MumatecTaskManager {
             this.userMap = {};
         }
         this.populateAssigneeDropdown();
+    }
+
+    async loadProjects() {
+        if (!db) return;
+        try {
+            const snap = await getDocs(collection(db, 'projects'));
+            this.projects = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+            this.projectMap = {};
+            this.projects.forEach(p => { this.projectMap[p.id] = p; });
+        } catch (e) {
+            console.warn('Failed to load projects', e);
+            this.projects = [];
+            this.projectMap = {};
+        }
+        this.populateProjectDropdown();
+    }
+
+    populateProjectDropdown() {
+        const select = document.getElementById('taskProject');
+        if (!select) return;
+        select.innerHTML = this.projects.map(p => `<option value="${p.id}">${escapeHtmlUtil(p.name)}</option>`).join('');
+        if (this.projects.length) {
+            select.value = this.projects[0].id;
+        }
+        this.handleProjectChange();
+    }
+
+    async createProject() {
+        if (!db) return;
+        const name = prompt('Project name');
+        if (!name) return;
+        const type = prompt('Project type (software/marketing)') || 'software';
+        try {
+            const docRef = doc(collection(db, 'projects'));
+            await setDoc(docRef, { name, type, createdAt: new Date().toISOString() });
+            const proj = { id: docRef.id, name, type };
+            this.projects.push(proj);
+            this.projectMap[proj.id] = proj;
+            this.populateProjectDropdown();
+            const select = document.getElementById('taskProject');
+            if (select) {
+                select.value = proj.id;
+                this.handleProjectChange();
+            }
+        } catch (e) {
+            console.error('Failed to create project', e);
+        }
+    }
+
+    handleProjectChange() {
+        const select = document.getElementById('taskProject');
+        const proj = this.projectMap[select?.value];
+        const typeField = document.getElementById('taskTypeField');
+        const categoryField = document.getElementById('taskCategoryField');
+        if (!typeField || !categoryField) return;
+        if (proj?.type === 'software') {
+            typeField.style.display = '';
+            categoryField.style.display = 'none';
+        } else if (proj?.type === 'marketing') {
+            typeField.style.display = 'none';
+            categoryField.style.display = '';
+        } else {
+            typeField.style.display = '';
+            categoryField.style.display = '';
+        }
     }
 
     populateTypeDatalist() {
@@ -329,6 +398,7 @@ class MumatecTaskManager {
             dueDate: taskData.dueDate || null,
             category: taskData.category?.trim() || 'Work',
             type: taskData.type || 'General',
+            projectId: taskData.projectId || null,
             assignedTo: taskData.assignedTo || null,
             dependencies: this.parseTags(taskData.dependencies),
             estimate: parseFloat(taskData.estimate) || 0,
@@ -364,6 +434,7 @@ class MumatecTaskManager {
             dueDate: taskData.dueDate || null,
             category: taskData.category?.trim() || 'Work',
             type: taskData.type || 'General',
+            projectId: taskData.projectId || this.tasks[taskIndex].projectId || null,
             assignedTo: taskData.assignedTo || this.tasks[taskIndex].assignedTo || null,
             dependencies: this.parseTags(taskData.dependencies),
             estimate: parseFloat(taskData.estimate) || this.tasks[taskIndex].estimate || 0,
@@ -997,6 +1068,11 @@ class MumatecTaskManager {
         document.getElementById('modalTitle').textContent = 'Add New Task';
         this.clearTaskForm();
         document.getElementById('taskStatus').value = status;
+        const projectSelect = document.getElementById('taskProject');
+        if (projectSelect && this.projects.length) {
+            projectSelect.value = this.projects[0].id;
+        }
+        this.handleProjectChange();
         document.getElementById('commentsContainer').innerHTML = '';
         document.getElementById('activityFeed').innerHTML = '';
         const modal = document.getElementById('taskModal');
@@ -1019,6 +1095,11 @@ class MumatecTaskManager {
         document.getElementById('taskDueDate').value = task.dueDate || '';
         document.getElementById('taskCategory').value = task.category || '';
         document.getElementById('taskType').value = task.type || '';
+        const projectSelectEdit = document.getElementById('taskProject');
+        if (projectSelectEdit) {
+            projectSelectEdit.value = task.projectId || '';
+        }
+        this.handleProjectChange();
         const assignee = this.userMap[task.assignedTo];
         document.getElementById('taskAssignee').value = task.assignedTo || '';
         const avatarEl = document.getElementById('assigneeAvatarPreview');
@@ -1067,6 +1148,11 @@ class MumatecTaskManager {
         document.getElementById('taskDueDate').value = '';
         document.getElementById('taskCategory').value = '';
         document.getElementById('taskType').value = '';
+        if (this.projects.length) {
+            document.getElementById('taskProject').value = this.projects[0].id;
+        } else {
+            document.getElementById('taskProject').value = '';
+        }
         document.getElementById('taskAssignee').value = '';
         const avatarEl = document.getElementById('assigneeAvatarPreview');
         if (avatarEl) avatarEl.style.display = 'none';
@@ -1080,6 +1166,7 @@ class MumatecTaskManager {
         document.getElementById('taskNotes').value = '';
         document.getElementById('activityFeed').innerHTML = '';
         document.getElementById('taskTags').value = '';
+        this.handleProjectChange();
     }
 
 
@@ -1360,6 +1447,15 @@ class MumatecTaskManager {
             assignBtn.addEventListener('click', () => this.assignToMe());
         }
 
+        const newProjectBtn = document.getElementById('newProjectBtn');
+        if (newProjectBtn) {
+            newProjectBtn.addEventListener('click', () => this.createProject());
+        }
+        const projectSelect = document.getElementById('taskProject');
+        if (projectSelect) {
+            projectSelect.addEventListener('change', () => this.handleProjectChange());
+        }
+
         const assigneeSelect = document.getElementById('taskAssignee');
         if (assigneeSelect) {
             assigneeSelect.addEventListener('change', () => {
@@ -1536,6 +1632,7 @@ class MumatecTaskManager {
             dueDate: document.getElementById('taskDueDate').value,
             category: document.getElementById('taskCategory').value,
             type: document.getElementById('taskType').value,
+            projectId: document.getElementById('taskProject').value,
             assignedTo: document.getElementById('taskAssignee').value || null,
             dependencies: document.getElementById('taskDependencies').value,
             estimate: document.getElementById('taskEstimate').value,
