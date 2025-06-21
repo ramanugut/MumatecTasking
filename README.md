@@ -50,10 +50,11 @@ domain to Firebase Authentication's allowed list. In the Firebase console open
 
 ### Simplified Version
 
-Previous releases included extensive administrative tools, custom roles and a
-profile management system. These features have been removed to keep the project
-lightweight. The current app focuses on basic authentication and task
-management only.
+Previous releases included extensive administrative tools and custom roles.
+The simplified build now reintroduces a lightweight profile page for updating
+personal details, preferred language, timezone and security options such as
+password reset and two-factor authentication. Other advanced features remain
+omitted so the app stays focused on basic authentication and task management.
 
 ## Workflow Documentation
 For an overview of task statuses, priorities, and categories, see [WORKFLOW.md](./WORKFLOW.md).
