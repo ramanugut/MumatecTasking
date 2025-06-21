@@ -1997,3 +1997,15 @@ body.dark-mode {
 
 }
 
+/* Visibility handling for add/edit task modal */
+.edit-only {
+  display: none;
+}
+
+#taskModal.edit-mode .edit-only {
+  display: flex;
+}
+#taskModal.edit-mode .activity-feed.edit-only {
+  display: block;
+}
+
