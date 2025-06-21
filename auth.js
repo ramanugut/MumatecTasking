@@ -16,15 +16,29 @@ onAuthStateChanged(auth, async (user) => {
       console.error('Failed to fetch user info', e);
     }
     let roles = [];
+    let permissions = [];
     try {
       const roleSnap = await getDocs(query(collection(db, 'userRoles'), where('userId', '==', user.uid)));
       roles = roleSnap.docs.map(d => d.data().roleId);
+      const docs = await Promise.all(roles.map(id => getDoc(doc(db, 'roles', id))));
+      docs.forEach(r => {
+        if (r.exists()) {
+          const data = r.data();
+          if (Array.isArray(data.permissions)) permissions.push(...data.permissions);
+        }
+      });
     } catch (e) {
       console.error('Failed to fetch user roles', e);
     }
     window.currentUserRoles = roles;
+    window.currentUserPermissions = Array.from(new Set(permissions));
     const required = window.REQUIRED_ROLES;
     if (required && required.length && !required.some(r => roles.includes(r))) {
+      window.location.href = 'index.html';
+      return;
+    }
+    const permsRequired = window.REQUIRED_PERMISSIONS;
+    if (permsRequired && permsRequired.length && !permsRequired.every(p => window.currentUserPermissions.includes(p))) {
       window.location.href = 'index.html';
       return;
     }

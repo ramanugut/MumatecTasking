@@ -5,6 +5,12 @@ import { collection, getDocs, query, where, addDoc, deleteDoc } from 'https://ww
 const tbody = document.getElementById('userTableBody');
 const searchInput = document.getElementById('userSearch');
 let userRolesMap = {};
+let availableRoles = [];
+
+async function fetchRoles() {
+  const snap = await getDocs(collection(db, 'roles'));
+  availableRoles = snap.docs.map(d => d.id);
+}
 
 function formatDate(ts) {
   if (!ts) return '';
@@ -64,7 +70,7 @@ tbody.addEventListener('click', async e => {
   if (!btn) return;
   const userId = btn.dataset.id;
   const current = (userRolesMap[userId] || []).join(', ');
-  const input = prompt('Assign roles (comma separated):', current);
+  const input = prompt(`Assign roles (comma separated). Available: ${availableRoles.join(', ')}`, current);
   if (input === null) return;
   const roles = input.split(',').map(r => r.trim()).filter(Boolean);
   try {
@@ -83,6 +89,6 @@ onAuthStateChanged(auth, user => {
   if (!user) {
     window.location.href = 'login.html';
   } else {
-    loadUsers();
+    fetchRoles().then(loadUsers);
   }
 });

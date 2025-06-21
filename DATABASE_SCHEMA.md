@@ -86,12 +86,25 @@ Used for admin notifications.
 - Document id: role identifier (e.g. `admin`)
 - **description**: string *(optional)*
 - **permissions**: array of strings *(optional)*
+Stores all available roles in the system. `permissions` holds identifiers used
+by the UI and middleware to restrict access to certain actions.
+
+Example:
+
+```json
+{
+  "description": "Full administrator",
+  "permissions": ["manageUsers", "manageProjects"]
+}
+```
 
 ## userRoles (collection)
 Mapping between users and roles.
 - **userId**: string
 - **roleId**: string (matches role document id)
 - **assignedAt**: timestamp
+Links a user to one or more roles. A user may have multiple documents in this
+collection, one for each assigned role.
 
 ## invites (collection)
 Pending invitations waiting for sign up.
