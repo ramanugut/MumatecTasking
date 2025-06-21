@@ -1712,8 +1712,8 @@ body {
 @media (prefers-color-scheme: dark) {
     :root {
         --background: linear-gradient(135deg, #0e5077 0%, #06315e 100%);
-        --surface: rgba(255, 255, 255, 0.05);
-        --surface-secondary: rgba(255, 255, 255, 0.08);
+        --surface: rgba(9, 45, 71, 0.85);
+        --surface-secondary: rgba(9, 45, 71, 0.65);
         --text-primary: #ffffff;
         --text-secondary: #a2b1bd;
         --text-tertiary: #a2b1bd;
@@ -1728,8 +1728,8 @@ body {
 /* Manual dark mode toggle */
 body.dark-mode {
     --background: linear-gradient(135deg, #0e5077 0%, #06315e 100%);
-    --surface: rgba(255, 255, 255, 0.05);
-    --surface-secondary: rgba(255, 255, 255, 0.08);
+    --surface: rgba(9, 45, 71, 0.85);
+    --surface-secondary: rgba(9, 45, 71, 0.65);
     --text-primary: #ffffff;
     --text-secondary: #a2b1bd;
     --text-tertiary: #a2b1bd;
