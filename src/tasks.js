@@ -1902,8 +1902,8 @@ class MumatecTaskManager {
     }
 
     toggleStyleSheet() {
-        if (typeof toggleStyleSheet === 'function') {
-            toggleStyleSheet();
+        if (typeof window.toggleStyleSheet === 'function') {
+            window.toggleStyleSheet();
         }
     }
 
