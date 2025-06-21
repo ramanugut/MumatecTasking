@@ -10,6 +10,7 @@ This document lists the Firestore collections used by the application and the ma
 - **photoURL**: string *(optional)*
 - **jobTitle**: string *(optional)*
 - **department**: string *(optional)*
+- **team**: string *(optional)*
 - **phone**: string *(optional)*
 - **timezone**: string *(optional)*
 - **language**: string *(optional)*
@@ -39,6 +40,13 @@ This document lists the Firestore collections used by the application and the ma
 - **targetUid**: string *(optional)*
 - **extra**: object *(optional)*
 - **timestamp**: timestamp
+
+## departments (collection)
+- **name**: string
+- **createdAt**: timestamp
+
+### Subcollection: members
+- **assignedAt**: timestamp
 
 ## teams (collection)
 - **name**: string

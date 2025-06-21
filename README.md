@@ -26,6 +26,7 @@ and always has full rights to manage other users.
 7. Administrators can manage pending invitations via `invite.html`.
 8. Roles can be created in `roles-admin.html` and assigned to users through
    `user-management.html`.
+9. Departments and teams can be edited in `departments.html`.
 
 Firebase is pre-configured with project **mumatectasking**. Update `firebase.js`
  if you need to change configuration.
