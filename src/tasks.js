@@ -49,6 +49,7 @@ class MumatecTaskManager {
             attachments: Array.isArray(data.attachments) ? data.attachments : [],
             comments: Array.isArray(data.comments) ? data.comments : [],
             tags: Array.isArray(data.tags) ? data.tags : [],
+            watchers: Array.isArray(data.watchers) ? data.watchers : [],
             labels: Array.isArray(data.labels) ? data.labels : [],
             subtasks: Array.isArray(data.subtasks) ? data.subtasks : [],
             activity: Array.isArray(data.activity) ? data.activity : [],
@@ -332,6 +333,7 @@ class MumatecTaskManager {
                 timeSpent: 0,
                 attachments: [],
                 comments: [],
+                watchers: [],
                 notes: '',
                 activity: [{ action: 'Created task', timestamp: new Date().toISOString() }],
                 dueDate: new Date(Date.now() + 86400000).toISOString(),
@@ -354,6 +356,7 @@ class MumatecTaskManager {
                 timeSpent: 0,
                 attachments: [],
                 comments: [],
+                watchers: [],
                 notes: '',
                 activity: [{ action: 'Created task', timestamp: new Date().toISOString() }],
                 createdAt: new Date().toISOString(),
@@ -375,6 +378,7 @@ class MumatecTaskManager {
                 timeSpent: 0.5,
                 attachments: [],
                 comments: [],
+                watchers: [],
                 notes: '',
                 activity: [{ action: 'Created task', timestamp: new Date().toISOString() }],
                 createdAt: new Date(Date.now() - 86400000).toISOString(),
@@ -406,6 +410,7 @@ class MumatecTaskManager {
             timeSpent: parseFloat(taskData.timeSpent) || 0,
             attachments: taskData.attachments || [],
             comments: taskData.comments || [],
+            watchers: [window.currentUser?.uid].filter(Boolean),
             tags: this.parseTags(taskData.tags),
             activity: [{ action: 'Created task', timestamp: new Date().toISOString() }],
             createdAt: new Date().toISOString(),
@@ -442,6 +447,7 @@ class MumatecTaskManager {
             timeSpent: parseFloat(taskData.timeSpent) || this.tasks[taskIndex].timeSpent || 0,
             attachments: taskData.attachments && taskData.attachments.length ? [...(this.tasks[taskIndex].attachments || []), ...taskData.attachments] : (this.tasks[taskIndex].attachments || []),
             comments: taskData.comments ? [...(this.tasks[taskIndex].comments || []), ...taskData.comments] : (this.tasks[taskIndex].comments || []),
+            watchers: Array.isArray(this.tasks[taskIndex].watchers) ? this.tasks[taskIndex].watchers : [],
             tags: this.parseTags(taskData.tags),
             updatedAt: new Date().toISOString()
         });
@@ -1119,6 +1125,13 @@ class MumatecTaskManager {
         const count = document.getElementById('commentsCount');
         if (count) count.textContent = '';
         this.showModalTab(localStorage.getItem('taskModalTab') || 'detailsTab');
+        this.updateWatchButton({watchers: []});
+        const modalTime = document.getElementById('modalTimeSpent');
+        if (modalTime) modalTime.textContent = '';
+        this.updateTaskTimerUI('', false);
+        const commentDraft = localStorage.getItem('commentDraft_new');
+        const commentInputNew = document.getElementById('taskComment');
+        if (commentInputNew) commentInputNew.value = commentDraft || '';
         const modal = document.getElementById('taskModal');
         modal.classList.add('active');
         modal.setAttribute('aria-hidden', 'false');
@@ -1171,11 +1184,15 @@ class MumatecTaskManager {
         }
         this.renderAttachments(task);
         const commentInput = document.getElementById('taskComment');
-        if (commentInput) commentInput.value = '';
+        if (commentInput) commentInput.value = localStorage.getItem(`commentDraft_${taskId}`) || '';
         const notesEl = document.getElementById('taskNotes');
         if (notesEl) notesEl.value = task.notes || '';
         this.renderActivity(task);
         this.updateCommentsCount(task);
+        this.updateWatchButton(task);
+        const modalTime = document.getElementById('modalTimeSpent');
+        if (modalTime) modalTime.textContent = formatDurationUtil(task.timeSpent);
+        this.updateTaskTimerUI(taskId, !!this.activeTimers[taskId]);
         this.showModalTab(localStorage.getItem('taskModalTab') || 'detailsTab');
         const tagsEl = document.getElementById('taskTags');
         if (tagsEl) tagsEl.value = task.tags?.join(', ') || '';
@@ -1229,6 +1246,7 @@ class MumatecTaskManager {
         if (act) act.innerHTML = '';
         get('taskTags').value = '';
         localStorage.removeItem('taskDraft');
+        localStorage.removeItem('commentDraft_new');
         this.handleProjectChange();
     }
 
@@ -1471,9 +1489,10 @@ class MumatecTaskManager {
         if (!container) return;
         container.innerHTML = (task.comments || []).map((c, idx) => {
             const reactions = c.reactions || { like: 0, love: 0, laugh: 0, wow: 0 };
+            const avatar = this.userMap[c.userId]?.photoURL || 'https://via.placeholder.com/24';
             return `
                 <div class="comment-item" data-comment-index="${idx}">
-                    <div class="comment-meta">${escapeHtmlUtil(c.author)} - ${formatDateUtil(new Date(c.timestamp))}</div>
+                    <div class="comment-meta"><img class="comment-avatar" src="${escapeHtmlUtil(avatar)}" alt=""> ${escapeHtmlUtil(c.author)} - ${formatDateUtil(new Date(c.timestamp))}</div>
                     <div>${escapeHtmlUtil(c.text)}</div>
                     <div class="comment-reactions">
                         ${this.renderReactionButton('like','👍', reactions.like || 0)}
@@ -1662,6 +1681,28 @@ class MumatecTaskManager {
             });
         }
 
+        const watchBtn = document.getElementById('watchTaskBtn');
+        if (watchBtn) {
+            watchBtn.addEventListener('click', () => {
+                if (this.currentEditingTask) {
+                    this.toggleWatchTask(this.currentEditingTask);
+                }
+            });
+        }
+
+        const mStart = document.getElementById('modalTimerStart');
+        const mStop = document.getElementById('modalTimerStop');
+        if (mStart) {
+            mStart.addEventListener('click', () => {
+                if (this.currentEditingTask) this.startTaskTimer(this.currentEditingTask);
+            });
+        }
+        if (mStop) {
+            mStop.addEventListener('click', () => {
+                if (this.currentEditingTask) this.stopTaskTimer(this.currentEditingTask);
+            });
+        }
+
         const insightsBtn = document.getElementById('insightsToggle');
         if (insightsBtn) {
             insightsBtn.addEventListener('click', () => this.openInsights());
@@ -1818,6 +1859,32 @@ class MumatecTaskManager {
                 avatarEl.style.display = 'none';
             }
         }
+    }
+
+    updateWatchButton(task) {
+        const btn = document.getElementById('watchTaskBtn');
+        if (!btn) return;
+        const uid = window.currentUser?.uid;
+        const watching = uid && task.watchers && task.watchers.includes(uid);
+        btn.innerHTML = `<span class="material-icons">${watching ? 'notifications_active' : 'notifications_off'}</span>`;
+        btn.setAttribute('aria-label', watching ? 'Unwatch task' : 'Watch task');
+    }
+
+    toggleWatchTask(taskId) {
+        const task = this.tasks.find(t => t.id === taskId);
+        const uid = window.currentUser?.uid;
+        if (!task || !uid) return;
+        task.watchers = Array.isArray(task.watchers) ? task.watchers : [];
+        const idx = task.watchers.indexOf(uid);
+        if (idx === -1) {
+            task.watchers.push(uid);
+            this.showNotification('Watching', 'You are now watching this task', 'success');
+        } else {
+            task.watchers.splice(idx, 1);
+            this.showNotification('Unwatched', 'Stopped watching this task', 'info');
+        }
+        this.saveTaskToFirestore(task);
+        this.updateWatchButton(task);
     }
 
     updatePriorityBadges(value) {
@@ -2111,18 +2178,38 @@ class MumatecTaskManager {
 
     updateTaskTimerUI(taskId, running) {
         const card = document.querySelector(`[data-task-id="${taskId}"]`);
-        if (!card) return;
-        const startBtn = card.querySelector('.task-start-btn');
-        const stopBtn = card.querySelector('.task-stop-btn');
-        const indicator = card.querySelector('.timer-indicator');
-        if (running) {
-            if (startBtn) startBtn.style.display = 'none';
-            if (stopBtn) stopBtn.style.display = 'inline-flex';
-            if (indicator) indicator.style.display = 'inline-block';
-        } else {
-            if (startBtn) startBtn.style.display = 'inline-flex';
-            if (stopBtn) stopBtn.style.display = 'none';
-            if (indicator) indicator.style.display = 'none';
+        const modalStart = document.getElementById('modalTimerStart');
+        const modalStop = document.getElementById('modalTimerStop');
+        const modalInd = document.getElementById('modalTimerIndicator');
+        const modalTime = document.getElementById('modalTimeSpent');
+        if (card) {
+            const startBtn = card.querySelector('.task-start-btn');
+            const stopBtn = card.querySelector('.task-stop-btn');
+            const indicator = card.querySelector('.timer-indicator');
+            if (running) {
+                if (startBtn) startBtn.style.display = 'none';
+                if (stopBtn) stopBtn.style.display = 'inline-flex';
+                if (indicator) indicator.style.display = 'inline-block';
+            } else {
+                if (startBtn) startBtn.style.display = 'inline-flex';
+                if (stopBtn) stopBtn.style.display = 'none';
+                if (indicator) indicator.style.display = 'none';
+            }
+        }
+        if (modalStart && modalStop && modalInd) {
+            if (running) {
+                modalStart.style.display = 'none';
+                modalStop.style.display = 'inline-flex';
+                modalInd.style.display = 'inline-block';
+            } else {
+                modalStart.style.display = 'inline-flex';
+                modalStop.style.display = 'none';
+                modalInd.style.display = 'none';
+            }
+        }
+        if (modalTime) {
+            const task = this.tasks.find(t => t.id === taskId);
+            modalTime.textContent = task ? formatDurationUtil(task.timeSpent) : '';
         }
     }
 
@@ -2271,7 +2358,17 @@ class MumatecTaskManager {
             });
         }
 
+        const commentInputEl = document.getElementById('taskComment');
         const commentBtn = document.getElementById('addCommentBtn');
+        if (commentInputEl) {
+            commentInputEl.addEventListener('input', () => {
+                if (this.currentEditingTask) {
+                    localStorage.setItem(`commentDraft_${this.currentEditingTask}`, commentInputEl.value);
+                } else {
+                    localStorage.setItem('commentDraft_new', commentInputEl.value);
+                }
+            });
+        }
         if (commentBtn) {
             commentBtn.addEventListener('click', () => {
                 if (this.currentEditingTask) {
@@ -2296,6 +2393,7 @@ class MumatecTaskManager {
         task.activity = task.activity || [];
         task.activity.push({ action: 'Added comment', timestamp: new Date().toISOString() });
         document.getElementById('taskComment').value = '';
+        localStorage.removeItem(`commentDraft_${taskId}`);
         this.saveTaskToFirestore(task);
         this.renderComments(task);
         this.renderActivity(task);
