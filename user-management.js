@@ -15,6 +15,24 @@ const bulkApplyBtn = document.getElementById('bulkApply');
 const bulkCancelBtn = document.getElementById('bulkCancel');
 const bulkCloseBtn = document.getElementById('bulkClose');
 const selectAll = document.getElementById('selectAll');
+const rolesNav = document.querySelector('.nav-item[aria-label="User Roles & Permissions"]');
+const departmentsNav = document.querySelector('.nav-item[aria-label="Departments/Teams"]');
+const invitesNav = document.querySelector('.nav-item[aria-label="Pending Invitations"]');
+const auditNav = document.querySelector('.nav-item[aria-label="Audit Logs"]');
+const inactiveNav = document.querySelector('.nav-item[aria-label="Inactive Users"]');
+const bulkNav = document.querySelector('.nav-item[aria-label="Bulk Actions"]');
+
+const rolesModal = document.getElementById('rolesModal');
+const rolesClose = document.getElementById('rolesClose');
+const departmentsModal = document.getElementById('departmentsModal');
+const departmentsClose = document.getElementById('departmentsClose');
+const invitesModal = document.getElementById('invitesModal');
+const invitesClose = document.getElementById('invitesClose');
+const auditModal = document.getElementById('auditModal');
+const auditClose = document.getElementById('auditClose');
+const inactiveModal = document.getElementById('inactiveModal');
+const inactiveClose = document.getElementById('inactiveClose');
+const inactiveBody = document.getElementById('inactiveBody');
 let userRolesMap = {};
 let availableRoles = [];
 let availableProjects = [];
@@ -130,6 +148,26 @@ async function loadUsers() {
   }
 }
 
+async function loadInactiveUsers() {
+  if (!db) return;
+  try {
+    const snap = await getDocs(collection(db, 'users'));
+    inactiveBody.innerHTML = '';
+    snap.forEach(doc => {
+      const data = doc.data();
+      if (data.disabled || data.status === 'inactive') {
+        const tr = document.createElement('tr');
+        const name = data.displayName || data.name || '';
+        const last = formatDate(data.lastLogin);
+        tr.innerHTML = `<td>${name}</td><td>${data.email || ''}</td><td>${last}</td>`;
+        inactiveBody.appendChild(tr);
+      }
+    });
+  } catch (e) {
+    console.error('Failed to load inactive users', e);
+  }
+}
+
 tbody.addEventListener('click', async e => {
   const btn = e.target.closest('button[data-id]');
   if (!btn) return;
@@ -180,6 +218,16 @@ function closeBulkModal() {
   bulkModal.setAttribute('aria-hidden', 'true');
 }
 
+function openModal(modal) {
+  modal.classList.add('active');
+  modal.setAttribute('aria-hidden', 'false');
+}
+
+function closeModal(modal) {
+  modal.classList.remove('active');
+  modal.setAttribute('aria-hidden', 'true');
+}
+
 bulkBtn?.addEventListener('click', () => {
   if (selectedUsers.size === 0) {
     alert('Select users first');
@@ -219,6 +267,28 @@ bulkApplyBtn?.addEventListener('click', async () => {
     console.error('Failed to apply bulk changes', err);
   }
 });
+
+rolesNav?.addEventListener('click', () => openModal(rolesModal));
+rolesClose?.addEventListener('click', () => closeModal(rolesModal));
+rolesModal?.addEventListener('click', e => { if (e.target === rolesModal) closeModal(rolesModal); });
+
+departmentsNav?.addEventListener('click', () => openModal(departmentsModal));
+departmentsClose?.addEventListener('click', () => closeModal(departmentsModal));
+departmentsModal?.addEventListener('click', e => { if (e.target === departmentsModal) closeModal(departmentsModal); });
+
+invitesNav?.addEventListener('click', () => openModal(invitesModal));
+invitesClose?.addEventListener('click', () => closeModal(invitesModal));
+invitesModal?.addEventListener('click', e => { if (e.target === invitesModal) closeModal(invitesModal); });
+
+auditNav?.addEventListener('click', () => openModal(auditModal));
+auditClose?.addEventListener('click', () => closeModal(auditModal));
+auditModal?.addEventListener('click', e => { if (e.target === auditModal) closeModal(auditModal); });
+
+bulkNav?.addEventListener('click', () => openBulkModal());
+
+inactiveNav?.addEventListener('click', () => { loadInactiveUsers(); openModal(inactiveModal); });
+inactiveClose?.addEventListener('click', () => closeModal(inactiveModal));
+inactiveModal?.addEventListener('click', e => { if (e.target === inactiveModal) closeModal(inactiveModal); });
 
 onAuthStateChanged(auth, user => {
   if (!user) {

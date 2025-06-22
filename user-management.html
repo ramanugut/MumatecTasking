@@ -36,27 +36,27 @@
           <span class="material-icons nav-icon">people</span>
           <span class="nav-label">All Users</span>
         </div>
-        <div class="nav-item" aria-label="User Roles &amp; Permissions">
+        <div class="nav-item" aria-label="User Roles &amp; Permissions" data-target="rolesModal">
           <span class="material-icons nav-icon">security</span>
           <span class="nav-label">User Roles &amp; Permissions</span>
         </div>
-        <a href="departments.html" class="nav-item" aria-label="Departments/Teams">
+        <div class="nav-item" aria-label="Departments/Teams" data-target="departmentsModal">
           <span class="material-icons nav-icon">groups</span>
           <span class="nav-label">Departments/Teams</span>
-        </a>
-        <div class="nav-item" aria-label="Inactive Users">
+        </div>
+        <div class="nav-item" aria-label="Inactive Users" data-target="inactiveModal">
           <span class="material-icons nav-icon">person_off</span>
           <span class="nav-label">Inactive Users</span>
         </div>
-        <a href="invite.html" class="nav-item" aria-label="Pending Invitations">
+        <div class="nav-item" aria-label="Pending Invitations" data-target="invitesModal">
           <span class="material-icons nav-icon">mail</span>
           <span class="nav-label">Pending Invitations</span>
-        </a>
-        <a href="audit.html" class="nav-item" aria-label="Audit Logs">
+        </div>
+        <div class="nav-item" aria-label="Audit Logs" data-target="auditModal">
           <span class="material-icons nav-icon">list_alt</span>
           <span class="nav-label">Audit Logs</span>
-        </a>
-        <div class="nav-item" aria-label="Bulk Actions">
+        </div>
+        <div class="nav-item" aria-label="Bulk Actions" data-target="bulkModal">
           <span class="material-icons nav-icon">playlist_add_check</span>
           <span class="nav-label">Bulk Actions</span>
         </div>
@@ -123,6 +123,61 @@
         <button class="quick-btn secondary" id="bulkCancel">Cancel</button>
         <button class="quick-btn primary" id="bulkApply">Apply</button>
       </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="rolesModal" aria-hidden="true">
+    <div class="task-modal">
+      <div class="modal-header">
+        <h3>User Roles &amp; Permissions</h3>
+        <button class="close-btn" id="rolesClose"><span class="material-icons">close</span></button>
+      </div>
+      <iframe src="roles-admin.html" class="modal-iframe"></iframe>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="departmentsModal" aria-hidden="true">
+    <div class="task-modal">
+      <div class="modal-header">
+        <h3>Departments &amp; Teams</h3>
+        <button class="close-btn" id="departmentsClose"><span class="material-icons">close</span></button>
+      </div>
+      <iframe src="departments.html" class="modal-iframe"></iframe>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="invitesModal" aria-hidden="true">
+    <div class="task-modal">
+      <div class="modal-header">
+        <h3>Pending Invitations</h3>
+        <button class="close-btn" id="invitesClose"><span class="material-icons">close</span></button>
+      </div>
+      <iframe src="invite.html" class="modal-iframe"></iframe>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="auditModal" aria-hidden="true">
+    <div class="task-modal">
+      <div class="modal-header">
+        <h3>Audit Logs</h3>
+        <button class="close-btn" id="auditClose"><span class="material-icons">close</span></button>
+      </div>
+      <iframe src="audit.html" class="modal-iframe"></iframe>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="inactiveModal" aria-hidden="true">
+    <div class="task-modal">
+      <div class="modal-header">
+        <h3>Inactive Users</h3>
+        <button class="close-btn" id="inactiveClose"><span class="material-icons">close</span></button>
+      </div>
+      <table class="user-table">
+        <thead>
+          <tr><th>Name</th><th>Email</th><th>Last Login</th></tr>
+        </thead>
+        <tbody id="inactiveBody"></tbody>
+      </table>
     </div>
   </div>
 
