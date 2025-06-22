@@ -1875,7 +1875,7 @@ body {
 }
 
 /* Manual dark mode toggle */
-body.dark-mode {
+html.dark-mode, body.dark-mode {
     --background: linear-gradient(135deg, #0e5077 0%, #06315e 100%);
     --surface: rgba(9, 45, 71, 0.85);
     --surface-secondary: rgba(9, 45, 71, 0.65);
