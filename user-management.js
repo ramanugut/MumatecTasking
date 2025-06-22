@@ -37,6 +37,9 @@ let userRolesMap = {};
 let availableRoles = [];
 let availableProjects = [];
 const selectedUsers = new Set();
+const userDeptMap = {};
+const userTeamMap = {};
+const MASTER_ROLE = 'superAdmin';
 
 
 async function fetchRoles() {
@@ -129,6 +132,9 @@ async function loadUsers() {
       const projects = (data.projects || []).length;
       const last = formatDate(data.lastLogin);
       const status = data.status || (data.disabled ? 'Suspended' : (data.emailVerified ? 'Active' : 'Pending'));
+      const isMaster = (userRolesMap[doc.id] || []).some(r => r.roleId === MASTER_ROLE);
+      const canDelete = window.currentUserRoles?.includes(MASTER_ROLE) && !isMaster && auth.currentUser?.uid !== doc.id;
+      const deleteBtn = canDelete ? `<button class="action-btn danger small delete-btn" data-id="${doc.id}">Delete</button>` : '';
       tr.innerHTML = `
         <td><input type="checkbox" class="row-select" data-id="${doc.id}"></td>
         <td><div class="avatar-name">${name}</div></td>
@@ -139,7 +145,7 @@ async function loadUsers() {
         <td>${projects}</td>
         <td>${last}</td>
         <td>${status}</td>
-        <td><button class="action-btn secondary small" data-id="${doc.id}">Edit</button></td>`;
+        <td><button class="action-btn secondary small edit-btn" data-id="${doc.id}">Edit</button> ${deleteBtn}</td>`;
       tbody.appendChild(tr);
     });
     filterRows();
@@ -172,6 +178,25 @@ tbody.addEventListener('click', async e => {
   const btn = e.target.closest('button[data-id]');
   if (!btn) return;
   const userId = btn.dataset.id;
+  if (btn.classList.contains('delete-btn')) {
+    if (!confirm('Delete this user?')) return;
+    try {
+      if ((userRolesMap[userId] || []).some(r => r.roleId === MASTER_ROLE)) {
+        alert('Master Users cannot be deleted.');
+        return;
+      }
+      const snap = await getDocs(query(collection(db, 'userRoles'), where('userId', '==', userId)));
+      const ops = [];
+      snap.forEach(d => ops.push(deleteDoc(d.ref)));
+      ops.push(deleteDoc(doc(db, 'users', userId)));
+      await Promise.all(ops);
+      logAuditAction(auth.currentUser?.uid, 'deleteUser', userId);
+      loadUsers();
+    } catch (err) {
+      console.error('Failed to delete user', err);
+    }
+    return;
+  }
   const current = (userRolesMap[userId] || []).map(r => {
     if (r.projectId) return `${r.roleId}:${r.projectId}`;
     if (r.department) return `${r.roleId}@${r.department}`;
@@ -180,6 +205,21 @@ tbody.addEventListener('click', async e => {
   const input = prompt(`Assign roles (comma separated). Use role:projectId or role@department. Available roles: ${availableRoles.join(', ')}`, current);
   if (input === null) return;
   const roles = input.split(',').map(r => r.trim()).filter(Boolean);
+  const hadMaster = (userRolesMap[userId] || []).some(r => r.roleId === MASTER_ROLE);
+  let updatedRoles = [...roles];
+  if (updatedRoles.includes(MASTER_ROLE) && !window.currentUserRoles?.includes(MASTER_ROLE)) {
+    alert('Only Master Users can grant superAdmin role.');
+    updatedRoles = updatedRoles.filter(r => r !== MASTER_ROLE);
+  }
+  if (updatedRoles.includes(MASTER_ROLE) && !hadMaster) {
+    if (!confirm('Grant Master User privileges to this user?')) {
+      updatedRoles = updatedRoles.filter(r => r !== MASTER_ROLE);
+    }
+  }
+  if (hadMaster && !updatedRoles.includes(MASTER_ROLE)) {
+    alert('Master Users cannot lose the superAdmin role.');
+    updatedRoles.push(MASTER_ROLE);
+  }
   const dept = prompt('Department:', userDeptMap[userId] || '')
   if (dept === null) return;
   const team = prompt('Team:', userTeamMap[userId] || '')
@@ -189,7 +229,7 @@ tbody.addEventListener('click', async e => {
     const ops = [];
     snap.forEach(d => ops.push(deleteDoc(d.ref)));
 
-    roles.forEach(r => ops.push(addDoc(collection(db, 'userRoles'), { userId, roleId: r, assignedAt: new Date() })));
+    updatedRoles.forEach(r => ops.push(addDoc(collection(db, 'userRoles'), { userId, roleId: r, assignedAt: new Date() })));
     ops.push(updateDoc(doc(db, 'users', userId), { department: dept.trim() || null, team: team.trim() || null }));
     if (dept.trim()) {
       ops.push(setDoc(doc(db, 'departments', dept.trim()), { createdAt: new Date() }, { merge: true }));
@@ -201,7 +241,7 @@ tbody.addEventListener('click', async e => {
     }
 
     await Promise.all(ops);
-    logAuditAction(auth.currentUser?.uid, 'setUserRoles', userId, { roles });
+    logAuditAction(auth.currentUser?.uid, 'setUserRoles', userId, { roles: updatedRoles });
     loadUsers();
   } catch (err) {
     console.error('Failed to update roles', err);
