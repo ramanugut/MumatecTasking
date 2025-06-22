@@ -15,18 +15,23 @@ and always has full rights to manage other users.
 2. Initialize Firestore collections with `npm run init:collections` (requires a
    Firebase service account key). The script now provisions additional
    collections for comments, activity logs, attachments, and time tracking.
-3. Start the dev server using `npm run dev` (uses `serve` under the hood).
-4. Visit `login.html` to sign in with your admin credentials.
-5. If you do not have an account, use `signup.html` which will create a client
+3. Deploy the Cloud Functions in the `functions` directory. These handle
+   invitation and notification emails and require SMTP credentials configured
+   via environment variables (`SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`,
+   `SMTP_PASS`, and `SMTP_FROM`). Use `firebase deploy --only functions` after
+   running `npm install` within the `functions` folder.
+4. Start the dev server using `npm run dev` (uses `serve` under the hood).
+5. Visit `login.html` to sign in with your admin credentials.
+6. If you do not have an account, use `signup.html` which will create a client
    profile.
    You can also provide an invitation token during sign up to automatically
    assign a role and project.
-6. After signing in you will be redirected to `index.html` where you can manage
+7. After signing in you will be redirected to `index.html` where you can manage
    your tasks.
-7. Administrators can manage pending invitations via `invite.html`.
-8. Roles can be created in `roles-admin.html` and assigned to users through
+8. Administrators can manage pending invitations via `invite.html`.
+9. Roles can be created in `roles-admin.html` and assigned to users through
    `user-management.html`.
-9. Departments and teams can be edited in `departments.html`.
+10. Departments and teams can be edited in `departments.html`.
 
 Firebase is pre-configured with project **mumatectasking**. Update `firebase.js`
  if you need to change configuration.

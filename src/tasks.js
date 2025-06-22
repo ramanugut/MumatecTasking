@@ -2,7 +2,7 @@
 import { db } from '../firebase.js';
 import { generateId, escapeHtml as escapeHtmlUtil, parseCSVLine as parseCSVLineUtil, formatDate as formatDateUtil, debounce as debounceUtil, formatDuration as formatDurationUtil } from './utils.js';
 import { setupDragAndDrop, setupAutoScroll } from './ui.js';
-import { collection, setDoc, doc, deleteDoc, onSnapshot, getDocs, getDoc } from 'https://www.gstatic.com/firebasejs/11.9.0/firebase-firestore.js';
+import { collection, setDoc, doc, deleteDoc, onSnapshot, getDocs, getDoc, addDoc } from 'https://www.gstatic.com/firebasejs/11.9.0/firebase-firestore.js';
 class MumatecTaskManager {
     constructor() {
         this.tasks = [];
@@ -1951,10 +1951,11 @@ class MumatecTaskManager {
                 if (hoursDiff <= 2 && hoursDiff > 0) {
                     task.reminderSent = true;
                     this.saveTaskToFirestore(task);
-                    
+
                     const message = `"${task.title}" is due in ${Math.ceil(hoursDiff)} hour${Math.ceil(hoursDiff) !== 1 ? 's' : ''}`;
                     this.showNotification('Task Reminder', message, 'warning');
                     this.showSystemNotification('Mumatec Task Reminder', message);
+                    this.createNotification(window.currentUser.uid, 'taskReminder', task.id, message);
                 }
             }
         });
@@ -1989,6 +1990,22 @@ class MumatecTaskManager {
                 body,
                 icon: 'https://fonts.gstatic.com/s/i/materialicons/assignment/v1/24px.svg'
             });
+        }
+    }
+
+    async createNotification(recipientId, type, taskId, message) {
+        if (!db || !recipientId) return;
+        try {
+            await addDoc(collection(db, 'notifications'), {
+                recipientId,
+                type,
+                taskId: taskId || null,
+                message: message || '',
+                read: false,
+                createdAt: new Date()
+            });
+        } catch (err) {
+            console.error('Failed to create notification', err);
         }
     }
 
