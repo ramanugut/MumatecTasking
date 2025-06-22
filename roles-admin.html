@@ -42,7 +42,7 @@
   </div>
 
   <div class="modal-overlay" id="editRoleModal" aria-hidden="true">
-    <div class="task-modal">
+    <div class="task-modal large-modal">
       <div class="modal-header">
         <h3 id="editRoleTitle">Add Role</h3>
         <button class="close-btn" id="editRoleClose"><span class="material-icons">close</span></button>
@@ -57,8 +57,11 @@
           <input type="text" id="roleDesc">
         </div>
         <div class="form-field">
-          <label>Permissions (comma separated)</label>
-          <input type="text" id="rolePerms">
+          <label>Permissions</label>
+          <div style="display:flex;gap:8px;align-items:center;">
+            <input type="text" id="rolePerms" readonly>
+            <button type="button" class="action-btn secondary small" id="editPermsBtn">Edit</button>
+          </div>
         </div>
         <div class="form-field">
           <label>Parent Role</label>
@@ -69,6 +72,23 @@
           <button type="submit" class="quick-btn primary">Save</button>
         </div>
       </form>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="permissionsModal" aria-hidden="true">
+    <div class="task-modal large-modal">
+      <div class="modal-header">
+        <h3>Edit Permissions</h3>
+        <button class="close-btn" id="permClose"><span class="material-icons">close</span></button>
+      </div>
+      <div class="form-field">
+        <label><input type="checkbox" id="permSelectAll"> Select All</label>
+      </div>
+      <div id="permissionsContainer" class="permissions-container"></div>
+      <div class="quick-actions">
+        <button type="button" class="quick-btn secondary" id="permCancel">Cancel</button>
+        <button type="button" class="quick-btn primary" id="permSave">Save</button>
+      </div>
     </div>
   </div>
 

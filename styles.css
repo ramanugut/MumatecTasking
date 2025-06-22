@@ -1414,6 +1414,35 @@ body {
     color: var(--text-primary);
 }
 
+.large-modal {
+    width: 95%;
+    max-width: 800px;
+}
+
+.permissions-container {
+    max-height: 60vh;
+    overflow-y: auto;
+    padding: 8px 0;
+}
+
+.perm-group {
+    margin-bottom: 16px;
+}
+
+.perm-group-header {
+    font-weight: 600;
+    margin-bottom: 4px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.perm-group label {
+    display: block;
+    margin-left: 20px;
+    font-size: 14px;
+}
+
 /* Insights Modal */
 .insights-modal {
     background: var(--background);
@@ -1851,6 +1880,10 @@ body {
         max-width: none;
         height: 100%;
         border-radius: 0;
+    }
+    .large-modal {
+        width: 100%;
+        max-width: none;
     }
 }
 
