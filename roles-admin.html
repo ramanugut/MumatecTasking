@@ -44,5 +44,12 @@
   <script type="module" src="firebase.js"></script>
   <script type="module" src="auth.js"></script>
   <script type="module" src="roles-admin.js"></script>
+  <script>
+    if (window.self !== window.top) {
+      const header = document.querySelector('.top-bar');
+      if (header) header.remove();
+      document.documentElement.style.setProperty('--top-bar-height', '0px');
+    }
+  </script>
 </body>
 </html>
