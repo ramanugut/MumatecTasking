@@ -88,6 +88,8 @@ class MumatecTaskManager {
             month: 'long',
             day: 'numeric'
         });
+
+        this.setupRoleLinks();
     }
 
     // Data Management
@@ -2300,6 +2302,16 @@ class MumatecTaskManager {
                 btn.setAttribute('aria-expanded', String(!collapsed));
             }
         }
+    }
+
+    setupRoleLinks() {
+        const links = document.querySelectorAll('.role-link');
+        links.forEach(link => {
+            const role = link.dataset.role || '';
+            const roles = role.split(',').map(r => r.trim()).filter(Boolean);
+            const visible = roles.some(r => window.currentUserRoles?.includes(r));
+            link.style.display = visible ? 'block' : 'none';
+        });
     }
 
     loadQuickNotes() {

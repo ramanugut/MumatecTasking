@@ -51,6 +51,8 @@ onAuthStateChanged(auth, async (user) => {
     }
     const nameEl = document.getElementById('userName');
     if (nameEl && name) nameEl.textContent = name;
+    const roleEl = document.getElementById('userRole');
+    if (roleEl && roles.length) roleEl.textContent = roles.join(', ');
     if (typeof window.initTodoApp === 'function') {
       window.initTodoApp();
     }
