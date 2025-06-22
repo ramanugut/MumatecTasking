@@ -1266,6 +1266,11 @@ body {
     display: flex;
 }
 
+/* Ensure dropdown text in modals remains visible */
+.modal-overlay select option {
+    color: #000;
+}
+
 .quick-capture-modal {
     background: var(--background);
     border-radius: var(--border-radius-lg);
