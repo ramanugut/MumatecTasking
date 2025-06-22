@@ -1,7 +1,7 @@
 import { auth, db } from './firebase.js';
 import { logAuditAction } from './auth.js';
 import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/11.9.0/firebase-auth.js';
-import { collection, getDocs, setDoc, doc, getDoc } from 'https://www.gstatic.com/firebasejs/11.9.0/firebase-firestore.js';
+import { collection, getDocs, setDoc, doc, getDoc, deleteDoc } from 'https://www.gstatic.com/firebasejs/11.9.0/firebase-firestore.js';
 
 const PERMISSION_GROUPS = {
   'User Management Rights': [
@@ -186,7 +186,6 @@ async function populateParentRoles(excludeId) {
 async function showEditModal(id) {
   editingRoleId = id || null;
   roleForm.reset();
-  roleNameInput.disabled = !!id;
   await populateParentRoles(id);
   if (id) {
     const snap = await getDoc(doc(db, 'roles', id));
@@ -255,9 +254,20 @@ roleForm.addEventListener('submit', async e => {
   const permsInput = rolePermsInput.value;
   const parentRole = roleParentSelect.value;
   const permissions = permsInput.split(',').map(p => p.trim()).filter(Boolean);
-  await setDoc(doc(db, 'roles', name), { description: desc, permissions, parentRole }, { merge: true });
-  const action = editingRoleId ? 'updateRole' : 'createRole';
-  logAuditAction(auth.currentUser?.uid, action, name, { description: desc, permissions, parentRole });
+  let action = 'createRole';
+  if (editingRoleId) {
+    if (editingRoleId !== name) {
+      await setDoc(doc(db, 'roles', name), { description: desc, permissions, parentRole }, { merge: true });
+      await deleteDoc(doc(db, 'roles', editingRoleId));
+      action = 'renameRole';
+    } else {
+      await setDoc(doc(db, 'roles', name), { description: desc, permissions, parentRole }, { merge: true });
+      action = 'updateRole';
+    }
+  } else {
+    await setDoc(doc(db, 'roles', name), { description: desc, permissions, parentRole }, { merge: true });
+  }
+  logAuditAction(auth.currentUser?.uid, action, name, { description: desc, permissions, parentRole, previousId: editingRoleId && editingRoleId !== name ? editingRoleId : null });
   closeModal(editRoleModal);
   loadRoles();
 });
