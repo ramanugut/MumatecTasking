@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Guest Portal - Mumatec Tasking</title>
+  <script>
+  if (localStorage.getItem('mumatecTheme') === 'dark') {
+    document.documentElement.classList.add('dark-mode');
+  }
+  </script>
+  <link id="styleLink" rel="stylesheet" href="styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <script src="style.js"></script>
+  <script>applySavedTheme(); window.REQUIRED_ROLES = ['guest'];</script>
+</head>
+<body>
+  <header class="top-bar">
+    <div class="top-bar-left">
+      <a href="index.html" class="action-btn secondary" aria-label="Back to dashboard"><span class="material-icons">arrow_back</span></a>
+      <h1 class="page-title">Guest Portal</h1>
+    </div>
+    <div class="top-bar-right">
+      <div class="user-info" id="userInfo">
+        <div class="user-avatar" id="userAvatar"><span class="material-icons">person</span></div>
+        <div class="profile-dropdown" id="profileDropdown">
+          <button id="themeToggle" class="dropdown-btn"><span class="material-icons">dark_mode</span></button>
+          <a href="profile.html" class="dropdown-btn"><span class="material-icons">person</span> Profile</a>
+          <button class="dropdown-btn" onclick="logout()">Logout</button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="app-container">
+    <div class="main-content">
+      <div class="content-area" style="padding:20px;">
+        <p>This read-only view is provided for guests.</p>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="firebase.js"></script>
+  <script type="module" src="auth.js"></script>
+</body>
+</html>
