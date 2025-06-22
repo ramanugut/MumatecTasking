@@ -41,6 +41,37 @@
     </div>
   </div>
 
+  <div class="modal-overlay" id="editRoleModal" aria-hidden="true">
+    <div class="task-modal">
+      <div class="modal-header">
+        <h3 id="editRoleTitle">Add Role</h3>
+        <button class="close-btn" id="editRoleClose"><span class="material-icons">close</span></button>
+      </div>
+      <form id="roleForm">
+        <div class="form-field">
+          <label>Role Name</label>
+          <input type="text" id="roleName" required>
+        </div>
+        <div class="form-field">
+          <label>Description</label>
+          <input type="text" id="roleDesc">
+        </div>
+        <div class="form-field">
+          <label>Permissions (comma separated)</label>
+          <input type="text" id="rolePerms">
+        </div>
+        <div class="form-field">
+          <label>Parent Role</label>
+          <select id="roleParent"></select>
+        </div>
+        <div class="quick-actions">
+          <button type="button" class="quick-btn secondary" id="roleCancel">Cancel</button>
+          <button type="submit" class="quick-btn primary">Save</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <script type="module" src="firebase.js"></script>
   <script type="module" src="auth.js"></script>
   <script type="module" src="roles-admin.js"></script>
