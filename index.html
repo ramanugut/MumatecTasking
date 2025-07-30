@@ -17,7 +17,7 @@
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <script src="check-environment.js"></script>
     <script src="style.js"></script>
-    <script>applySavedTheme();</script>
+    <script>applySavedTheme();applySavedDesignSystem();</script>
 </head>
 <body>
     <div id="loadingOverlay" class="loading-overlay" style="display:none;">Loading...</div>
@@ -51,6 +51,11 @@
                 </div>
                 <div class="profile-dropdown" id="profileDropdown">
                     <button id="themeToggle" class="dropdown-btn"><span class="material-icons">dark_mode</span></button>
+                    <select id="designSelect" class="dropdown-select" onchange="changeDesignSystem(this.value)">
+                        <option value="apple">Apple</option>
+                        <option value="material">Google</option>
+                        <option value="samsung">Samsung</option>
+</select>
                     <button class="dropdown-btn" onclick="document.getElementById('csvImport').click()">
                         <span class="material-icons">file_upload</span> Import
                     </button>

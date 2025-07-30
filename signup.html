@@ -15,7 +15,7 @@
   <link href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css" rel="stylesheet">
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
   <script src="style.js"></script>
-  <script>applySavedTheme();</script>
+  <script>applySavedTheme();applySavedDesignSystem();</script>
 </head>
 <body class="auth-page">
   <div class="auth-container">
@@ -67,10 +67,10 @@
       </div>
       <div class="input-field">
         <select id="status" class="browser-default">
-        <option value="online">Online</option>
-        <option value="offline">Offline</option>
-        <option value="away">Away</option>
-        <option value="busy">Busy</option>
+                            <option value="online">Online</option>
+                            <option value="offline">Offline</option>
+                            <option value="away">Away</option>
+                            <option value="busy">Busy</option>
       </select>
         <label for="status">Status</label>
       </div>
