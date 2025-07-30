@@ -13,6 +13,7 @@
     <link id="styleLink" rel="stylesheet" href="styles.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <script src="check-environment.js"></script>
     <script src="style.js"></script>
@@ -23,7 +24,7 @@
     <!-- Sticky Header -->
     <header class="top-bar" id="mainHeader">
         <div class="top-bar-left">
-            <button id="sidebarToggle" class="action-btn secondary" aria-label="Toggle navigation menu" aria-expanded="true"><span class="material-icons">menu</span></button>
+            <button id="sidebarToggle" class="btn-flat waves-effect" aria-label="Toggle navigation menu" aria-expanded="true"><span class="material-icons">menu</span></button>
             <h1 class="page-title" id="pageTitle">Mumatec Tasking</h1>
 
         </div>
@@ -39,7 +40,7 @@
         </div>
 
         <div class="top-bar-right">
-            <button class="action-btn primary" onclick="todoApp.openAddTaskModal()">
+            <button class="btn waves-effect waves-light" onclick="todoApp.openAddTaskModal()">
                 <span class="material-icons">add</span> New Task
             </button>
             <div class="user-info" id="userInfo">
@@ -494,6 +495,8 @@
             </div>
         </div>
     </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    <script>M.AutoInit();</script>
 
     <!-- File Input -->
     <input type="file" id="csvImport" accept=".csv" style="display: none;">

@@ -12,6 +12,7 @@
   <link id="styleLink" rel="stylesheet" href="styles.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css" rel="stylesheet">
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
   <script src="style.js"></script>
   <script>applySavedTheme();</script>
@@ -19,19 +20,21 @@
 <body class="auth-page">
   <div class="auth-container">
     <h2>Reset Password</h2>
-    <form id="resetForm">
-      <div class="form-field">
+    <form id="resetForm" class="container">
+      <div class="input-field">
+        <input type="email" id="email" class="validate" required />
         <label for="email">Email</label>
-        <input type="email" id="email" required />
       </div>
-      <button type="submit" class="action-btn primary">Send Reset Email</button>
+      <button type="submit" class="btn waves-effect waves-light">Send Reset Email</button>
       <div id="msg" class="error"></div>
     </form>
     <p style="text-align:center;margin-top:0.5rem;">
       <a href="login.html">Back to login</a>
     </p>
   </div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
   <script type="module" src="firebase.js"></script>
   <script type="module" src="reset.js"></script>
+  <script>M.AutoInit();</script>
 </body>
 </html>

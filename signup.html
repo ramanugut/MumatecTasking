@@ -12,6 +12,7 @@
   <link id="styleLink" rel="stylesheet" href="styles.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css" rel="stylesheet">
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
   <script src="style.js"></script>
   <script>applySavedTheme();</script>
@@ -19,70 +20,82 @@
 <body class="auth-page">
   <div class="auth-container">
     <h2>Create Account</h2>
-    <form id="signupForm">
-      <div class="form-field">
+    <form id="signupForm" class="container">
+      <div class="input-field">
+        <input type="text" id="name" class="validate" required />
         <label for="name">Name</label>
-        <input type="text" id="name" required />
       </div>
-      <div class="form-field">
+      <div class="input-field">
+        <input type="email" id="email" class="validate" required />
         <label for="email">Email</label>
-        <input type="email" id="email" required />
       </div>
-      <div class="form-field">
+      <div class="input-field">
+        <input type="password" id="password" class="validate" required />
         <label for="password">Password</label>
-        <input type="password" id="password" required />
       </div>
-      <div class="form-field">
+      <div class="input-field">
+        <input type="text" id="inviteToken" class="validate" />
         <label for="inviteToken">Invitation token (optional)</label>
-        <input type="text" id="inviteToken" />
       </div>
-      <div class="form-field">
+      <div class="input-field">
+        <input type="text" id="photoURL" class="validate" />
         <label for="photoURL">Profile picture URL (optional)</label>
-        <input type="text" id="photoURL" />
       </div>
-      <div class="form-field">
+      <div class="input-field">
+        <input type="text" id="jobTitle" class="validate" />
         <label for="jobTitle">Job title</label>
-        <input type="text" id="jobTitle" />
       </div>
-      <div class="form-field">
+      <div class="input-field">
+        <input type="text" id="department" class="validate" />
         <label for="department">Department</label>
-        <input type="text" id="department" />
       </div>
-      <div class="form-field">
+      <div class="input-field">
+        <input type="text" id="team" class="validate" />
         <label for="team">Team</label>
-        <input type="text" id="team" />
       </div>
-      <div class="form-field">
+      <div class="input-field">
+        <input type="tel" id="phone" class="validate" />
         <label for="phone">Phone</label>
-        <input type="tel" id="phone" />
       </div>
-      <div class="form-field">
+      <div class="input-field">
+        <input type="text" id="timezone" class="validate" />
         <label for="timezone">Timezone</label>
-        <input type="text" id="timezone" />
       </div>
-      <div class="form-field">
+      <div class="input-field">
+        <input type="text" id="skills" class="validate" />
         <label for="skills">Skills (comma separated)</label>
-        <input type="text" id="skills" />
       </div>
-      <div class="form-field">
-        <label for="status">Status</label>
-        <select id="status">
+      <div class="input-field">
+        <select id="status" class="browser-default">
         <option value="online">Online</option>
         <option value="offline">Offline</option>
         <option value="away">Away</option>
         <option value="busy">Busy</option>
       </select>
+        <label for="status">Status</label>
       </div>
-      <label><input type="checkbox" id="emailNotif" checked /> Email notifications</label>
-      <label><input type="checkbox" id="pushNotif" /> Push notifications</label>
-      <button type="submit" class="action-btn primary">Sign Up</button>
+      <p>
+        <label>
+          <input type="checkbox" id="emailNotif" checked />
+          <span>Email notifications</span>
+        </label>
+      </p>
+      <p>
+        <label>
+          <input type="checkbox" id="pushNotif" />
+          <span>Push notifications</span>
+        </label>
+      </p>
+      <button type="submit" class="btn waves-effect waves-light">Sign Up</button>
       <div id="error" class="error"></div>
     </form>
     <p style="text-align:center;margin-top:0.5rem;">
       <a href="login.html">Already have an account? Login</a>
     </p>
   </div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
   <script type="module" src="firebase.js"></script>
   <script type="module" src="signup.js"></script>
+  <script>M.AutoInit();</script>
 </body>
 </html>

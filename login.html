@@ -12,6 +12,7 @@
   <link id="styleLink" rel="stylesheet" href="styles.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css" rel="stylesheet">
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
   <script src="check-environment.js"></script>
   <script src="style.js"></script>
@@ -20,25 +21,25 @@
 <body class="auth-page">
   <div class="auth-container">
     <h2>Admin Login</h2>
-    <form id="loginForm">
-      <div class="form-field">
+    <form id="loginForm" class="container">
+      <div class="input-field">
+        <input type="email" id="email" class="validate" required />
         <label for="email">Email</label>
-        <input type="email" id="email" required />
       </div>
-      <div class="form-field">
+      <div class="input-field">
+        <input type="password" id="password" class="validate" required />
         <label for="password">Password</label>
-        <input type="password" id="password" required />
       </div>
-      <button type="submit" class="action-btn primary">Login</button>
+      <button type="submit" class="btn waves-effect waves-light">Login</button>
       <div id="error" class="error"></div>
     </form>
     <div id="totpContainer" style="display:none;">
-      <form id="totpForm">
-        <div class="form-field">
+      <form id="totpForm" class="container">
+        <div class="input-field">
+          <input type="text" id="totpCode" autocomplete="one-time-code" class="validate" required />
           <label for="totpCode">Authentication code</label>
-          <input type="text" id="totpCode" autocomplete="one-time-code" required />
         </div>
-        <button type="submit" class="action-btn primary">Verify</button>
+        <button type="submit" class="btn waves-effect waves-light">Verify</button>
         <div id="totpError" class="error"></div>
       </form>
     </div>
@@ -47,7 +48,9 @@
       <a href="reset.html">Forgot password?</a>
     </p>
   </div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
   <script type="module" src="firebase.js"></script>
   <script type="module" src="login.js"></script>
+  <script>M.AutoInit();</script>
 </body>
 </html>
