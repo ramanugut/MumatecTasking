@@ -7,41 +7,39 @@
 }
 
 :root {
-    /* Modern Apple Color Palette */
-    --primary-blue: #24a1c6;
-    --primary-blue-hover: #4db8d9;
-    --secondary-blue: #0e5077;
+    /* Core color palette */
+    --primary-blue: #1e88e5;
+    --primary-blue-hover: #1565c0;
+    --secondary-blue: #0d47a1;
     --success-green: #10b981;
-    --warning-orange: #FF9500;
-    --warning-yellow: #FFD60A;
-    --error-red: #FF3B30;
-    --critical-red: #B00020;
-    --purple: #AF52DE;
-    
+    --warning-orange: #f59e0b;
+    --warning-yellow: #facc15;
+    --error-red: #ef4444;
+    --critical-red: #b91c1c;
+    --purple: #8b5cf6;
+
     /* Neutral Colors */
-    --gray-50: #F9F9F9;
-    --gray-100: #F2F2F2;
-    --gray-200: #E5E5E5;
-    --gray-300: #D1D1D1;
-    --gray-400: #A1A1A1;
-    --gray-500: #737373;
-    --gray-600: #525252;
-    --gray-700: #404040;
-    --gray-800: #262626;
-    --gray-900: #171717;
-    
+    --gray-50: #f8fafc;
+    --gray-100: #f1f5f9;
+    --gray-200: #e2e8f0;
+    --gray-300: #cbd5e1;
+    --gray-400: #94a3b8;
+    --gray-500: #64748b;
+    --gray-600: #475569;
+    --gray-700: #334155;
+    --gray-800: #1e293b;
+    --gray-900: #0f172a;
+
     /* Semantic Colors */
-    --background: rgba(255, 255, 255, 0.7);
-    --surface: radial-gradient(circle at 20% 20%, rgba(36, 161, 198, 0.1) 0%, transparent 50%),
-               radial-gradient(circle at 80% 80%, rgba(14, 80, 119, 0.08) 0%, transparent 50%),
-               linear-gradient(135deg, #f0f7fa 0%, #e6f3f8 50%, #ddeef5 100%);
-    --surface-secondary: rgba(255, 255, 255, 0.5);
-    --text-primary: #06315e;
-    --text-secondary: #5a7a8a;
-    --text-tertiary: #7d9aaa;
-    --border: rgba(255, 255, 255, 0.9);
-    --shadow: rgba(14, 80, 119, 0.05);
-    --shadow-hover: rgba(14, 80, 119, 0.12);
+    --background: var(--gray-50);
+    --surface: #ffffff;
+    --surface-secondary: var(--gray-100);
+    --text-primary: var(--gray-800);
+    --text-secondary: var(--gray-600);
+    --text-tertiary: var(--gray-500);
+    --border: var(--gray-200);
+    --shadow: rgba(15, 23, 42, 0.04);
+    --shadow-hover: rgba(15, 23, 42, 0.1);
     
     /* Layout */
     --sidebar-width: 280px;
@@ -75,21 +73,25 @@
 
 html.material-theme {
     --primary-blue: #1a73e8;
-    --primary-blue-hover: #1765d1;
+    --primary-blue-hover: #165dc2;
     --surface: #ffffff;
-    --surface-secondary: #f5f5f5;
+    --surface-secondary: #f1f3f4;
     --text-primary: #202124;
     --text-secondary: #5f6368;
+    --text-tertiary: #7c7c7c;
+    --border: #dadce0;
     --font-system: 'Roboto', sans-serif;
 }
 
 html.samsung-theme {
     --primary-blue: #1428a0;
     --primary-blue-hover: #1a47d0;
-    --surface: #f7f8fa;
-    --surface-secondary: #ffffff;
+    --surface: #ffffff;
+    --surface-secondary: #f5f7fa;
     --text-primary: #000000;
     --text-secondary: #555555;
+    --text-tertiary: #777777;
+    --border: #e5e7eb;
     --font-system: 'Segoe UI', sans-serif;
 }
 
@@ -99,7 +101,7 @@ html.apple-theme {
 
 body {
     font-family: var(--font-system);
-    background: var(--surface);
+    background: var(--background);
     color: var(--text-primary);
     overflow: hidden;
     -webkit-font-smoothing: antialiased;
@@ -143,9 +145,8 @@ body {
 /* Sidebar */
 .sidebar {
     width: var(--sidebar-width);
-    background: var(--background);
+    background: var(--surface);
     border-right: 1px solid var(--border);
-    backdrop-filter: blur(15px);
     display: flex;
     flex-direction: column;
     overflow: hidden;
@@ -312,8 +313,8 @@ body {
 }
 
 .nav-item:hover {
-    background: var(--gray-100);
-    color: var(--primary-blue);
+    background: var(--surface-secondary);
+    color: var(--text-primary);
 }
 
 .nav-item.active {
@@ -439,9 +440,9 @@ body {
     left: 0;
     width: 100%;
     height: var(--top-bar-height);
-    background: var(--background);
+    background: var(--surface);
     border-bottom: 1px solid var(--border);
-    backdrop-filter: blur(20px);
+    box-shadow: 0 1px 2px var(--shadow);
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -451,7 +452,7 @@ body {
 }
 
 .top-bar.sticky-active {
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 2px 4px var(--shadow-hover);
 }
 
 .top-bar-left {
@@ -603,19 +604,20 @@ body {
 }
 
 .stat-card {
-    background: var(--background);
+    background: var(--surface);
     border: 1px solid var(--border);
     border-radius: var(--border-radius);
-    padding: 12px;
+    padding: 16px;
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 12px;
+    box-shadow: 0 1px 2px var(--shadow);
     transition: var(--transition);
 }
 
 .stat-card:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 25px var(--shadow-hover);
+    box-shadow: 0 4px 12px var(--shadow-hover);
 }
 
 .stat-icon {
@@ -665,7 +667,7 @@ body {
 }
 
 .kanban-column {
-    background: var(--background);
+    background: var(--surface);
     border: 1px solid var(--border);
     border-radius: var(--border-radius);
     display: flex;
@@ -674,7 +676,7 @@ body {
     flex: 0 0 var(--kanban-column-width);
     min-width: var(--kanban-column-width);
     position: relative;
-    box-shadow: 0 1px 3px var(--shadow);
+    box-shadow: 0 1px 2px var(--shadow);
 }
 
 .kanban-column:not(:last-child)::after {
