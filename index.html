@@ -24,7 +24,7 @@
     <!-- Sticky Header -->
     <header class="top-bar" id="mainHeader">
         <div class="top-bar-left">
-            <button id="sidebarToggle" class="btn-flat waves-effect" aria-label="Toggle navigation menu" aria-expanded="true"><span class="material-icons">menu</span></button>
+            <button id="sidebarToggle" class="btn-flat waves-effect" aria-label="Toggle navigation menu" aria-expanded="true" aria-controls="sidebar" type="button"><span class="material-icons" aria-hidden="true">menu</span></button>
             <h1 class="page-title" id="pageTitle">Mumatec Tasking</h1>
 
         </div>
@@ -34,61 +34,61 @@
 
                 <input type="text" class="search-input" id="searchInput" placeholder="Search tasks..." aria-label="Search tasks">
 
-                <span class="material-icons search-icon">search</span>
+                <span class="material-icons search-icon" aria-hidden="true">search</span>
             </div>
             
         </div>
 
         <div class="top-bar-right">
-            <button class="btn waves-effect waves-light" onclick="todoApp.openAddTaskModal()">
-                <span class="material-icons">add</span> New Task
+            <button class="btn waves-effect waves-light" onclick="todoApp.openAddTaskModal()" type="button">
+                <span class="material-icons" aria-hidden="true">add</span> New Task
             </button>
             <div class="user-info" id="userInfo">
-                <div class="user-avatar" id="userAvatar"><span class="material-icons">person</span></div>
+                <div class="user-avatar" id="userAvatar"><span class="material-icons" aria-hidden="true">person</span></div>
                 <div class="user-details">
                     <div class="user-name" id="userName">User</div>
                     <div class="user-role" id="userRole">&nbsp;</div>
                 </div>
                 <div class="profile-dropdown" id="profileDropdown">
-                    <button id="themeToggle" class="dropdown-btn"><span class="material-icons">dark_mode</span></button>
+                    <button id="themeToggle" class="dropdown-btn" type="button"><span class="material-icons" aria-hidden="true">dark_mode</span></button>
                     <select id="designSelect" class="dropdown-select" onchange="changeDesignSystem(this.value)">
                         <option value="apple">Apple</option>
                         <option value="material">Google</option>
                         <option value="samsung">Samsung</option>
 </select>
-                    <button class="dropdown-btn" onclick="document.getElementById('csvImport').click()">
-                        <span class="material-icons">file_upload</span> Import
+                    <button class="dropdown-btn" onclick="document.getElementById('csvImport').click()" type="button">
+                        <span class="material-icons" aria-hidden="true">file_upload</span> Import
                     </button>
                     <a href="profile.html" class="dropdown-btn">
-                        <span class="material-icons">person</span> Profile
+                        <span class="material-icons" aria-hidden="true">person</span> Profile
                     </a>
                     <a href="user-management.html" class="dropdown-btn">
-                        <span class="material-icons">manage_accounts</span> User Management
+                        <span class="material-icons" aria-hidden="true">manage_accounts</span> User Management
                     </a>
                     <a href="project-dashboard.html" class="dropdown-btn role-link" data-role="projectManager">
-                        <span class="material-icons">dashboard</span> Project Dashboard
+                        <span class="material-icons" aria-hidden="true">dashboard</span> Project Dashboard
                     </a>
                     <a href="team-lead.html" class="dropdown-btn role-link" data-role="teamLead">
-                        <span class="material-icons">groups</span> Team Lead Tools
+                        <span class="material-icons" aria-hidden="true">groups</span> Team Lead Tools
                     </a>
                     <a href="developer-tools.html" class="dropdown-btn role-link" data-role="developer">
-                        <span class="material-icons">code</span> Developer Tools
+                        <span class="material-icons" aria-hidden="true">code</span> Developer Tools
                     </a>
                     <a href="designer-hub.html" class="dropdown-btn role-link" data-role="designer">
-                        <span class="material-icons">brush</span> Designer Hub
+                        <span class="material-icons" aria-hidden="true">brush</span> Designer Hub
                     </a>
                     <a href="client-portal.html" class="dropdown-btn role-link" data-role="client">
-                        <span class="material-icons">business</span> Client Portal
+                        <span class="material-icons" aria-hidden="true">business</span> Client Portal
                     </a>
                     <a href="guest-portal.html" class="dropdown-btn role-link" data-role="guest">
-                        <span class="material-icons">visibility</span> Guest Portal
+                        <span class="material-icons" aria-hidden="true">visibility</span> Guest Portal
                     </a>
-                    <button class="dropdown-btn" onclick="logout()">Logout</button>
+                    <button class="dropdown-btn" onclick="logout()" type="button">Logout</button>
                 </div>
             </div>
             <div class="view-controls">
-                <button class="view-btn active material-icons" data-view="kanban" aria-label="Kanban view" aria-pressed="true">view_kanban</button>
-                <button class="view-btn material-icons" data-view="list" aria-label="List view" aria-pressed="false">view_list</button>
+                <button class="view-btn active" data-view="kanban" aria-label="Kanban view" aria-pressed="true" type="button"><span class="material-icons" aria-hidden="true">view_kanban</span></button>
+                <button class="view-btn" data-view="list" aria-label="List view" aria-pressed="false" type="button"><span class="material-icons" aria-hidden="true">view_list</span></button>
             </div>
         </div>
     </header>
@@ -96,28 +96,28 @@
     <!-- App Shell -->
     <div class="app-container">
         <!-- Sidebar -->
-        <div class="sidebar">
+        <div class="sidebar" id="sidebar">
 
 
             <div class="sidebar-nav">
                 <div class="nav-section">
                     <div class="nav-item active" data-view="dashboard" aria-label="Mumatec Tasking">
-                        <span class="material-icons nav-icon">dashboard</span>
+                        <span class="material-icons nav-icon" aria-hidden="true">dashboard</span>
                         <span class="nav-label">Mumatec Tasking</span>
                         <span class="nav-count" id="dashboardCount">0</span>
                     </div>
                     <div class="nav-item" data-view="today" aria-label="Today">
-                        <span class="material-icons nav-icon">today</span>
+                        <span class="material-icons nav-icon" aria-hidden="true">today</span>
                         <span class="nav-label">Today</span>
                         <span class="nav-count" id="todayCount">0</span>
                     </div>
                     <div class="nav-item" data-view="upcoming" aria-label="Upcoming">
-                        <span class="material-icons nav-icon">schedule</span>
+                        <span class="material-icons nav-icon" aria-hidden="true">schedule</span>
                         <span class="nav-label">Upcoming</span>
                         <span class="nav-count" id="upcomingCount">0</span>
                     </div>
                     <div class="nav-item" data-view="completed" aria-label="Completed">
-                        <span class="material-icons nav-icon">check_circle</span>
+                        <span class="material-icons nav-icon" aria-hidden="true">check_circle</span>
                         <span class="nav-label">Completed</span>
                         <span class="nav-count" id="completedNavCount">0</span>
                     </div>
@@ -135,11 +135,11 @@
 
                 <div class="nav-section">
                     <div class="nav-item" onclick="todoApp.openQuickCapture()" aria-label="Quick Capture">
-                        <span class="material-icons nav-icon">flash_on</span>
+                        <span class="material-icons nav-icon" aria-hidden="true">flash_on</span>
                         <span class="nav-label">Quick Capture</span>
                     </div>
                     <div class="nav-item" onclick="todoApp.exportToCSV()" aria-label="Export Data">
-                        <span class="material-icons nav-icon">file_download</span>
+                        <span class="material-icons nav-icon" aria-hidden="true">file_download</span>
                         <span class="nav-label">Export Data</span>
                     </div>
                 </div>
@@ -195,13 +195,13 @@
                                     <div class="column-title">Todo</div>
                                     <div class="column-count" id="todoCount">0</div>
                                     <div class="column-controls">
-                                        <button class="move-btn move-col" data-status="todo" data-direction="left" aria-label="Move column left"><span class="material-icons">arrow_left</span></button>
-                                        <button class="move-btn move-col" data-status="todo" data-direction="right" aria-label="Move column right"><span class="material-icons">arrow_right</span></button>
+                                        <button class="move-btn move-col" data-status="todo" data-direction="left" aria-label="Move column left" type="button"><span class="material-icons" aria-hidden="true">arrow_left</span></button>
+                                        <button class="move-btn move-col" data-status="todo" data-direction="right" aria-label="Move column right" type="button"><span class="material-icons" aria-hidden="true">arrow_right</span></button>
                                     </div>
                                 </div>
                                 <div class="column-content" id="todoBoard">
                                     <div class="add-task-card" onclick="todoApp.openAddTaskModal('todo')">
-                                        <span class="material-icons add-icon">add</span>
+                                        <span class="material-icons add-icon" aria-hidden="true">add</span>
 
                                         <span>Add task</span>
 
@@ -214,13 +214,13 @@
                                     <div class="column-title">In Progress</div>
                                     <div class="column-count" id="inprogressCount">0</div>
                                     <div class="column-controls">
-                                        <button class="move-btn move-col" data-status="inprogress" data-direction="left" aria-label="Move column left"><span class="material-icons">arrow_left</span></button>
-                                        <button class="move-btn move-col" data-status="inprogress" data-direction="right" aria-label="Move column right"><span class="material-icons">arrow_right</span></button>
+                                        <button class="move-btn move-col" data-status="inprogress" data-direction="left" aria-label="Move column left" type="button"><span class="material-icons" aria-hidden="true">arrow_left</span></button>
+                                        <button class="move-btn move-col" data-status="inprogress" data-direction="right" aria-label="Move column right" type="button"><span class="material-icons" aria-hidden="true">arrow_right</span></button>
                                     </div>
                                 </div>
                                 <div class="column-content" id="inprogressBoard">
                                     <div class="add-task-card" onclick="todoApp.openAddTaskModal('inprogress')">
-                                        <span class="material-icons add-icon">add</span>
+                                        <span class="material-icons add-icon" aria-hidden="true">add</span>
 
                                         <span>Add task</span>
                                     </div>
@@ -232,13 +232,13 @@
                                     <div class="column-title">Done</div>
                                     <div class="column-count" id="doneCount">0</div>
                                     <div class="column-controls">
-                                        <button class="move-btn move-col" data-status="done" data-direction="left" aria-label="Move column left"><span class="material-icons">arrow_left</span></button>
-                                        <button class="move-btn move-col" data-status="done" data-direction="right" aria-label="Move column right"><span class="material-icons">arrow_right</span></button>
+                                        <button class="move-btn move-col" data-status="done" data-direction="left" aria-label="Move column left" type="button"><span class="material-icons" aria-hidden="true">arrow_left</span></button>
+                                        <button class="move-btn move-col" data-status="done" data-direction="right" aria-label="Move column right" type="button"><span class="material-icons" aria-hidden="true">arrow_right</span></button>
                                     </div>
                                 </div>
                                 <div class="column-content" id="doneBoard">
                                     <div class="add-task-card" onclick="todoApp.openAddTaskModal('done')">
-                                        <span class="material-icons add-icon">add</span>
+                                        <span class="material-icons add-icon" aria-hidden="true">add</span>
 
                                         <span>Add task</span>
 
@@ -251,13 +251,13 @@
                                     <div class="column-title">Under Review</div>
                                     <div class="column-count" id="reviewCount">0</div>
                                     <div class="column-controls">
-                                        <button class="move-btn move-col" data-status="review" data-direction="left" aria-label="Move column left"><span class="material-icons">arrow_left</span></button>
-                                        <button class="move-btn move-col" data-status="review" data-direction="right" aria-label="Move column right"><span class="material-icons">arrow_right</span></button>
+                                        <button class="move-btn move-col" data-status="review" data-direction="left" aria-label="Move column left" type="button"><span class="material-icons" aria-hidden="true">arrow_left</span></button>
+                                        <button class="move-btn move-col" data-status="review" data-direction="right" aria-label="Move column right" type="button"><span class="material-icons" aria-hidden="true">arrow_right</span></button>
                                     </div>
                                 </div>
                                 <div class="column-content" id="reviewBoard">
                                     <div class="add-task-card" onclick="todoApp.openAddTaskModal('review')">
-                                        <span class="material-icons add-icon">add</span>
+                                        <span class="material-icons add-icon" aria-hidden="true">add</span>
 
                                         <span>Add task</span>
 
@@ -270,13 +270,13 @@
                                     <div class="column-title">Blocked</div>
                                     <div class="column-count" id="blockedCount">0</div>
                                     <div class="column-controls">
-                                        <button class="move-btn move-col" data-status="blocked" data-direction="left" aria-label="Move column left"><span class="material-icons">arrow_left</span></button>
-                                        <button class="move-btn move-col" data-status="blocked" data-direction="right" aria-label="Move column right"><span class="material-icons">arrow_right</span></button>
+                                        <button class="move-btn move-col" data-status="blocked" data-direction="left" aria-label="Move column left" type="button"><span class="material-icons" aria-hidden="true">arrow_left</span></button>
+                                        <button class="move-btn move-col" data-status="blocked" data-direction="right" aria-label="Move column right" type="button"><span class="material-icons" aria-hidden="true">arrow_right</span></button>
                                     </div>
                                 </div>
                                 <div class="column-content" id="blockedBoard">
                                     <div class="add-task-card" onclick="todoApp.openAddTaskModal('blocked')">
-                                        <span class="material-icons add-icon">add</span>
+                                        <span class="material-icons add-icon" aria-hidden="true">add</span>
 
                                         <span>Add task</span>
 
@@ -289,13 +289,13 @@
                                     <div class="column-title">Cancelled</div>
                                     <div class="column-count" id="cancelledCount">0</div>
                                     <div class="column-controls">
-                                        <button class="move-btn move-col" data-status="cancelled" data-direction="left" aria-label="Move column left"><span class="material-icons">arrow_left</span></button>
-                                        <button class="move-btn move-col" data-status="cancelled" data-direction="right" aria-label="Move column right"><span class="material-icons">arrow_right</span></button>
+                                        <button class="move-btn move-col" data-status="cancelled" data-direction="left" aria-label="Move column left" type="button"><span class="material-icons" aria-hidden="true">arrow_left</span></button>
+                                        <button class="move-btn move-col" data-status="cancelled" data-direction="right" aria-label="Move column right" type="button"><span class="material-icons" aria-hidden="true">arrow_right</span></button>
                                     </div>
                                 </div>
                                 <div class="column-content" id="cancelledBoard">
                                     <div class="add-task-card" onclick="todoApp.openAddTaskModal('cancelled')">
-                                        <span class="material-icons add-icon">add</span>
+                                        <span class="material-icons add-icon" aria-hidden="true">add</span>
 
                                         <span>Add task</span>
 
@@ -340,8 +340,8 @@
     <div class="modal-overlay" id="quickCaptureModal" role="dialog" aria-hidden="true">
         <div class="quick-capture-modal">
             <div class="quick-capture-header">
-                <h3><span class="material-icons">flash_on</span> Quick Capture</h3>
-                <button class="close-btn" onclick="todoApp.closeQuickCapture()"><span class="material-icons">close</span></button>
+                <h3><span class="material-icons" aria-hidden="true">flash_on</span> Quick Capture</h3>
+                <button class="close-btn" onclick="todoApp.closeQuickCapture()" type="button"><span class="material-icons" aria-hidden="true">close</span></button>
             </div>
             <input type="text" class="quick-input" id="quickTaskInput" placeholder="What needs to be done?">
             <input type="date" class="quick-input" id="quickTaskDueDate">
@@ -362,8 +362,8 @@
         <div class="task-modal">
             <div class="modal-header">
                 <h3 id="modalTitle">Add New Task</h3>
-                <button type="button" id="watchTaskBtn" class="watch-btn" aria-label="Watch task"><span class="material-icons">notifications_off</span></button>
-                <button class="close-btn" onclick="todoApp.closeModal()"><span class="material-icons">close</span></button>
+                <button type="button" id="watchTaskBtn" class="watch-btn" aria-label="Watch task"><span class="material-icons" aria-hidden="true">notifications_off</span></button>
+                <button class="close-btn" onclick="todoApp.closeModal()" type="button"><span class="material-icons" aria-hidden="true">close</span></button>
             </div>
             <div class="hint-banner">Fill in the essentials. You can edit details later.</div>
             <div class="tab-header" role="tablist">
@@ -469,7 +469,7 @@
         <div class="insights-modal">
             <div class="modal-header">
                 <h3 id="insightsTitle"><span class="material-icons">bar_chart</span> Insights</h3>
-                <button class="close-btn" id="insightsClose" aria-label="Close insights" onclick="todoApp.closeInsights()"><span class="material-icons">close</span></button>
+                <button class="close-btn" id="insightsClose" aria-label="Close insights" onclick="todoApp.closeInsights()" type="button"><span class="material-icons" aria-hidden="true">close</span></button>
             </div>
             <div class="insights-grid">
                 <div class="insight-metric">
