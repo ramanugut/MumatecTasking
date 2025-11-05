@@ -359,6 +359,30 @@ body.modal-open {
     color: white;
 }
 
+.page-nav-panel {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 20px;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+}
+
+.page-nav-panel .nav-item {
+    flex: 0 0 auto;
+    padding: 6px 12px;
+    background: var(--surface-secondary);
+}
+
+.page-nav-panel .nav-item:hover {
+    background: var(--gray-200);
+}
+
+.page-nav-panel .nav-item.active {
+    background: var(--primary-blue);
+    color: #fff;
+}
+
 .nav-controls {
     display: flex;
     gap: 2px;
@@ -476,6 +500,13 @@ body.modal-open {
     gap: 12px;
 }
 
+.title-block {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    gap: 4px;
+}
+
 .page-title {
     font-size: 28px;
     font-weight: 700;
@@ -491,7 +522,47 @@ body.modal-open {
 }
 
 .top-bar-center {
-    flex: 0 0 400px;
+    flex: 1.4;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-width: 260px;
+}
+
+.hosting-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: center;
+}
+
+.hosting-shortcuts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.shortcut-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    border-radius: 16px;
+    background: var(--surface-secondary);
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.shortcut-btn:hover {
+    background: var(--gray-200);
+    color: var(--text-primary);
+}
+
+.shortcut-btn.active {
+    background: var(--primary-blue);
+    color: #fff;
 }
 
 .search-container {
@@ -528,9 +599,16 @@ body.modal-open {
 }
 
 .top-bar-right {
+    flex: 1;
     display: flex;
     align-items: center;
     gap: 12px;
+    justify-content: flex-end;
+}
+
+.top-bar-right .search-container {
+    flex: 1;
+    max-width: 280px;
 }
 
 .action-btn {
@@ -550,6 +628,15 @@ body.modal-open {
 .action-btn.primary {
     background: var(--primary-blue);
     color: white;
+}
+
+.action-btn.tertiary {
+    background: var(--surface-secondary);
+    color: var(--text-primary);
+}
+
+.action-btn.tertiary:hover {
+    background: var(--gray-200);
 }
 
 .action-btn.primary:hover {
