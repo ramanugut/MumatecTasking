@@ -1054,6 +1054,10 @@ class MumatecTaskManager {
         // Reset scroll positions when switching views
         const activeView = document.querySelector('.view-container.active');
         if (activeView) activeView.scrollTop = 0;
+        const contentArea = document.querySelector('.content-area');
+        if (contentArea) contentArea.scrollTop = 0;
+        const globalScroller = document.scrollingElement || document.body;
+        if (globalScroller) globalScroller.scrollTop = 0;
         const kanban = document.querySelector('.kanban-container');
         if (kanban) kanban.scrollLeft = 0;
         const rows = document.getElementById('rowsContainer');
@@ -1064,12 +1068,34 @@ class MumatecTaskManager {
 
     updateHeaderShadow() {
         const header = document.querySelector('.top-bar');
-        const activeView = document.querySelector('.view-container.active');
-        if (!header || !activeView) return;
-        if (activeView.scrollTop > 0) {
+        if (!header) return;
+        const scroller = this.getPrimaryScrollContainer();
+        if (scroller && scroller.scrollTop > 0) {
             header.classList.add('sticky-active');
         } else {
             header.classList.remove('sticky-active');
+        }
+    }
+
+    getPrimaryScrollContainer() {
+        const activeView = document.querySelector('.view-container.active');
+        if (activeView && activeView.scrollHeight > activeView.clientHeight + 1) {
+            return activeView;
+        }
+        const contentArea = document.querySelector('.content-area');
+        if (contentArea && contentArea.scrollHeight > contentArea.clientHeight + 1) {
+            return contentArea;
+        }
+        return document.scrollingElement || document.body;
+    }
+
+    lockBodyScroll() {
+        document.body?.classList.add('modal-open');
+    }
+
+    unlockBodyScroll() {
+        if (!document.querySelector('.modal-overlay.active')) {
+            document.body?.classList.remove('modal-open');
         }
     }
 
@@ -1135,8 +1161,10 @@ class MumatecTaskManager {
         const commentInputNew = document.getElementById('taskComment');
         if (commentInputNew) commentInputNew.value = commentDraft || '';
         const modal = document.getElementById('taskModal');
+        if (!modal) return;
         modal.classList.add('active');
         modal.setAttribute('aria-hidden', 'false');
+        this.lockBodyScroll();
         document.getElementById('taskTitle').focus();
     }
 
@@ -1201,18 +1229,23 @@ class MumatecTaskManager {
 
         
         const modal = document.getElementById('taskModal');
+        if (!modal) return;
         modal.classList.add('active');
         modal.setAttribute('aria-hidden', 'false');
+        this.lockBodyScroll();
         document.getElementById('taskTitle').focus();
     }
 
     closeModal() {
         const modal = document.getElementById('taskModal');
-        modal.classList.remove('active');
-        modal.setAttribute('aria-hidden', 'true');
-        modal.classList.remove('edit-mode', 'add-mode');
+        if (modal) {
+            modal.classList.remove('active');
+            modal.setAttribute('aria-hidden', 'true');
+            modal.classList.remove('edit-mode', 'add-mode');
+        }
         this.clearTaskForm();
         this.currentEditingTask = null;
+        this.unlockBodyScroll();
     }
 
     clearTaskForm() {
@@ -1256,29 +1289,47 @@ class MumatecTaskManager {
     // Quick Capture
     openQuickCapture() {
         const modal = document.getElementById('quickCaptureModal');
+        if (!modal) return;
         modal.classList.add('active');
         modal.setAttribute('aria-hidden', 'false');
+        this.lockBodyScroll();
         document.getElementById('quickTaskInput').focus();
         document.getElementById('quickTaskDueDate').value = '';
     }
 
 
     closeQuickCapture() {
-        document.getElementById('quickCaptureModal').classList.remove('active');
-        document.getElementById('quickTaskInput').value = '';
-        document.getElementById('quickTaskDueDate').value = '';
+        const modal = document.getElementById('quickCaptureModal');
+        if (modal) {
+            modal.classList.remove('active');
+            modal.setAttribute('aria-hidden', 'true');
+        }
+        const input = document.getElementById('quickTaskInput');
+        if (input) input.value = '';
+        const due = document.getElementById('quickTaskDueDate');
+        if (due) due.value = '';
+        this.unlockBodyScroll();
     }
 
     openInsights() {
-        document.getElementById('insightsModal').classList.add('active');
+        const modal = document.getElementById('insightsModal');
+        if (!modal) return;
+        modal.classList.add('active');
+        modal.setAttribute('aria-hidden', 'false');
+        this.lockBodyScroll();
         this.updateInsights();
         this.renderWeeklyChart();
-        document.getElementById('insightsClose').focus();
+        document.getElementById('insightsClose')?.focus();
     }
 
     closeInsights() {
-        document.getElementById('insightsModal').classList.remove('active');
+        const modal = document.getElementById('insightsModal');
+        if (modal) {
+            modal.classList.remove('active');
+            modal.setAttribute('aria-hidden', 'true');
+        }
         document.getElementById('insightsToggle')?.focus();
+        this.unlockBodyScroll();
     }
 
     applyDateShortcut(type) {
@@ -1744,6 +1795,7 @@ class MumatecTaskManager {
         document.querySelectorAll('.view-container').forEach(view => {
             view.addEventListener('scroll', () => this.updateHeaderShadow());
         });
+        window.addEventListener('scroll', () => this.updateHeaderShadow(), { passive: true });
         this.updateHeaderShadow();
 
         this.attachMoveControls();

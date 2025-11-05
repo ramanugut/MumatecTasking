@@ -55,16 +55,23 @@ export function setupAutoScroll(manager) {
   let v = 0;
   let active = false;
   let rowTarget = null;
+  const getVerticalTarget = () => {
+    const contentArea = document.querySelector('.content-area');
+    if (contentArea && contentArea.scrollHeight > contentArea.clientHeight + 1) {
+      return contentArea;
+    }
+    return document.scrollingElement || document.body;
+  };
   const step = () => {
     if (!active) return;
-    const view = document.querySelector('.content-area');
     const kanban = document.querySelector('.kanban-container');
     const horizontal = manager.viewMode === 'kanban' ? kanban : rowTarget;
     if (horizontal && h !== 0) {
       horizontal.scrollLeft += h;
     }
-    if (view && v !== 0) {
-      view.scrollTop += v;
+    const vertical = getVerticalTarget();
+    if (vertical && v !== 0) {
+      vertical.scrollTop += v;
     }
     requestAnimationFrame(step);
   };

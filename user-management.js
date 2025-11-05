@@ -42,6 +42,17 @@ const userTeamMap = {};
 const MASTER_ROLE = 'superAdmin';
 
 
+function lockBodyScroll() {
+  document.body?.classList.add('modal-open');
+}
+
+function unlockBodyScroll() {
+  if (!document.querySelector('.modal-overlay.active')) {
+    document.body?.classList.remove('modal-open');
+  }
+}
+
+
 async function fetchRoles() {
   const snap = await getDocs(collection(db, 'roles'));
   availableRoles = snap.docs.map(d => d.id);
@@ -251,21 +262,25 @@ tbody.addEventListener('click', async e => {
 function openBulkModal() {
   bulkModal.classList.add('active');
   bulkModal.setAttribute('aria-hidden', 'false');
+  lockBodyScroll();
 }
 
 function closeBulkModal() {
   bulkModal.classList.remove('active');
   bulkModal.setAttribute('aria-hidden', 'true');
+  unlockBodyScroll();
 }
 
 function openModal(modal) {
   modal.classList.add('active');
   modal.setAttribute('aria-hidden', 'false');
+  lockBodyScroll();
 }
 
 function closeModal(modal) {
   modal.classList.remove('active');
   modal.setAttribute('aria-hidden', 'true');
+  unlockBodyScroll();
 }
 
 bulkBtn?.addEventListener('click', () => {
