@@ -1,6 +1,6 @@
 import { auth, db } from './firebase.js';
 import { signInWithEmailAndPassword, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/11.9.0/firebase-auth.js';
-import { doc, getDoc, collection, addDoc } from 'https://www.gstatic.com/firebasejs/11.9.0/firebase-firestore.js';
+import { doc, getDoc, collection, addDoc, getDocs, query, where } from 'https://www.gstatic.com/firebasejs/11.9.0/firebase-firestore.js';
 import { TOTP } from 'https://cdn.jsdelivr.net/npm/otpauth@9.0.0/dist/otpauth.esm.js';
 
 
@@ -13,6 +13,33 @@ const totpError = document.getElementById('totpError');
 let pendingUser = null;
 let pendingSecret = null;
 let awaitingTotp = false;
+
+async function determineLandingUrl(user) {
+  if (!user) return 'index.html';
+  try {
+    const snap = await getDocs(query(collection(db, 'userRoles'), where('userId', '==', user.uid)));
+    const roles = snap.docs.map(d => (d.data()?.roleId || '').toLowerCase());
+    const roleSet = new Set(roles);
+
+    const hasAny = (...targets) => targets.some(role => roleSet.has(role));
+
+    if (hasAny('superadmin', 'admin')) return 'index.html?focus=environments';
+    if (hasAny('automation', 'devops', 'sre')) return 'index.html?focus=automation';
+    if (hasAny('finance', 'billing', 'accounting')) return 'index.html?focus=billing';
+    if (hasAny('client', 'clientsuccess', 'accountmanager', 'projectmanager', 'designer')) return 'index.html?focus=clients';
+    if (hasAny('developer', 'teamlead')) return 'index.html?focus=environments';
+    if (hasAny('guest')) return 'index.html?focus=clients';
+    return 'index.html?focus=environments';
+  } catch (error) {
+    console.error('Failed to resolve landing route', error);
+    return 'index.html';
+  }
+}
+
+async function redirectToLanding(user) {
+  const url = await determineLandingUrl(user);
+  window.location.href = url;
+}
 
 async function recordLogin(user) {
   try {
@@ -51,7 +78,7 @@ loginForm.addEventListener('submit', async (e) => {
       totpContainer.style.display = 'block';
     } else {
       await recordLogin(cred.user);
-      window.location.href = 'index.html';
+      await redirectToLanding(cred.user);
     }
   } catch (err) {
     errorEl.textContent = messages[err.code] || err.message;
@@ -68,11 +95,11 @@ totpForm.addEventListener('submit', async e => {
   }
   awaitingTotp = false;
   await recordLogin(pendingUser);
-  window.location.href = 'index.html';
+  await redirectToLanding(pendingUser);
 });
 
 onAuthStateChanged(auth, (user) => {
   if (user && !awaitingTotp) {
-    window.location.href = 'index.html';
+    redirectToLanding(user);
   }
 });

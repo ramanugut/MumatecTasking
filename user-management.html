@@ -14,67 +14,48 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
   <script src="style.js"></script>
+  <script type="module" src="src/app-shell.js"></script>
   <script>applySavedTheme();applySavedDesignSystem(); window.REQUIRED_ROLES = ['admin', 'superAdmin'];</script>
 </head>
-<body>
-  <header class="top-bar">
-    <div class="top-bar-left">
-      <a href="index.html" class="action-btn secondary" aria-label="Back to dashboard"><span class="material-icons">arrow_back</span></a>
-      <h1 class="page-title">User Management</h1>
-    </div>
-    <div class="top-bar-right">
-      <div class="user-info" id="userInfo">
-        <div class="user-avatar" id="userAvatar"><span class="material-icons">person</span></div>
-        <div class="profile-dropdown" id="profileDropdown">
-          <button id="themeToggle" class="dropdown-btn"><span class="material-icons">dark_mode</span></button>
-                    <select id="designSelect" class="dropdown-select" onchange="changeDesignSystem(this.value)">
-                        <option value="apple">Apple</option>
-                        <option value="material">Google</option>
-                        <option value="samsung">Samsung</option>
-</select>
-          <a href="profile.html" class="dropdown-btn"><span class="material-icons">person</span> Profile</a>
-          <button class="dropdown-btn" onclick="logout()">Logout</button>
-        </div>
-      </div>
-    </div>
-  </header>
+<body data-shell-page="user-management" data-page-title="User Management" data-page-subtitle="Manage hosting accounts &amp; access controls">
+  <div id="appShellHeader"></div>
 
   <div class="app-container">
-    <div class="sidebar">
-      <div class="sidebar-nav">
-        <div class="nav-item active" aria-label="All Users">
-          <span class="material-icons nav-icon">people</span>
-          <span class="nav-label">All Users</span>
-        </div>
-        <div class="nav-item" aria-label="User Roles &amp; Permissions" data-target="rolesModal">
-          <span class="material-icons nav-icon">security</span>
-          <span class="nav-label">User Roles &amp; Permissions</span>
-        </div>
-        <div class="nav-item" aria-label="Departments/Teams" data-target="departmentsModal">
-          <span class="material-icons nav-icon">groups</span>
-          <span class="nav-label">Departments/Teams</span>
-        </div>
-        <div class="nav-item" aria-label="Inactive Users" data-target="inactiveModal">
-          <span class="material-icons nav-icon">person_off</span>
-          <span class="nav-label">Inactive Users</span>
-        </div>
-        <div class="nav-item" aria-label="Pending Invitations" data-target="invitesModal">
-          <span class="material-icons nav-icon">mail</span>
-          <span class="nav-label">Pending Invitations</span>
-        </div>
-        <div class="nav-item" aria-label="Audit Logs" data-target="auditModal">
-          <span class="material-icons nav-icon">list_alt</span>
-          <span class="nav-label">Audit Logs</span>
-        </div>
-        <div class="nav-item" aria-label="Bulk Actions" data-target="bulkModal">
-          <span class="material-icons nav-icon">playlist_add_check</span>
-          <span class="nav-label">Bulk Actions</span>
-        </div>
-      </div>
-    </div>
+    <div id="appShellSidebar"></div>
 
     <div class="main-content">
       <div class="content-area" style="padding:20px;">
+        <div class="page-nav-panel" role="navigation" aria-label="User management navigation">
+          <div class="nav-item active" aria-label="All Users" data-target="allUsers">
+            <span class="material-icons nav-icon">people</span>
+            <span class="nav-label">All Users</span>
+          </div>
+          <div class="nav-item" aria-label="User Roles &amp; Permissions" data-target="rolesModal">
+            <span class="material-icons nav-icon">security</span>
+            <span class="nav-label">User Roles &amp; Permissions</span>
+          </div>
+          <div class="nav-item" aria-label="Departments/Teams" data-target="departmentsModal">
+            <span class="material-icons nav-icon">groups</span>
+            <span class="nav-label">Departments/Teams</span>
+          </div>
+          <div class="nav-item" aria-label="Inactive Users" data-target="inactiveModal">
+            <span class="material-icons nav-icon">person_off</span>
+            <span class="nav-label">Inactive Users</span>
+          </div>
+          <div class="nav-item" aria-label="Pending Invitations" data-target="invitesModal">
+            <span class="material-icons nav-icon">mail</span>
+            <span class="nav-label">Pending Invitations</span>
+          </div>
+          <div class="nav-item" aria-label="Audit Logs" data-target="auditModal">
+            <span class="material-icons nav-icon">fact_check</span>
+            <span class="nav-label">Audit Logs</span>
+          </div>
+          <div class="nav-item" aria-label="Bulk Actions" data-target="bulkModal">
+            <span class="material-icons nav-icon">playlist_add_check</span>
+            <span class="nav-label">Bulk Actions</span>
+          </div>
+        </div>
+
         <div class="user-actions">
           <button class="action-btn primary" id="inviteBtn"><span class="material-icons">person_add</span> Invite</button>
           <button class="action-btn secondary" id="bulkEditBtn"><span class="material-icons">edit</span> Bulk Edit</button>

@@ -26,6 +26,7 @@ class MumatecTaskManager {
         this.activeTimers = {};
         this.categoryOrder = ['Work', 'Personal', 'Development'];
         this.categoryIcons = { Work: 'work', Personal: 'home', Development: 'code' };
+        this.activeHostingFocus = null;
 
         this.init();
     }
@@ -90,6 +91,7 @@ class MumatecTaskManager {
         });
 
         this.setupRoleLinks();
+        this.applyInitialHostingFocus();
     }
 
     // Data Management
@@ -1028,10 +1030,10 @@ class MumatecTaskManager {
     // View Management
     switchView(viewName) {
         // Update navigation
-        document.querySelectorAll('.nav-item').forEach(item => {
+        document.querySelectorAll('.nav-item[data-view]').forEach(item => {
             item.classList.remove('active');
         });
-        document.querySelector(`[data-view="${viewName}"]`)?.classList.add('active');
+        document.querySelector(`.nav-item[data-view="${viewName}"]`)?.classList.add('active');
 
         this.currentView = viewName;
         this.renderCurrentView();
@@ -1252,23 +1254,6 @@ class MumatecTaskManager {
         this.handleProjectChange();
     }
 
-
-    // Quick Capture
-    openQuickCapture() {
-        const modal = document.getElementById('quickCaptureModal');
-        modal.classList.add('active');
-        modal.setAttribute('aria-hidden', 'false');
-        document.getElementById('quickTaskInput').focus();
-        document.getElementById('quickTaskDueDate').value = '';
-    }
-
-
-    closeQuickCapture() {
-        document.getElementById('quickCaptureModal').classList.remove('active');
-        document.getElementById('quickTaskInput').value = '';
-        document.getElementById('quickTaskDueDate').value = '';
-    }
-
     openInsights() {
         document.getElementById('insightsModal').classList.add('active');
         this.updateInsights();
@@ -1282,7 +1267,7 @@ class MumatecTaskManager {
     }
 
     applyDateShortcut(type) {
-        const input = document.getElementById('taskDueDate') || document.getElementById('quickTaskDueDate');
+        const input = document.getElementById('taskDueDate');
         const now = new Date();
         let date;
 
@@ -1303,15 +1288,6 @@ class MumatecTaskManager {
         if (input) {
             input.value = date.toISOString().slice(0, 16);
         }
-    }
-
-    saveQuickTask() {
-        const title = document.getElementById('quickTaskInput').value.trim();
-        const dueDate = document.getElementById('quickTaskDueDate').value;
-        if (!title) return;
-
-        this.addTask({ title, status: 'todo', category: 'Work', type: 'General', dueDate });
-        this.closeQuickCapture();
     }
 
     // Utility Functions
@@ -1564,25 +1540,31 @@ class MumatecTaskManager {
         });
 
         // Search
-        document.getElementById('searchInput').addEventListener('input', debounceUtil((e) => {
-            this.searchTerm = e.target.value.trim();
-            this.updateUI();
-        }, 300));
+        const searchInput = document.getElementById('searchInput');
+        if (searchInput) {
+            searchInput.addEventListener('input', debounceUtil((e) => {
+                this.searchTerm = e.target.value.trim();
+                this.updateUI();
+            }, 300));
+        }
 
         // Form submission
-        document.getElementById('taskForm').addEventListener('submit', (e) => {
-            e.preventDefault();
-            this.handleFormSubmit();
-        });
-
-        document.getElementById('taskForm').addEventListener('keydown', (e) => {
-            if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+        const taskForm = document.getElementById('taskForm');
+        if (taskForm) {
+            taskForm.addEventListener('submit', (e) => {
                 e.preventDefault();
                 this.handleFormSubmit();
-            }
-        });
+            });
 
-        document.getElementById('taskForm').addEventListener('input', () => this.saveDraft());
+            taskForm.addEventListener('keydown', (e) => {
+                if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+                    e.preventDefault();
+                    this.handleFormSubmit();
+                }
+            });
+
+            taskForm.addEventListener('input', () => this.saveDraft());
+        }
 
         const titleInput = document.getElementById('taskTitle');
         if (titleInput) {
@@ -1628,36 +1610,20 @@ class MumatecTaskManager {
             });
         }
 
-        // Quick capture
-        document.getElementById('quickTaskInput').addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                this.saveQuickTask();
-            }
-        });
-
         // CSV import
-        document.getElementById('csvImport').addEventListener('change', (e) => {
-            this.importFromCSV(e);
-        });
+        const csvImport = document.getElementById('csvImport');
+        if (csvImport) {
+            csvImport.addEventListener('change', (e) => {
+                this.importFromCSV(e);
+            });
+        }
 
         // Theme toggle
         document.getElementById('themeToggle').addEventListener('click', () => {
             this.toggleTheme();
         });
 
-        const userInfo = document.getElementById('userInfo');
-        const profileDropdown = document.getElementById('profileDropdown');
-        if (userInfo && profileDropdown) {
-            userInfo.addEventListener('click', (e) => {
-                e.stopPropagation();
-                profileDropdown.classList.toggle('open');
-            });
-            document.addEventListener('click', (e) => {
-                if (!profileDropdown.contains(e.target) && e.target !== userInfo && !userInfo.contains(e.target)) {
-                    profileDropdown.classList.remove('open');
-                }
-            });
-        }
+        // Dropdown interactions handled by global shell
 
         document.querySelectorAll('#priorityBadges .priority-badge').forEach(b => {
             b.addEventListener('click', () => this.updatePriorityBadges(b.dataset.value));
@@ -1729,9 +1695,7 @@ class MumatecTaskManager {
         document.querySelectorAll('.modal-overlay').forEach(modal => {
             modal.addEventListener('click', (e) => {
                 if (e.target === modal) {
-                    if (modal.id === 'quickCaptureModal') {
-                        this.closeQuickCapture();
-                    } else if (modal.id === 'insightsModal') {
+                    if (modal.id === 'insightsModal') {
                         this.closeInsights();
                     } else {
                         this.closeModal();
@@ -1757,14 +1721,6 @@ class MumatecTaskManager {
                     case 'n':
                         e.preventDefault();
                         this.openAddTaskModal();
-                        break;
-                    case 'k':
-                        e.preventDefault();
-                        this.openQuickCapture();
-                        break;
-                    case 's':
-                        e.preventDefault();
-                        this.exportToCSV();
                         break;
                     case '1':
                         e.preventDefault();
@@ -1994,49 +1950,7 @@ class MumatecTaskManager {
         }
     }
 
-    // CSV Import/Export
-    exportToCSV() {
-        if (this.tasks.length === 0) {
-            this.showNotification('No Data', 'No tasks to export', 'warning');
-            return;
-        }
-
-        const headers = ['ID', 'Title', 'Description', 'Priority', 'Status', 'Due Date', 'Category', 'Type', 'Tags', 'Created', 'Updated'];
-        const csvData = [headers];
-
-        this.tasks.forEach(task => {
-            csvData.push([
-                task.id,
-                task.title,
-                task.description || '',
-                task.priority,
-                task.status,
-                task.dueDate || '',
-                task.category || '',
-                task.type || 'General',
-                task.tags ? task.tags.join(';') : '',
-                task.createdAt,
-                task.updatedAt || task.createdAt
-            ]);
-        });
-
-        const csvContent = csvData.map(row => 
-            row.map(field => `"${String(field).replace(/"/g, '""')}"`).join(',')
-        ).join('\n');
-
-        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-        const link = document.createElement('a');
-        const url = URL.createObjectURL(blob);
-        link.setAttribute('href', url);
-        link.setAttribute('download', `mumatec-tasks-${new Date().toISOString().split('T')[0]}.csv`);
-        link.style.visibility = 'hidden';
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-
-        this.showNotification('Success', `Exported ${this.tasks.length} tasks`, 'success');
-    }
-
+    // CSV Import
     importFromCSV(event) {
         const file = event.target.files[0];
         if (!file) return;
@@ -2301,6 +2215,68 @@ class MumatecTaskManager {
             if (btn) {
                 btn.setAttribute('aria-expanded', String(!collapsed));
             }
+        }
+    }
+
+    applyInitialHostingFocus() {
+        const defaultSubtitle = document.body.dataset.pageSubtitle || 'Operational oversight for Mumatec hosting';
+        const subtitleEl = document.getElementById('pageSubtitle');
+        if (subtitleEl && subtitleEl.textContent.trim() === '') {
+            subtitleEl.textContent = defaultSubtitle;
+        }
+
+        const params = new URLSearchParams(window.location.search);
+        const focusFromUrl = params.get('focus');
+        const stored = window.pendingShortcutFocus || focusFromUrl || localStorage.getItem('hostingPreferredFocus');
+        if (stored) {
+            this.handleHostingShortcut(stored);
+            delete window.pendingShortcutFocus;
+        } else if (typeof window.highlightHostingShortcut === 'function') {
+            window.highlightHostingShortcut(null);
+        }
+    }
+
+    handleHostingShortcut(focus) {
+        this.activeHostingFocus = focus;
+
+        const viewMap = {
+            environments: 'dashboard',
+            clients: 'today',
+            billing: 'upcoming',
+            automation: 'completed'
+        };
+
+        const filterMap = {
+            clients: 'Clients',
+            billing: 'Billing',
+            automation: 'Automation'
+        };
+
+        const subtitleMap = {
+            environments: 'Monitor environment health and provisioning activity.',
+            clients: 'Coordinate client onboarding and domain changes.',
+            billing: 'Track invoicing, renewals, and payment follow-ups.',
+            automation: 'Review automation runs and orchestration rules.'
+        };
+
+        const subtitleEl = document.getElementById('pageSubtitle');
+        const defaultSubtitle = document.body.dataset.pageSubtitle || 'Operational oversight for Mumatec hosting';
+        if (subtitleEl) {
+            subtitleEl.textContent = subtitleMap[focus] || defaultSubtitle;
+        }
+
+        const desiredFilter = filterMap[focus] || null;
+        this.activeFilter = desiredFilter;
+
+        const targetView = viewMap[focus] || 'dashboard';
+        if (this.currentView !== targetView) {
+            this.switchView(targetView);
+        } else {
+            this.updateUI();
+        }
+
+        if (typeof window.highlightHostingShortcut === 'function') {
+            window.highlightHostingShortcut(focus);
         }
     }
 
