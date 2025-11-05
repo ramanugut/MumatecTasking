@@ -3,35 +3,35 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Project Dashboard - Mumatec Tasking</title>
+  <title>Hosting Control Center - Mumatec Tasking</title>
   <script>
-  if (localStorage.getItem('mumatecTheme') === 'dark') {
-    document.documentElement.classList.add('dark-mode');
-  }
+    if (localStorage.getItem('mumatecTheme') === 'dark') {
+      document.documentElement.classList.add('dark-mode');
+    }
   </script>
   <link id="styleLink" rel="stylesheet" href="styles.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
   <script src="style.js"></script>
-  <script>applySavedTheme();applySavedDesignSystem(); window.REQUIRED_ROLES = ['projectManager'];</script>
+  <script>applySavedTheme();applySavedDesignSystem(); window.REQUIRED_ROLES = ['projectManager','hostingManager'];</script>
 </head>
 <body>
   <header class="top-bar">
     <div class="top-bar-left">
       <a href="index.html" class="action-btn secondary" aria-label="Back to dashboard"><span class="material-icons">arrow_back</span></a>
-      <h1 class="page-title">Project Dashboard</h1>
+      <h1 class="page-title">Hosting Control Center</h1>
     </div>
     <div class="top-bar-right">
       <div class="user-info" id="userInfo">
         <div class="user-avatar" id="userAvatar"><span class="material-icons">person</span></div>
         <div class="profile-dropdown" id="profileDropdown">
           <button id="themeToggle" class="dropdown-btn"><span class="material-icons">dark_mode</span></button>
-                    <select id="designSelect" class="dropdown-select" onchange="changeDesignSystem(this.value)">
-                        <option value="apple">Apple</option>
-                        <option value="material">Google</option>
-                        <option value="samsung">Samsung</option>
-</select>
+          <select id="designSelect" class="dropdown-select" onchange="changeDesignSystem(this.value)">
+            <option value="apple">Apple</option>
+            <option value="material">Google</option>
+            <option value="samsung">Samsung</option>
+          </select>
           <a href="profile.html" class="dropdown-btn"><span class="material-icons">person</span> Profile</a>
           <button class="dropdown-btn" onclick="logout()">Logout</button>
         </div>
@@ -39,15 +39,112 @@
     </div>
   </header>
 
-  <div class="app-container">
+  <div class="app-container hosting-shell">
     <div class="main-content">
-      <div class="content-area" style="padding:20px;">
-        <p>Welcome to the Project Manager dashboard.</p>
+      <div class="content-area hosting-content">
+        <section class="hosting-hero">
+          <div class="hero-headline">
+            <div>
+              <h2>Platform Health Overview</h2>
+              <p>Real-time visibility into uptime, incidents, billing, and deployment automation.</p>
+            </div>
+            <nav class="hosting-nav" aria-label="Hosting shortcuts">
+              <a class="hosting-nav-link" href="#environments"><span class="material-icons" aria-hidden="true">dns</span>Environments</a>
+              <a class="hosting-nav-link" href="#clients"><span class="material-icons" aria-hidden="true">groups</span>Clients</a>
+              <a class="hosting-nav-link" href="#billing"><span class="material-icons" aria-hidden="true">receipt_long</span>Billing</a>
+            </nav>
+          </div>
+          <div class="metric-grid" role="list">
+            <article class="metric-card" role="listitem">
+              <div class="metric-icon uptime"><span class="material-icons" aria-hidden="true">speed</span></div>
+              <div class="metric-body">
+                <h3>Global Uptime</h3>
+                <p class="metric-value" id="uptimeValue">99.99%</p>
+                <p class="metric-subtitle" id="uptimeSubtitle">Across all monitored regions</p>
+              </div>
+            </article>
+            <article class="metric-card" role="listitem">
+              <div class="metric-icon incidents"><span class="material-icons" aria-hidden="true">warning_amber</span></div>
+              <div class="metric-body">
+                <h3>Open Incidents</h3>
+                <p class="metric-value" id="incidentsValue">0</p>
+                <p class="metric-subtitle" id="incidentsSubtitle">All services operational</p>
+              </div>
+            </article>
+            <article class="metric-card" role="listitem">
+              <div class="metric-icon plans"><span class="material-icons" aria-hidden="true">hub</span></div>
+              <div class="metric-body">
+                <h3>Active Plans</h3>
+                <p class="metric-value" id="plansValue">0</p>
+                <p class="metric-subtitle" id="plansSubtitle">Managed client subscriptions</p>
+              </div>
+            </article>
+          </div>
+        </section>
+
+        <div class="hosting-grid">
+          <section class="panel" id="environments">
+            <header class="panel-header">
+              <div>
+                <h2>Environment Status</h2>
+                <p>Monitor server uptime, regional health, and automation checks.</p>
+              </div>
+              <button class="action-btn tertiary" id="refreshEnvironments" type="button">
+                <span class="material-icons" aria-hidden="true">refresh</span>
+                Refresh
+              </button>
+            </header>
+            <div class="environment-grid" id="environmentGrid" role="list"></div>
+          </section>
+
+          <section class="panel" id="deployments">
+            <header class="panel-header">
+              <div>
+                <h2>Deployment Timeline</h2>
+                <p>Track recent launches and automation rollouts.</p>
+              </div>
+            </header>
+            <ol class="timeline" id="deploymentTimeline" aria-live="polite"></ol>
+          </section>
+
+          <section class="panel" id="automation">
+            <header class="panel-header">
+              <div>
+                <h2>Automation Queue</h2>
+                <p>Review active jobs from CI/CD, backups, and compliance scripts.</p>
+              </div>
+            </header>
+            <div class="list-group" id="automationQueue" role="list"></div>
+          </section>
+        </div>
+
+        <div class="hosting-grid two-column">
+          <section class="panel" id="clients">
+            <header class="panel-header">
+              <div>
+                <h2>Client Portfolio</h2>
+                <p>Sites by plan tier and current health signals.</p>
+              </div>
+            </header>
+            <div class="list-group" id="clientList" role="list"></div>
+          </section>
+
+          <section class="panel" id="billing">
+            <header class="panel-header">
+              <div>
+                <h2>Billing &amp; Renewals</h2>
+                <p>Upcoming invoices and plan commitments.</p>
+              </div>
+            </header>
+            <div class="list-group" id="billingList" role="list"></div>
+          </section>
+        </div>
       </div>
     </div>
   </div>
 
   <script type="module" src="firebase.js"></script>
   <script type="module" src="auth.js"></script>
+  <script type="module" src="hosting-management.js"></script>
 </body>
 </html>
