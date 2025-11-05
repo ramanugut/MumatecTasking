@@ -17,147 +17,16 @@
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <script src="check-environment.js"></script>
     <script src="style.js"></script>
+    <script type="module" src="src/app-shell.js"></script>
     <script>applySavedTheme();applySavedDesignSystem();</script>
 </head>
-<body>
+<body data-shell-page="control-center" data-page-title="Hosting Control Center" data-page-subtitle="Operational oversight for Mumatec hosting">
     <div id="loadingOverlay" class="loading-overlay" style="display:none;">Loading...</div>
-    <!-- Sticky Header -->
-    <header class="top-bar" id="mainHeader">
-        <div class="top-bar-left">
-            <button id="sidebarToggle" class="btn-flat waves-effect" aria-label="Toggle navigation menu" aria-expanded="true" aria-controls="sidebar" type="button"><span class="material-icons" aria-hidden="true">menu</span></button>
-            <h1 class="page-title" id="pageTitle">Mumatec Tasking</h1>
-
-        </div>
-
-        <div class="top-bar-center">
-            <div class="search-container">
-
-                <input type="text" class="search-input" id="searchInput" placeholder="Search tasks..." aria-label="Search tasks">
-
-                <span class="material-icons search-icon" aria-hidden="true">search</span>
-            </div>
-            
-        </div>
-
-        <div class="top-bar-right">
-
-            <button class="action-btn primary" onclick="todoApp.openAddTaskModal()" type="button">
-
-                <span class="material-icons" aria-hidden="true">add</span> New Task
-            </button>
-            <div class="user-info" id="userInfo">
-                <div class="user-avatar" id="userAvatar"><span class="material-icons" aria-hidden="true">person</span></div>
-                <div class="user-details">
-                    <div class="user-name" id="userName">User</div>
-                    <div class="user-role" id="userRole">&nbsp;</div>
-                </div>
-                <div class="profile-dropdown" id="profileDropdown">
-                    <button id="themeToggle" class="dropdown-btn" type="button"><span class="material-icons" aria-hidden="true">dark_mode</span></button>
-                    <select id="designSelect" class="dropdown-select" onchange="changeDesignSystem(this.value)">
-                        <option value="apple">Apple</option>
-                        <option value="material">Google</option>
-                        <option value="samsung">Samsung</option>
-</select>
-                    <button class="dropdown-btn" onclick="document.getElementById('csvImport').click()" type="button">
-                        <span class="material-icons" aria-hidden="true">file_upload</span> Import
-                    </button>
-                    <a href="profile.html" class="dropdown-btn">
-                        <span class="material-icons" aria-hidden="true">person</span> Profile
-                    </a>
-                    <a href="user-management.html" class="dropdown-btn">
-                        <span class="material-icons" aria-hidden="true">manage_accounts</span> User Management
-                    </a>
-                    <a href="project-dashboard.html" class="dropdown-btn role-link" data-role="projectManager,hostingManager">
-                        <span class="material-icons" aria-hidden="true">dns</span> Hosting Control Center
-                    </a>
-                    <a href="project-dashboard.html#environments" class="dropdown-btn role-link" data-role="projectManager,hostingManager">
-                        <span class="material-icons" aria-hidden="true">language</span> Hosting · Environments
-                    </a>
-                    <a href="project-dashboard.html#clients" class="dropdown-btn role-link" data-role="projectManager,hostingManager">
-                        <span class="material-icons" aria-hidden="true">people_alt</span> Hosting · Clients
-                    </a>
-                    <a href="project-dashboard.html#billing" class="dropdown-btn role-link" data-role="projectManager,hostingManager">
-                        <span class="material-icons" aria-hidden="true">paid</span> Hosting · Billing
-                    </a>
-                    <a href="team-lead.html" class="dropdown-btn role-link" data-role="teamLead">
-                        <span class="material-icons" aria-hidden="true">groups</span> Team Lead Tools
-                    </a>
-                    <a href="developer-tools.html" class="dropdown-btn role-link" data-role="developer">
-                        <span class="material-icons" aria-hidden="true">code</span> Developer Tools
-                    </a>
-                    <a href="designer-hub.html" class="dropdown-btn role-link" data-role="designer">
-                        <span class="material-icons" aria-hidden="true">brush</span> Designer Hub
-                    </a>
-                    <a href="client-portal.html" class="dropdown-btn role-link" data-role="client">
-                        <span class="material-icons" aria-hidden="true">business</span> Client Portal
-                    </a>
-                    <a href="guest-portal.html" class="dropdown-btn role-link" data-role="guest">
-                        <span class="material-icons" aria-hidden="true">visibility</span> Guest Portal
-                    </a>
-                    <button class="dropdown-btn" onclick="logout()" type="button">Logout</button>
-                </div>
-            </div>
-            <div class="view-controls">
-                <button class="view-btn active" data-view="kanban" aria-label="Kanban view" aria-pressed="true" type="button"><span class="material-icons" aria-hidden="true">view_kanban</span></button>
-                <button class="view-btn" data-view="list" aria-label="List view" aria-pressed="false" type="button"><span class="material-icons" aria-hidden="true">view_list</span></button>
-            </div>
-        </div>
-    </header>
-
+    <div id="appShellHeader"></div>
     <!-- App Shell -->
     <div class="app-container">
         <!-- Sidebar -->
-        <div class="sidebar" id="sidebar">
-
-
-            <div class="sidebar-nav">
-                <div class="nav-section">
-                    <div class="nav-item active" data-view="dashboard" aria-label="Mumatec Tasking">
-                        <span class="material-icons nav-icon" aria-hidden="true">dashboard</span>
-                        <span class="nav-label">Mumatec Tasking</span>
-                        <span class="nav-count" id="dashboardCount">0</span>
-                    </div>
-                    <div class="nav-item" data-view="today" aria-label="Today">
-                        <span class="material-icons nav-icon" aria-hidden="true">today</span>
-                        <span class="nav-label">Today</span>
-                        <span class="nav-count" id="todayCount">0</span>
-                    </div>
-                    <div class="nav-item" data-view="upcoming" aria-label="Upcoming">
-                        <span class="material-icons nav-icon" aria-hidden="true">schedule</span>
-                        <span class="nav-label">Upcoming</span>
-                        <span class="nav-count" id="upcomingCount">0</span>
-                    </div>
-                    <div class="nav-item" data-view="completed" aria-label="Completed">
-                        <span class="material-icons nav-icon" aria-hidden="true">check_circle</span>
-                        <span class="nav-label">Completed</span>
-                        <span class="nav-count" id="completedNavCount">0</span>
-                    </div>
-                </div>
-
-                <div class="nav-divider"></div>
-
-                <div class="nav-section" id="categoryNavSection">
-                    <div class="nav-section-title">Projects</div>
-                    <div id="categoryNavContainer"></div>
-                    <div id="categoryTimeTotals" class="time-totals"></div>
-                </div>
-
-                <div class="nav-divider"></div>
-
-                <div class="nav-section">
-                    <div class="nav-item" onclick="todoApp.openQuickCapture()" aria-label="Quick Capture">
-                        <span class="material-icons nav-icon" aria-hidden="true">flash_on</span>
-                        <span class="nav-label">Quick Capture</span>
-                    </div>
-                    <div class="nav-item" onclick="todoApp.exportToCSV()" aria-label="Export Data">
-                        <span class="material-icons nav-icon" aria-hidden="true">file_download</span>
-                        <span class="nav-label">Export Data</span>
-                    </div>
-                </div>
-            </div>
-
-                <!-- Sidebar footer removed -->
-        </div>
+        <div id="appShellSidebar"></div>
 
         <!-- Main Content -->
         <div class="main-content">
@@ -323,7 +192,7 @@
                 <div class="view-container" id="todayView">
                     <div class="today-content">
                         <div class="today-header">
-                            <h2>Today's Focus</h2>
+                            <h2>Infrastructure Status</h2>
                             <div class="today-date" id="todayDate"></div>
                         </div>
                         <div class="today-tasks" id="todayTasks"></div>
@@ -332,38 +201,17 @@
 
                 <div class="view-container" id="upcomingView">
                     <div class="upcoming-content">
-                        <h2>Upcoming Tasks</h2>
+                        <h2>Incident Queue</h2>
                         <div class="upcoming-timeline" id="upcomingTimeline"></div>
                     </div>
                 </div>
 
                 <div class="view-container" id="completedView">
                     <div class="completed-content">
-                        <h2>Completed Tasks</h2>
+                        <h2>Scheduled Maintenance</h2>
                         <div class="completed-list" id="completedList"></div>
                     </div>
                 </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Quick Capture Modal -->
-    <div class="modal-overlay" id="quickCaptureModal" role="dialog" aria-hidden="true">
-        <div class="quick-capture-modal">
-            <div class="quick-capture-header">
-                <h3><span class="material-icons" aria-hidden="true">flash_on</span> Quick Capture</h3>
-                <button class="close-btn" onclick="todoApp.closeQuickCapture()" type="button"><span class="material-icons" aria-hidden="true">close</span></button>
-            </div>
-            <input type="text" class="quick-input" id="quickTaskInput" placeholder="What needs to be done?">
-            <input type="date" class="quick-input" id="quickTaskDueDate">
-            <div class="date-shortcuts" style="margin-bottom:16px;">
-                <button type="button" class="date-shortcut-btn" data-shortcut="tomorrow">Tomorrow</button>
-                <button type="button" class="date-shortcut-btn" data-shortcut="next-week">Next Week</button>
-                <button type="button" class="date-shortcut-btn" data-shortcut="end-month">End of Month</button>
-            </div>
-            <div class="quick-actions">
-                <button class="quick-btn secondary" onclick="todoApp.closeQuickCapture()">Cancel</button>
-                <button class="quick-btn primary" onclick="todoApp.saveQuickTask()">Add Task</button>
             </div>
         </div>
     </div>

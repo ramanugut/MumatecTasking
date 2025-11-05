@@ -9,7 +9,15 @@ window.initTodoApp = function () {
   }
 };
 
-function initAfterAuth() {
+async function initAfterAuth() {
+  if (window.shellReady) {
+    try {
+      await window.shellReady;
+    } catch (error) {
+      console.error('App shell failed to load', error);
+    }
+  }
+
   if (window.currentUser) {
     window.initTodoApp();
   } else {

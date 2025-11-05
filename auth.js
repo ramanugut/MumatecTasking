@@ -2,6 +2,25 @@ import { auth, db } from './firebase.js';
 import { onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/11.9.0/firebase-auth.js';
 import { doc, getDoc, collection, getDocs, query, where, addDoc } from 'https://www.gstatic.com/firebasejs/11.9.0/firebase-firestore.js';
 
+function resolveHostingFocus(roles = []) {
+  const normalized = new Set(roles.map(r => (r || '').toLowerCase()));
+  const hasAny = (...names) => names.some(name => normalized.has(name));
+
+  if (hasAny('superadmin', 'admin')) return 'environments';
+  if (hasAny('automation', 'devops', 'sre')) return 'automation';
+  if (hasAny('finance', 'billing', 'accounting')) return 'billing';
+  if (hasAny('client', 'clientsuccess', 'accountmanager', 'projectmanager', 'designer')) return 'clients';
+  if (hasAny('developer', 'teamlead')) return 'environments';
+  if (hasAny('guest')) return 'clients';
+  return 'environments';
+}
+
+function redirectToHostingCenter(roles = []) {
+  const focus = resolveHostingFocus(Array.isArray(roles) ? roles : []);
+  const target = focus ? `index.html?focus=${focus}` : 'index.html';
+  window.location.href = target;
+}
+
 onAuthStateChanged(auth, async (user) => {
   window.currentUser = user;
   if (user) {
@@ -52,12 +71,12 @@ onAuthStateChanged(auth, async (user) => {
     }
     const required = window.REQUIRED_ROLES;
     if (required && required.length && !required.some(r => roles.includes(r))) {
-      window.location.href = 'index.html';
+      redirectToHostingCenter(roles);
       return;
     }
     const permsRequired = window.REQUIRED_PERMISSIONS;
     if (permsRequired && permsRequired.length && !permsRequired.every(p => window.currentUserPermissions.includes(p))) {
-      window.location.href = 'index.html';
+      redirectToHostingCenter(roles);
       return;
     }
     const nameEl = document.getElementById('userName');

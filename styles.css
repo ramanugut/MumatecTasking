@@ -103,9 +103,18 @@ body {
     font-family: var(--font-system);
     background: var(--background);
     color: var(--text-primary);
-    overflow: hidden;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow-x: hidden;
+    overflow-y: auto;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+}
+
+body.modal-open {
+    overflow: hidden;
+    touch-action: none;
 }
 
 /* Global Scrollbar Styling */
@@ -136,10 +145,12 @@ body {
 /* App Container */
 .app-container {
     display: flex;
-    height: calc(100vh - var(--top-bar-height));
-    width: 100vw;
+    flex: 1 0 auto;
+    min-height: calc(100vh - var(--top-bar-height));
+    width: 100%;
     position: relative;
     margin-top: 0;
+    align-items: stretch;
 }
 
 /* Sidebar */
@@ -348,6 +359,30 @@ body {
     color: white;
 }
 
+.page-nav-panel {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 20px;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+}
+
+.page-nav-panel .nav-item {
+    flex: 0 0 auto;
+    padding: 6px 12px;
+    background: var(--surface-secondary);
+}
+
+.page-nav-panel .nav-item:hover {
+    background: var(--gray-200);
+}
+
+.page-nav-panel .nav-item.active {
+    background: var(--primary-blue);
+    color: #fff;
+}
+
 .nav-controls {
     display: flex;
     gap: 2px;
@@ -430,6 +465,8 @@ body {
     flex: 1;
     display: flex;
     flex-direction: column;
+    min-width: 0;
+    min-height: 0;
     overflow: hidden;
 }
 
@@ -463,6 +500,13 @@ body {
     gap: 12px;
 }
 
+.title-block {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    gap: 4px;
+}
+
 .page-title {
     font-size: 28px;
     font-weight: 700;
@@ -478,7 +522,47 @@ body {
 }
 
 .top-bar-center {
-    flex: 0 0 400px;
+    flex: 1.4;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-width: 260px;
+}
+
+.hosting-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: center;
+}
+
+.hosting-shortcuts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.shortcut-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    border-radius: 16px;
+    background: var(--surface-secondary);
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.shortcut-btn:hover {
+    background: var(--gray-200);
+    color: var(--text-primary);
+}
+
+.shortcut-btn.active {
+    background: var(--primary-blue);
+    color: #fff;
 }
 
 .search-container {
@@ -515,9 +599,16 @@ body {
 }
 
 .top-bar-right {
+    flex: 1;
     display: flex;
     align-items: center;
     gap: 12px;
+    justify-content: flex-end;
+}
+
+.top-bar-right .search-container {
+    flex: 1;
+    max-width: 280px;
 }
 
 .action-btn {
@@ -537,6 +628,15 @@ body {
 .action-btn.primary {
     background: var(--primary-blue);
     color: white;
+}
+
+.action-btn.tertiary {
+    background: var(--surface-secondary);
+    color: var(--text-primary);
+}
+
+.action-btn.tertiary:hover {
+    background: var(--gray-200);
 }
 
 .action-btn.primary:hover {
@@ -584,6 +684,7 @@ body {
     overflow-x: hidden;
     overflow-y: auto;
     position: relative;
+    min-height: 0;
 }
 
 .view-container {
@@ -1298,6 +1399,8 @@ body {
     z-index: 2000;
     align-items: center;
     justify-content: center;
+    padding: 32px 16px;
+    overflow-y: auto;
 }
 
 .modal-overlay.active {
@@ -1844,9 +1947,19 @@ body {
         grid-template-columns: 1fr;
         gap: 20px;
     }
-    
+
     .insights-panel {
         max-height: 400px;
+    }
+}
+
+@media (max-height: 700px) {
+    .modal-overlay {
+        align-items: flex-start;
+    }
+
+    .view-container {
+        padding-bottom: 64px;
     }
 }
 

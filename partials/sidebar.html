@@ -1,0 +1,56 @@
+<div class="sidebar" id="sidebar">
+  <div class="sidebar-nav">
+    <div class="nav-section" data-section="overview">
+      <div class="nav-item active" data-view="dashboard" aria-label="Hosting control center">
+        <span class="material-icons nav-icon" aria-hidden="true">dns</span>
+        <span class="nav-label">Control Center</span>
+        <span class="nav-count" id="dashboardCount">0</span>
+      </div>
+      <div class="nav-item" data-view="today" aria-label="Infrastructure status">
+        <span class="material-icons nav-icon" aria-hidden="true">cloud_done</span>
+        <span class="nav-label">Infrastructure Status</span>
+        <span class="nav-count" id="todayCount">0</span>
+      </div>
+      <div class="nav-item" data-view="upcoming" aria-label="Incident queue">
+        <span class="material-icons nav-icon" aria-hidden="true">warning_amber</span>
+        <span class="nav-label">Incident Queue</span>
+        <span class="nav-count" id="upcomingCount">0</span>
+      </div>
+      <div class="nav-item" data-view="completed" aria-label="Scheduled maintenance">
+        <span class="material-icons nav-icon" aria-hidden="true">build_circle</span>
+        <span class="nav-label">Scheduled Maintenance</span>
+        <span class="nav-count" id="completedNavCount">0</span>
+      </div>
+    </div>
+
+    <div class="nav-divider"></div>
+
+    <div class="nav-section" id="categoryNavSection">
+      <div class="nav-section-title">Hosting Services</div>
+      <div id="categoryNavContainer"></div>
+      <div id="categoryTimeTotals" class="time-totals"></div>
+    </div>
+
+    <div class="nav-divider"></div>
+
+    <div class="nav-section" id="operationsNavSection">
+      <div class="nav-section-title">Operations</div>
+      <a href="user-management.html" class="nav-item link-item role-link" data-role="admin,superAdmin" data-shell-link="user-management">
+        <span class="material-icons nav-icon" aria-hidden="true">people</span>
+        <span class="nav-label">User Management</span>
+      </a>
+      <a href="departments.html" class="nav-item link-item role-link" data-role="admin,superAdmin" data-shell-link="departments">
+        <span class="material-icons nav-icon" aria-hidden="true">apartment</span>
+        <span class="nav-label">Departments</span>
+      </a>
+      <a href="audit.html" class="nav-item link-item role-link" data-role="admin,superAdmin" data-shell-link="audits">
+        <span class="material-icons nav-icon" aria-hidden="true">fact_check</span>
+        <span class="nav-label">Audit Logs</span>
+      </a>
+      <a href="roles-admin.html" class="nav-item link-item role-link" data-role="superAdmin" data-shell-link="roles">
+        <span class="material-icons nav-icon" aria-hidden="true">rule</span>
+        <span class="nav-label">Role Governance</span>
+      </a>
+    </div>
+  </div>
+</div>
