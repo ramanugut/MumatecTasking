@@ -94,6 +94,16 @@ let editingRoleId = null;
 const tbody = document.getElementById('rolesBody');
 const addBtn = document.getElementById('addRole');
 
+function lockBodyScroll() {
+  document.body?.classList.add('modal-open');
+}
+
+function unlockBodyScroll() {
+  if (!document.querySelector('.modal-overlay.active')) {
+    document.body?.classList.remove('modal-open');
+  }
+}
+
 async function loadRoles() {
   const snap = await getDocs(collection(db, 'roles'));
   tbody.innerHTML = '';
@@ -110,11 +120,13 @@ async function loadRoles() {
 function openModal(modal) {
   modal.classList.add('active');
   modal.setAttribute('aria-hidden', 'false');
+  lockBodyScroll();
 }
 
 function closeModal(modal) {
   modal.classList.remove('active');
   modal.setAttribute('aria-hidden', 'true');
+  unlockBodyScroll();
 }
 
 function populatePermissions(selected = []) {
