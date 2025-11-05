@@ -58,6 +58,17 @@ onAuthStateChanged(auth, async (user) => {
     }
     window.currentUserRoles = roles;
     window.currentUserPermissions = Array.from(new Set(permissions));
+    const hostingRoles = ['projectManager', 'hostingManager'];
+    const pathSegment = window.location.pathname.split('/').pop() || 'index.html';
+    const shouldDefaultToHosting = hostingRoles.some(role => roles.includes(role));
+    if (shouldDefaultToHosting && (pathSegment === '' || pathSegment === 'index.html')) {
+      const redirected = sessionStorage.getItem('hostingControlRedirected');
+      if (!redirected) {
+        sessionStorage.setItem('hostingControlRedirected', '1');
+        window.location.href = 'project-dashboard.html';
+        return;
+      }
+    }
     const required = window.REQUIRED_ROLES;
     if (required && required.length && !required.some(r => roles.includes(r))) {
       redirectToHostingCenter(roles);
