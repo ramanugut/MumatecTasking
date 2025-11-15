@@ -531,13 +531,22 @@ class MumatecTaskManager {
     }
 
     updateStats(stats) {
-        const { total, completed, inProgress } = stats;
-        const streak = this.calculateStreak();
+        const { total, completed, inProgress, todo, today, overdue } = stats;
 
-        document.getElementById('totalTasks').textContent = total;
-        document.getElementById('completedTasks').textContent = completed;
-        document.getElementById('pendingTasks').textContent = inProgress;
-        document.getElementById('streakDays').textContent = streak;
+        const setText = (id, value) => {
+            const el = document.getElementById(id);
+            if (el) el.textContent = value;
+        };
+
+        setText('totalTasks', total);
+        setText('completedTasks', completed);
+        setText('inProgressTasks', inProgress);
+        setText('todoTasks', todo);
+        setText('todayCount', today);
+        setText('todaySummary', today);
+        setText('overdueSummary', overdue);
+        setText('quickMetaToday', today);
+        setText('quickMetaOverdue', overdue);
     }
 
     updateNavigationCounts(stats) {
@@ -1289,6 +1298,51 @@ class MumatecTaskManager {
 
 
     // Quick Capture
+    focusQuickAdd() {
+        const card = document.querySelector('.quick-add-card');
+        if (card) {
+            card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+        const input = document.getElementById('quickTaskTitle');
+        if (input) {
+            input.focus();
+            input.select();
+        }
+    }
+
+    async handleQuickAddSubmit() {
+        const titleInput = document.getElementById('quickTaskTitle');
+        if (!titleInput) return;
+
+        const title = titleInput.value.trim();
+        if (!title) {
+            titleInput.focus();
+            return;
+        }
+
+        const statusSelect = document.getElementById('quickTaskStatus');
+        const prioritySelect = document.getElementById('quickTaskPriority');
+        const dueDateInput = document.getElementById('quickTaskDueDate');
+        const dueDate = dueDateInput?.value ? new Date(dueDateInput.value).toISOString() : null;
+
+        try {
+            await this.addTask({
+                title,
+                status: statusSelect?.value || 'todo',
+                priority: prioritySelect?.value || 'medium',
+                dueDate
+            });
+            titleInput.value = '';
+            if (statusSelect) statusSelect.value = 'todo';
+            if (prioritySelect) prioritySelect.value = 'medium';
+            if (dueDateInput) dueDateInput.value = '';
+            this.focusQuickAdd();
+        } catch (error) {
+            console.error('Quick add failed', error);
+            this.showNotification('Error', 'Unable to create task', 'error');
+        }
+    }
+
     openQuickCapture() {
         const modal = document.getElementById('quickCaptureModal');
         if (!modal) return;
@@ -1386,6 +1440,8 @@ class MumatecTaskManager {
             total: this.tasks.length,
             completed: 0,
             inProgress: 0,
+            todo: 0,
+            overdue: 0,
             today: 0,
             upcoming: 0,
             categories: {}
@@ -1396,7 +1452,8 @@ class MumatecTaskManager {
 
         for (const t of this.tasks) {
             if (t.status === 'done') stats.completed++;
-            if (t.status === 'inprogress') stats.inProgress++;
+            if (t.status === 'inprogress' || t.status === 'review') stats.inProgress++;
+            if (t.status === 'todo' || t.status === 'blocked') stats.todo++;
             if (t.category) {
                 stats.categories[t.category] = (stats.categories[t.category] || 0) + 1;
             }
@@ -1404,6 +1461,7 @@ class MumatecTaskManager {
                 const due = new Date(t.dueDate);
                 if (due.toDateString() === todayStr) stats.today++;
                 else if (due > now && due.toDateString() !== todayStr) stats.upcoming++;
+                else if (due < now && t.status !== 'done') stats.overdue++;
             }
         }
 
@@ -1616,6 +1674,14 @@ class MumatecTaskManager {
             }, 300));
         }
 
+        const quickForm = document.getElementById('quickAddForm');
+        if (quickForm) {
+            quickForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                await this.handleQuickAddSubmit();
+            });
+        }
+
         // Form submission
         const taskForm = document.getElementById('taskForm');
         if (taskForm) {
@@ -1687,9 +1753,17 @@ class MumatecTaskManager {
         }
 
         // Theme toggle
-        document.getElementById('themeToggle').addEventListener('click', () => {
-            this.toggleTheme();
-        });
+        const themeToggle = document.getElementById('themeToggle');
+        if (themeToggle) {
+            themeToggle.addEventListener('click', () => {
+                this.toggleTheme();
+            });
+        }
+
+        const headerQuickAdd = document.getElementById('headerQuickAdd');
+        if (headerQuickAdd) {
+            headerQuickAdd.addEventListener('click', () => this.focusQuickAdd());
+        }
 
         // Dropdown interactions handled by global shell
 

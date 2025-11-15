@@ -1,48 +1,27 @@
 <header class="top-bar" id="mainHeader">
   <div class="top-bar-left">
-    <button id="sidebarToggle" class="btn-flat waves-effect" aria-label="Toggle navigation menu" aria-expanded="true" aria-controls="sidebar" type="button">
+    <button id="sidebarToggle" class="icon-btn" aria-label="Toggle navigation menu" aria-expanded="true" aria-controls="sidebar" type="button">
       <span class="material-icons" aria-hidden="true">menu</span>
     </button>
     <div class="title-block">
-      <h1 class="page-title" id="pageTitle">Hosting Control Center</h1>
       <p class="page-subtitle" id="pageSubtitle">Operational oversight for Mumatec hosting</p>
+      <h1 class="page-title" id="pageTitle">Hosting Control Center</h1>
     </div>
   </div>
   <div class="top-bar-center">
-    <div class="hosting-actions">
-      <button class="action-btn primary" id="provisionSiteBtn" type="button">
-        <span class="material-icons" aria-hidden="true">rocket_launch</span>
-        Provision Site
-      </button>
-      <button class="action-btn tertiary" id="addDomainBtn" type="button">
-        <span class="material-icons" aria-hidden="true">language</span>
-        Add Domain
-      </button>
-    </div>
-    <div class="hosting-shortcuts" id="hostingShortcutRail">
-      <button class="shortcut-btn" data-focus="environments" type="button">
-        <span class="material-icons" aria-hidden="true">dns</span>
-        <span>Environments</span>
-      </button>
-      <button class="shortcut-btn" data-focus="clients" type="button">
-        <span class="material-icons" aria-hidden="true">handshake</span>
-        <span>Clients</span>
-      </button>
-      <button class="shortcut-btn" data-focus="billing" type="button">
-        <span class="material-icons" aria-hidden="true">request_quote</span>
-        <span>Billing</span>
-      </button>
-      <button class="shortcut-btn" data-focus="automation" type="button">
-        <span class="material-icons" aria-hidden="true">auto_mode</span>
-        <span>Automation</span>
-      </button>
-    </div>
+    <label class="top-search" for="searchInput">
+      <span class="material-icons" aria-hidden="true">search</span>
+      <input type="search" class="search-input" id="searchInput" placeholder="Search tasks, people or infrastructure" aria-label="Search tasks, people or infrastructure">
+    </label>
   </div>
   <div class="top-bar-right">
-    <div class="search-container">
-      <input type="text" class="search-input" id="searchInput" placeholder="Search infrastructure &amp; tasks..." aria-label="Search infrastructure and tasks">
-      <span class="material-icons search-icon" aria-hidden="true">search</span>
-    </div>
+    <button class="quick-task-button" id="headerQuickAdd" type="button">
+      <span class="material-icons" aria-hidden="true">bolt</span>
+      Quick task
+    </button>
+    <button id="themeToggle" class="icon-btn" type="button" aria-label="Toggle theme">
+      <span class="material-icons" aria-hidden="true">dark_mode</span>
+    </button>
     <div class="view-controls" aria-label="View mode controls">
       <button class="view-btn active" data-view="kanban" aria-label="Kanban view" aria-pressed="true" type="button"><span class="material-icons" aria-hidden="true">view_kanban</span></button>
       <button class="view-btn" data-view="list" aria-label="List view" aria-pressed="false" type="button"><span class="material-icons" aria-hidden="true">view_list</span></button>
@@ -53,13 +32,16 @@
         <div class="user-name" id="userName">User</div>
         <div class="user-role" id="userRole">&nbsp;</div>
       </div>
+      <span class="material-icons dropdown-arrow" aria-hidden="true">expand_more</span>
       <div class="profile-dropdown" id="profileDropdown">
-        <button id="themeToggle" class="dropdown-btn" type="button"><span class="material-icons" aria-hidden="true">dark_mode</span></button>
-        <select id="designSelect" class="dropdown-select" onchange="changeDesignSystem(this.value)">
-          <option value="apple">Apple</option>
-          <option value="material">Google</option>
-          <option value="samsung">Samsung</option>
-        </select>
+        <label class="design-select" for="designSelect">
+          <span>Interface</span>
+          <select id="designSelect" class="dropdown-select" onchange="changeDesignSystem(this.value)">
+            <option value="apple">Apple</option>
+            <option value="material">Google</option>
+            <option value="samsung">Samsung</option>
+          </select>
+        </label>
         <a href="profile.html" class="dropdown-btn">
           <span class="material-icons" aria-hidden="true">person</span> Profile
         </a>

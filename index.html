@@ -34,54 +34,76 @@
             <div class="content-area">
                 <!-- Dashboard View -->
                 <div class="view-container active" id="dashboardView">
-                    <div class="dashboard-hero">
-                        <div class="hero-copy">
-                            <span class="hero-kicker">Today</span>
-                            <h1 class="hero-title">Hosting Control Center</h1>
-                            <p class="hero-subtitle">Keep every initiative in view with a calm, precise dashboard crafted for Mumatec.</p>
+                    <div class="dashboard-header">
+                        <div class="dashboard-heading">
+                            <span class="dashboard-date" id="todayDate">&nbsp;</span>
+                            <h2>Run your work without the clutter</h2>
+                            <p>Every priority is visible the moment you sign in.</p>
                         </div>
-                        <div class="hero-actions">
-                            <button type="button" class="hero-primary" onclick="todoApp.openAddTaskModal('todo')">
-                                <span class="material-icons" aria-hidden="true">add</span>
-                                New Task
-                            </button>
-                            <button type="button" class="hero-secondary" onclick="document.getElementById('todayView').scrollIntoView({ behavior: 'smooth' });">
-                                <span class="material-icons" aria-hidden="true">bolt</span>
-                                Focus Mode
-                            </button>
+                        <div class="dashboard-health">
+                            <div class="health-pill">
+                                <span class="health-label">Due today</span>
+                                <span class="health-value" id="todaySummary">0</span>
+                            </div>
+                            <div class="health-pill">
+                                <span class="health-label">Overdue</span>
+                                <span class="health-value" id="overdueSummary">0</span>
+                            </div>
                         </div>
                     </div>
 
-                    <!-- Quick Stats -->
                     <div class="quick-stats">
-                        <div class="stat-card">
-                            <div class="stat-icon material-icons">assignment</div>
-                            <div class="stat-content">
-                                <div class="stat-number" id="totalTasks">0</div>
-                                <div class="stat-label">Total Tasks</div>
+                        <article class="stat-card">
+                            <span class="stat-label">Total tasks</span>
+                            <span class="stat-number" id="totalTasks">0</span>
+                        </article>
+                        <article class="stat-card">
+                            <span class="stat-label">Ready to start</span>
+                            <span class="stat-number" id="todoTasks">0</span>
+                        </article>
+                        <article class="stat-card">
+                            <span class="stat-label">In progress</span>
+                            <span class="stat-number" id="inProgressTasks">0</span>
+                        </article>
+                        <article class="stat-card">
+                            <span class="stat-label">Completed</span>
+                            <span class="stat-number" id="completedTasks">0</span>
+                        </article>
+                    </div>
+
+                    <div class="quick-add-card">
+                        <form id="quickAddForm" class="quick-add-form">
+                            <div class="quick-add-fields">
+                                <label class="sr-only" for="quickTaskTitle">Task title</label>
+                                <input type="text" id="quickTaskTitle" name="quickTaskTitle" placeholder="Create a task without leaving the dashboard" autocomplete="off" required>
+                                <label class="sr-only" for="quickTaskStatus">Status</label>
+                                <select id="quickTaskStatus" name="quickTaskStatus">
+                                    <option value="todo">To do</option>
+                                    <option value="inprogress">In progress</option>
+                                    <option value="review">Review</option>
+                                    <option value="done">Done</option>
+                                </select>
+                                <label class="sr-only" for="quickTaskPriority">Priority</label>
+                                <select id="quickTaskPriority" name="quickTaskPriority">
+                                    <option value="medium">Priority: Medium</option>
+                                    <option value="low">Priority: Low</option>
+                                    <option value="high">Priority: High</option>
+                                    <option value="critical">Priority: Critical</option>
+                                </select>
+                                <label class="sr-only" for="quickTaskDueDate">Due date</label>
+                                <input type="date" id="quickTaskDueDate" name="quickTaskDueDate">
                             </div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-icon material-icons">check_circle</div>
-                            <div class="stat-content">
-                                <div class="stat-number" id="completedTasks">0</div>
-                                <div class="stat-label">Completed</div>
+                            <div class="quick-add-actions">
+                                <div class="quick-add-meta">
+                                    <span>Today <strong id="quickMetaToday">0</strong></span>
+                                    <span>Overdue <strong id="quickMetaOverdue">0</strong></span>
+                                </div>
+                                <button type="submit" class="quick-add-submit">
+                                    <span class="material-icons" aria-hidden="true">add</span>
+                                    Add task
+                                </button>
                             </div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-icon material-icons">hourglass_empty</div>
-                            <div class="stat-content">
-                                <div class="stat-number" id="pendingTasks">0</div>
-                                <div class="stat-label">In Progress</div>
-                            </div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-icon material-icons">whatshot</div>
-                            <div class="stat-content">
-                                <div class="stat-number" id="streakDays">0</div>
-                                <div class="stat-label">Day Streak</div>
-                            </div>
-                        </div>
+                        </form>
                     </div>
 
                     <!-- Main Dashboard Content -->
