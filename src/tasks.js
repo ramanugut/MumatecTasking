@@ -522,31 +522,11 @@ class MumatecTaskManager {
     updateUI() {
         const stats = this.getTaskStats();
         const timeTotals = this.computeTimeTotals();
-        this.updateStats(stats);
         this.updateNavigationCounts(stats);
         this.renderCategoryTimeTotals(timeTotals);
         this.updateProductivityRing(stats);
         this.renderCurrentView();
         this.updateInsights();
-    }
-
-    updateStats(stats) {
-        const { total, completed, inProgress, todo, today, overdue } = stats;
-
-        const setText = (id, value) => {
-            const el = document.getElementById(id);
-            if (el) el.textContent = value;
-        };
-
-        setText('totalTasks', total);
-        setText('completedTasks', completed);
-        setText('inProgressTasks', inProgress);
-        setText('todoTasks', todo);
-        setText('todayCount', today);
-        setText('todaySummary', today);
-        setText('overdueSummary', overdue);
-        setText('quickMetaToday', today);
-        setText('quickMetaOverdue', overdue);
     }
 
     updateNavigationCounts(stats) {
