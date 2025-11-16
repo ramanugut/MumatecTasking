@@ -1,26 +1,26 @@
 <div class="sidebar" id="sidebar">
   <div class="sidebar-nav">
     <div class="nav-section" data-section="overview">
-      <div class="nav-item active" data-view="dashboard" aria-label="Hosting control center">
+      <button type="button" class="nav-item active" data-view="dashboard" aria-label="Hosting control center" aria-pressed="true">
         <span class="material-icons nav-icon" aria-hidden="true">dns</span>
         <span class="nav-label">Control Center</span>
         <span class="nav-count" id="dashboardCount">0</span>
-      </div>
-      <div class="nav-item" data-view="today" aria-label="Infrastructure status">
+      </button>
+      <button type="button" class="nav-item" data-view="today" aria-label="Infrastructure status" aria-pressed="false">
         <span class="material-icons nav-icon" aria-hidden="true">cloud_done</span>
         <span class="nav-label">Infrastructure Status</span>
         <span class="nav-count" id="todayCount">0</span>
-      </div>
-      <div class="nav-item" data-view="upcoming" aria-label="Incident queue">
+      </button>
+      <button type="button" class="nav-item" data-view="upcoming" aria-label="Incident queue" aria-pressed="false">
         <span class="material-icons nav-icon" aria-hidden="true">warning_amber</span>
         <span class="nav-label">Incident Queue</span>
         <span class="nav-count" id="upcomingCount">0</span>
-      </div>
-      <div class="nav-item" data-view="completed" aria-label="Scheduled maintenance">
+      </button>
+      <button type="button" class="nav-item" data-view="completed" aria-label="Scheduled maintenance" aria-pressed="false">
         <span class="material-icons nav-icon" aria-hidden="true">build_circle</span>
         <span class="nav-label">Scheduled Maintenance</span>
         <span class="nav-count" id="completedNavCount">0</span>
-      </div>
+      </button>
     </div>
 
     <div class="nav-divider"></div>

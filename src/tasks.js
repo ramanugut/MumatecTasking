@@ -1021,8 +1021,13 @@ class MumatecTaskManager {
         // Update navigation
         document.querySelectorAll('.nav-item[data-view]').forEach(item => {
             item.classList.remove('active');
+            item.setAttribute('aria-pressed', 'false');
         });
-        document.querySelector(`.nav-item[data-view="${viewName}"]`)?.classList.add('active');
+        const activeNavItem = document.querySelector(`.nav-item[data-view="${viewName}"]`);
+        if (activeNavItem) {
+            activeNavItem.classList.add('active');
+            activeNavItem.setAttribute('aria-pressed', 'true');
+        }
 
         this.currentView = viewName;
         this.renderCurrentView();
@@ -1627,6 +1632,17 @@ class MumatecTaskManager {
         document.querySelectorAll('.nav-item[data-view]').forEach(item => {
             item.addEventListener('click', () => {
                 this.switchView(item.dataset.view);
+            });
+
+            item.addEventListener('keydown', (event) => {
+                if (event.key === 'Enter' || event.key === ' ' || event.key === 'Spacebar' || event.key === 'Space') {
+                    event.preventDefault();
+                    if (item.tagName === 'BUTTON') {
+                        item.click();
+                    } else {
+                        this.switchView(item.dataset.view);
+                    }
+                }
             });
         });
 
