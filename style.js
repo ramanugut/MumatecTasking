@@ -3,7 +3,9 @@
   function updateThemeIcon(){
     const btn = document.getElementById('themeToggle');
     if(btn){
-      const isDark = document.documentElement.classList.contains('dark-mode') || document.body.classList.contains('dark-mode');
+      const docIsDark = document.documentElement.classList.contains('dark-mode');
+      const bodyIsDark = document.body?.classList?.contains('dark-mode');
+      const isDark = docIsDark || bodyIsDark;
       btn.innerHTML = `<span class="material-icons">${isDark ? 'light_mode' : 'dark_mode'}</span>`;
     }
   }
@@ -18,19 +20,52 @@
     }
   }
 
+  let pendingThemeApplication = false;
+
   window.applySavedTheme = function(){
-    if(localStorage.getItem('mumatecTheme') === 'dark'){
-      document.documentElement.classList.add('dark-mode');
-      document.body.classList.add('dark-mode');
+    const shouldUseDark = localStorage.getItem('mumatecTheme') === 'dark';
+    document.documentElement.classList.toggle('dark-mode', shouldUseDark);
+
+    const applyToBodyAndIcon = function(){
+      const body = document.body;
+      if(!body){
+        return;
+      }
+      body.classList.toggle('dark-mode', shouldUseDark);
+      updateThemeIcon();
+    };
+
+    if(document.body){
+      applyToBodyAndIcon();
+    } else if(!pendingThemeApplication){
+      pendingThemeApplication = true;
+      document.addEventListener('DOMContentLoaded', function handleThemeReady(){
+        pendingThemeApplication = false;
+        applyToBodyAndIcon();
+      }, { once: true });
     }
-    updateThemeIcon();
   };
 
   window.applySavedDesignSystem = applySavedDesignSystem;
 
   window.toggleThemePreference = function(){
     document.documentElement.classList.toggle('dark-mode');
-    const isDark = document.body.classList.toggle('dark-mode');
+    const body = document.body;
+    let isDark;
+
+    if(body){
+      isDark = body.classList.toggle('dark-mode');
+    } else {
+      isDark = document.documentElement.classList.contains('dark-mode');
+      document.addEventListener('DOMContentLoaded', function syncBodyTheme(){
+        const readyBody = document.body;
+        if(readyBody){
+          readyBody.classList.toggle('dark-mode', isDark);
+          updateThemeIcon();
+        }
+      }, { once: true });
+    }
+
     localStorage.setItem('mumatecTheme', isDark ? 'dark' : 'light');
     updateThemeIcon();
   };
