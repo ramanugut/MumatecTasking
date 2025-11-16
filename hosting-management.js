@@ -21,13 +21,92 @@ const elements = {
   incidentsSubtitle: document.getElementById('incidentsSubtitle'),
   plansValue: document.getElementById('plansValue'),
   plansSubtitle: document.getElementById('plansSubtitle'),
-  environmentGrid: document.getElementById('environmentGrid'),
-  deploymentTimeline: document.getElementById('deploymentTimeline'),
-  automationQueue: document.getElementById('automationQueue'),
-  clientList: document.getElementById('clientList'),
-  billingList: document.getElementById('billingList'),
-  refreshBtn: document.getElementById('refreshEnvironments')
+  boardColumns: {
+    'get-started': document.getElementById('column-get-started'),
+    requests: document.getElementById('column-requests'),
+    progress: document.getElementById('column-progress'),
+    approved: document.getElementById('column-approved')
+  },
+  boardCounts: {
+    'get-started': document.getElementById('count-get-started'),
+    requests: document.getElementById('count-requests'),
+    progress: document.getElementById('count-progress'),
+    approved: document.getElementById('count-approved')
+  }
 };
+
+const boardColumnsConfig = [
+  { id: 'get-started', keywords: ['kickoff', 'start', 'brief', 'pending'] },
+  { id: 'requests', keywords: ['request', 'backlog', 'review', 'awaiting'] },
+  { id: 'progress', keywords: ['progress', 'building', 'wip', 'active', 'develop'] },
+  { id: 'approved', keywords: ['approved', 'done', 'launch', 'complete'] }
+];
+
+const sampleBoardTasks = [
+  {
+    column: 'get-started',
+    title: 'Process design brief',
+    subtitle: 'Finalize onboarding docs & scope',
+    tags: ['Branding', 'Intake'],
+    owner: 'Mila',
+    dateLabel: 'Due today',
+    icon: 'assignment'
+  },
+  {
+    column: 'get-started',
+    title: 'Branding refresh',
+    subtitle: 'Upload client files + guidelines',
+    tags: ['Creative', 'High priority'],
+    owner: 'Leo',
+    dateLabel: 'Apr 12',
+    icon: 'palette'
+  },
+  {
+    column: 'requests',
+    title: 'Keyword cover',
+    subtitle: 'Create short-form showcase assets',
+    tags: ['SEO', 'Content'],
+    owner: 'Rena',
+    dateLabel: 'Apr 15',
+    icon: 'lightbulb'
+  },
+  {
+    column: 'requests',
+    title: 'Facebook cover',
+    subtitle: 'Prep seasonal creative kit',
+    tags: ['Social', 'Campaign'],
+    owner: 'Sam',
+    dateLabel: 'Apr 17',
+    icon: 'share'
+  },
+  {
+    column: 'progress',
+    title: 'Schedule onboarding call',
+    subtitle: 'Confirm access + priorities',
+    tags: ['Client', 'Call'],
+    owner: 'Alex',
+    dateLabel: 'Tomorrow',
+    icon: 'phone'
+  },
+  {
+    column: 'progress',
+    title: 'Check keyword list',
+    subtitle: 'QA deliverables before send-off',
+    tags: ['Quality', 'Search'],
+    owner: 'Dana',
+    dateLabel: 'Apr 18',
+    icon: 'task_alt'
+  },
+  {
+    column: 'approved',
+    title: 'Signed checkout flow',
+    subtitle: 'Ready for deployment approval',
+    tags: ['Product', 'Payments'],
+    owner: 'Chris',
+    dateLabel: 'Queued',
+    icon: 'verified'
+  }
+];
 
 const unsubscribers = [];
 
@@ -113,276 +192,136 @@ function calculateHeroMetrics() {
   }
 }
 
-function renderEnvironmentGrid() {
-  if (!elements.environmentGrid) return;
-  elements.environmentGrid.innerHTML = '';
+function determineColumnForSite(site = {}) {
+  const stageValue = [
+    site.pipelineStage,
+    site.stage,
+    site.status,
+    site.workflowStatus,
+    site.progress,
+    site.phase
+  ]
+    .map(value => (value || '').toString().toLowerCase())
+    .filter(Boolean)
+    .join(' ');
 
-  if (!state.servers.length) {
-    const empty = document.createElement('div');
-    empty.className = 'empty-state';
-    empty.textContent = 'No environments found. Connect a server to begin monitoring.';
-    elements.environmentGrid.appendChild(empty);
-    return;
+  if (!stageValue) {
+    return site.approved || site.launchReady ? 'approved' : 'requests';
   }
 
-  const fragment = document.createDocumentFragment();
+  const matchedColumn = boardColumnsConfig.find(column =>
+    column.keywords.some(keyword => stageValue.includes(keyword))
+  );
 
-  state.servers.forEach(server => {
-    const card = document.createElement('article');
-    card.className = 'environment-card';
-    const status = (server.status || server.health?.status || 'operational').toLowerCase();
-    const incidentsOpen = Number(server.incidentsOpen || server.openIncidents || 0);
-    const uptime = server.uptime ?? server.uptimePercent ?? server.health?.uptime;
-    const environment = server.environment || server.tier || 'Production';
-    const region = server.region || server.location || 'Global';
-    const lastCheck = server.lastCheck || server.checkedAt;
+  if (matchedColumn) return matchedColumn.id;
 
-    const statusClass = status.includes('crit') ? 'critical' : status.includes('warn') || status.includes('degraded') ? 'warning' : 'ok';
-    const statusLabel = status.charAt(0).toUpperCase() + status.slice(1);
-
-    card.innerHTML = `
-      <header>
-        <div>
-          <div class="environment-name">${server.name || server.hostname || 'Unnamed Server'}</div>
-          <div class="environment-meta">${region} • ${environment}</div>
-        </div>
-        <span class="status-pill ${statusClass}">
-          <span class="material-icons" aria-hidden="true">${statusClass === 'critical' ? 'error' : statusClass === 'warning' ? 'report_problem' : 'check_circle'}</span>
-          ${statusLabel}
-        </span>
-      </header>
-      <div class="environment-health">
-        <span>Uptime</span>
-        <strong>${formatPercent(uptime)}</strong>
-      </div>
-      <div class="environment-health">
-        <span>Open incidents</span>
-        <strong>${incidentsOpen}</strong>
-      </div>
-      <div class="environment-health">
-        <span>Last check</span>
-        <strong>${formatDate(lastCheck)}</strong>
-      </div>
-      <div class="environment-actions">
-        <span class="tag">${environment}</span>
-        <span class="tag">${region}</span>
-        ${server.automation?.length ? `<span class="tag">${server.automation.length} automations</span>` : ''}
-      </div>
-    `;
-
-    fragment.appendChild(card);
-  });
-
-  elements.environmentGrid.appendChild(fragment);
+  return stageValue.includes('approve') || stageValue.includes('launch')
+    ? 'approved'
+    : stageValue.includes('progress') || stageValue.includes('active')
+      ? 'progress'
+      : 'requests';
 }
 
-function renderTimeline() {
-  if (!elements.deploymentTimeline) return;
-  elements.deploymentTimeline.innerHTML = '';
+function buildTaskFromSite(site, planMap) {
+  const column = determineColumnForSite(site);
+  const plan = planMap.get(site.planId) || planMap.get(site.plan) || planMap.get(site.planSlug) || planMap.get(site.planName);
+  const tags = [];
+  if (plan?.name) tags.push(plan.name);
+  if (site.environment) tags.push(site.environment);
+  if (site.priority) tags.push(site.priority);
 
-  const events = [];
+  const title = site.name || site.domain || 'Client request';
+  const subtitle = site.brief || site.description || site.goal || site.domain || 'Awaiting requirements';
+  const owner = site.owner || site.pointOfContact || site.accountOwner || 'Unassigned';
+  const date = site.dueDate || site.launchDate || site.nextDeployment || site.updatedAt;
+  const dateLabel = date ? formatDate(date, { month: 'short', day: 'numeric' }) : 'No date';
+  let icon = site.icon;
+  if (!icon) {
+    icon = column === 'approved' ? 'verified'
+      : column === 'progress' ? 'bolt'
+      : column === 'requests' ? 'lightbulb'
+      : 'assignment';
+  }
 
-  state.sites.forEach(site => {
-    const last = site.lastDeployment || site.deployedAt || site.updatedAt;
-    const upcoming = site.nextDeployment || site.scheduledDeployment;
-    if (last) {
-      events.push({
-        type: 'deployment',
-        time: asDate(last),
-        title: `${site.name || 'Site'} deployed`,
-        description: site.deploymentSummary || `Deployed ${site.branch || 'main'} to ${site.environment || 'production'}`
-      });
+  return { column, title, subtitle, tags, owner, dateLabel, icon };
+}
+
+function renderTaskCard(task) {
+  const card = document.createElement('article');
+  card.className = 'task-card';
+  const tags = (task.tags || [])
+    .filter(Boolean)
+    .map(tag => `<span class="task-tag">${tag}</span>`)
+    .join('');
+
+  card.innerHTML = `
+    <header>
+      <div>
+        <p class="task-title">${task.title}</p>
+        <p class="task-subtitle">${task.subtitle || ''}</p>
+      </div>
+      <div class="task-indicator" data-column="${task.column}">
+        <span class="material-icons" aria-hidden="true">${task.icon || 'radio_button_unchecked'}</span>
+      </div>
+    </header>
+    ${tags ? `<div class="task-tags">${tags}</div>` : ''}
+    <div class="task-footer">
+      <span class="task-owner">${task.owner || 'Unassigned'}</span>
+      <span class="task-date"><span class="material-icons" aria-hidden="true">event</span>${task.dateLabel || ''}</span>
+    </div>
+  `;
+
+  return card;
+}
+
+function renderWorkspaceBoard() {
+  if (!elements.boardColumns) return;
+  const hasColumn = Object.values(elements.boardColumns).some(Boolean);
+  if (!hasColumn) return;
+
+  const planMap = new Map();
+  state.plans.forEach(plan => {
+    [plan.id, plan.uid, plan.slug, plan.name]
+      .filter(Boolean)
+      .forEach(key => planMap.set(key, plan));
+  });
+  const buckets = boardColumnsConfig.reduce((acc, column) => {
+    acc[column.id] = [];
+    return acc;
+  }, {});
+
+  const tasks = state.sites.length
+    ? state.sites.map(site => buildTaskFromSite(site, planMap))
+    : sampleBoardTasks;
+
+  tasks.forEach(task => {
+    const bucket = buckets[task.column] ? task.column : 'requests';
+    buckets[bucket].push(task);
+  });
+
+  boardColumnsConfig.forEach(column => {
+    const listEl = elements.boardColumns[column.id];
+    const countEl = elements.boardCounts[column.id];
+    if (!listEl) return;
+    listEl.innerHTML = '';
+    const columnTasks = buckets[column.id];
+    if (!columnTasks.length) {
+      const empty = document.createElement('p');
+      empty.className = 'empty-state soft';
+      empty.textContent = 'No work in this column yet.';
+      listEl.appendChild(empty);
+    } else {
+      columnTasks.forEach(task => listEl.appendChild(renderTaskCard(task)));
     }
-    if (upcoming) {
-      events.push({
-        type: 'upcoming',
-        time: asDate(upcoming),
-        title: `Scheduled: ${site.name || 'Site'}`,
-        description: site.nextDeploymentSummary || `Queued for ${site.environment || 'production'}`
-      });
+    if (countEl) {
+      countEl.textContent = columnTasks.length.toString();
     }
   });
-
-  state.incidents.forEach(incident => {
-    const started = asDate(incident.startedAt || incident.openedAt || incident.createdAt);
-    if (started) {
-      events.push({
-        type: 'incident',
-        time: started,
-        title: `${incident.severity ? incident.severity.toUpperCase() : 'Incident'} - ${incident.title || incident.summary || 'Unnamed incident'}`,
-        description: incident.status ? `Status: ${incident.status}` : 'Investigation in progress'
-      });
-    }
-  });
-
-  events
-    .filter(evt => evt.time)
-    .sort((a, b) => b.time.getTime() - a.time.getTime())
-    .slice(0, 8)
-    .forEach(event => {
-      const item = document.createElement('li');
-      item.className = 'timeline-item';
-      item.innerHTML = `
-        <time datetime="${event.time.toISOString()}">${formatDate(event.time, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</time>
-        <h3>${event.title}</h3>
-        <p>${event.description}</p>
-      `;
-      elements.deploymentTimeline.appendChild(item);
-    });
-
-  if (!elements.deploymentTimeline.children.length) {
-    const empty = document.createElement('li');
-    empty.className = 'timeline-item';
-    empty.innerHTML = '<h3>No deployment activity yet</h3><p>Deployments, incidents, and schedules will appear here in real-time.</p>';
-    elements.deploymentTimeline.appendChild(empty);
-  }
-}
-
-function renderAutomationQueue() {
-  if (!elements.automationQueue) return;
-  elements.automationQueue.innerHTML = '';
-
-  const queue = [];
-
-  state.servers.forEach(server => {
-    const items = server.automationQueue || server.automation || [];
-    items.forEach(item => {
-      queue.push({
-        server: server.name || server.hostname || 'Server',
-        name: item.name || item.job || 'Automation Task',
-        type: item.type || 'general',
-        status: item.status || 'queued',
-        scheduled: item.scheduledAt || item.runAt || item.createdAt,
-        progress: item.progress
-      });
-    });
-  });
-
-  if (!queue.length) {
-    const empty = document.createElement('div');
-    empty.className = 'empty-state';
-    empty.textContent = 'Automation pipeline is idle. New jobs will appear here instantly.';
-    elements.automationQueue.appendChild(empty);
-    return;
-  }
-
-  queue
-    .sort((a, b) => {
-      const timeA = asDate(a.scheduled)?.getTime() || 0;
-      const timeB = asDate(b.scheduled)?.getTime() || 0;
-      return timeB - timeA;
-    })
-    .slice(0, 10)
-    .forEach(item => {
-      const el = document.createElement('article');
-      el.className = 'list-item';
-      const status = (item.status || '').toLowerCase();
-      const statusClass = status.includes('fail') || status.includes('error') ? 'error'
-        : status.includes('run') || status.includes('in-progress') ? 'warning'
-        : 'success';
-      const progress = item.progress != null ? `${Math.round(Number(item.progress) * (Number(item.progress) <= 1 ? 100 : 1))}%` : '';
-      el.innerHTML = `
-        <header>
-          <h3>${item.name}</h3>
-          <span class="badge ${statusClass}">${item.status || 'Queued'}</span>
-        </header>
-        <p>${item.type ? item.type.replace(/_/g, ' ') : 'automation'} • ${item.server}</p>
-        <div class="list-item-footer">
-          <span>${formatDate(item.scheduled)}</span>
-          <span>${progress}</span>
-        </div>
-      `;
-      elements.automationQueue.appendChild(el);
-    });
-}
-
-function renderClients() {
-  if (!elements.clientList) return;
-  elements.clientList.innerHTML = '';
-
-  if (!state.sites.length) {
-    const empty = document.createElement('div');
-    empty.className = 'empty-state';
-    empty.textContent = 'No client sites onboarded yet. Provision a site to see details here.';
-    elements.clientList.appendChild(empty);
-    return;
-  }
-
-  const planMap = new Map(state.plans.map(plan => [plan.id || plan.uid || plan.slug, plan]));
-
-  state.sites
-    .slice()
-    .sort((a, b) => (a.name || '').localeCompare(b.name || ''))
-    .forEach(site => {
-      const item = document.createElement('article');
-      item.className = 'list-item';
-      const plan = planMap.get(site.planId) || planMap.get(site.plan) || planMap.get(site.planSlug);
-      const status = (site.status || '').toLowerCase();
-      const statusClass = status === 'active' ? 'success' : status === 'warning' ? 'warning' : status === 'paused' ? 'warning' : 'success';
-      item.innerHTML = `
-        <header>
-          <h3>${site.name || site.domain || 'Client Site'}</h3>
-          <span class="badge ${statusClass}">${site.status || 'Active'}</span>
-        </header>
-        <p>${site.domain || site.url || '—'} • ${plan ? (plan.name || 'Custom plan') : (site.plan || 'Unassigned plan')}</p>
-        <div class="list-item-footer">
-          <span>Last deploy: ${formatDate(site.lastDeployment || site.updatedAt)}</span>
-          <span>Visitors: ${(site.monthlyVisitors ?? site.traffic ?? '—')}</span>
-        </div>
-      `;
-      elements.clientList.appendChild(item);
-    });
-}
-
-function renderBilling() {
-  if (!elements.billingList) return;
-  elements.billingList.innerHTML = '';
-
-  if (!state.invoices.length) {
-    const empty = document.createElement('div');
-    empty.className = 'empty-state';
-    empty.textContent = 'No invoices available. When billing is generated it will show up here instantly.';
-    elements.billingList.appendChild(empty);
-    return;
-  }
-
-  state.invoices
-    .slice()
-    .sort((a, b) => {
-      const dueA = asDate(a.dueDate)?.getTime() || 0;
-      const dueB = asDate(b.dueDate)?.getTime() || 0;
-      return dueA - dueB;
-    })
-    .forEach(invoice => {
-      const item = document.createElement('article');
-      item.className = 'list-item';
-      const status = (invoice.status || '').toLowerCase();
-      let statusClass = 'success';
-      if (status.includes('past') || status.includes('overdue')) statusClass = 'error';
-      else if (status.includes('pending') || status.includes('draft')) statusClass = 'warning';
-
-      item.innerHTML = `
-        <header>
-          <h3>${invoice.client || invoice.account || 'Client'}</h3>
-          <span class="badge ${statusClass}">${invoice.status || 'Pending'}</span>
-        </header>
-        <p>Invoice ${invoice.number || invoice.reference || '#'} • ${formatCurrency(invoice.amount, invoice.currency || 'USD')}</p>
-        <div class="list-item-footer">
-          <span>Due ${formatDate(invoice.dueDate, { month: 'short', day: 'numeric' })}</span>
-          <span>${invoice.plan || invoice.service || 'Hosting plan'}</span>
-        </div>
-      `;
-      elements.billingList.appendChild(item);
-    });
 }
 
 function renderAll() {
   calculateHeroMetrics();
-  renderEnvironmentGrid();
-  renderTimeline();
-  renderAutomationQueue();
-  renderClients();
-  renderBilling();
+  renderWorkspaceBoard();
 }
 
 function subscribeToCollection(name, handler, options = {}) {
@@ -437,12 +376,6 @@ document.addEventListener('visibilitychange', () => {
 });
 
 function init() {
-  if (elements.refreshBtn) {
-    elements.refreshBtn.addEventListener('click', () => {
-      renderAll();
-    });
-  }
-
   setupRealtime();
   renderAll();
 }

@@ -24,104 +24,124 @@
     <div id="appShellSidebar"></div>
 
     <div class="main-content">
-      <div class="content-area hosting-content">
-        <section class="hosting-hero">
-          <div class="hero-headline">
-            <div>
-              <h2>Platform Health Overview</h2>
-              <p>Real-time visibility into uptime, incidents, billing, and deployment automation.</p>
-            </div>
-            <nav class="hosting-nav" aria-label="Hosting shortcuts">
-              <a class="hosting-nav-link" href="#environments"><span class="material-icons" aria-hidden="true">dns</span>Environments</a>
-              <a class="hosting-nav-link" href="#clients"><span class="material-icons" aria-hidden="true">groups</span>Clients</a>
-              <a class="hosting-nav-link" href="#billing"><span class="material-icons" aria-hidden="true">receipt_long</span>Billing</a>
-            </nav>
+      <div class="content-area workspace-surface">
+        <section class="workspace-hero">
+          <div class="workspace-meta">
+            <p class="workspace-breadcrumb">Clients / Filters / What's My SERP</p>
+            <h1>What's My SERP</h1>
+            <p>Bring hosting, billing, and creative delivery together in one calm command center.</p>
           </div>
-          <div class="metric-grid" role="list">
-            <article class="metric-card" role="listitem">
-              <div class="metric-icon uptime"><span class="material-icons" aria-hidden="true">speed</span></div>
-              <div class="metric-body">
-                <h3>Global Uptime</h3>
-                <p class="metric-value" id="uptimeValue">99.99%</p>
-                <p class="metric-subtitle" id="uptimeSubtitle">Across all monitored regions</p>
-              </div>
-            </article>
-            <article class="metric-card" role="listitem">
-              <div class="metric-icon incidents"><span class="material-icons" aria-hidden="true">warning_amber</span></div>
-              <div class="metric-body">
-                <h3>Open Incidents</h3>
-                <p class="metric-value" id="incidentsValue">0</p>
-                <p class="metric-subtitle" id="incidentsSubtitle">All services operational</p>
-              </div>
-            </article>
-            <article class="metric-card" role="listitem">
-              <div class="metric-icon plans"><span class="material-icons" aria-hidden="true">hub</span></div>
-              <div class="metric-body">
-                <h3>Active Plans</h3>
-                <p class="metric-value" id="plansValue">0</p>
-                <p class="metric-subtitle" id="plansSubtitle">Managed client subscriptions</p>
-              </div>
-            </article>
+          <div class="workspace-quick-actions" aria-label="Quick actions">
+            <button class="chip-button">
+              <span class="material-icons" aria-hidden="true">add</span>
+              New Request
+            </button>
+            <button class="chip-button ghost">
+              <span class="material-icons" aria-hidden="true">ios_share</span>
+              Share Board
+            </button>
           </div>
         </section>
 
-        <div class="hosting-grid">
-          <section class="panel" id="environments">
-            <header class="panel-header">
-              <div>
-                <h2>Environment Status</h2>
-                <p>Monitor server uptime, regional health, and automation checks.</p>
-              </div>
-              <button class="action-btn tertiary" id="refreshEnvironments" type="button">
-                <span class="material-icons" aria-hidden="true">refresh</span>
-                Refresh
+        <section class="workspace-summary" aria-label="Key signals">
+          <article class="summary-card">
+            <div>
+              <p class="summary-label">Global Uptime</p>
+              <p class="summary-value" id="uptimeValue">99.99%</p>
+            </div>
+            <p class="summary-meta" id="uptimeSubtitle">Across all monitored regions</p>
+          </article>
+          <article class="summary-card">
+            <div>
+              <p class="summary-label">Open Incidents</p>
+              <p class="summary-value" id="incidentsValue">0</p>
+            </div>
+            <p class="summary-meta" id="incidentsSubtitle">All services operational</p>
+          </article>
+          <article class="summary-card">
+            <div>
+              <p class="summary-label">Active Plans</p>
+              <p class="summary-value" id="plansValue">0</p>
+            </div>
+            <p class="summary-meta" id="plansSubtitle">Managed client subscriptions</p>
+          </article>
+        </section>
+
+        <section class="workspace-board" aria-labelledby="workspaceBoardTitle">
+          <header class="workspace-board-header">
+            <div>
+              <p class="workspace-board-label">Pipeline overview</p>
+              <h2 id="workspaceBoardTitle">Requests &amp; Delivery</h2>
+            </div>
+            <div class="workspace-board-filters" aria-label="Board filters">
+              <button class="chip-button ghost">All clients</button>
+              <button class="chip-button ghost">Design system</button>
+              <button class="chip-button ghost">Weekly view</button>
+            </div>
+          </header>
+
+          <div class="board-columns" role="list">
+            <article class="board-column column-get-started" role="listitem">
+              <header>
+                <div>
+                  <p class="column-label">Get Started</p>
+                  <p class="column-meta">Kickoff requests waiting on scoping</p>
+                </div>
+                <span class="column-count" id="count-get-started">0</span>
+              </header>
+              <div class="column-cards" id="column-get-started"></div>
+              <button class="column-add" type="button">
+                <span class="material-icons" aria-hidden="true">add</span>
+                Add task
               </button>
-            </header>
-            <div class="environment-grid" id="environmentGrid" role="list"></div>
-          </section>
+            </article>
 
-          <section class="panel" id="deployments">
-            <header class="panel-header">
-              <div>
-                <h2>Deployment Timeline</h2>
-                <p>Track recent launches and automation rollouts.</p>
-              </div>
-            </header>
-            <ol class="timeline" id="deploymentTimeline" aria-live="polite"></ol>
-          </section>
+            <article class="board-column column-backlog" role="listitem">
+              <header>
+                <div>
+                  <p class="column-label">Requests Backlog</p>
+                  <p class="column-meta">Prioritized briefs ready for review</p>
+                </div>
+                <span class="column-count" id="count-requests">0</span>
+              </header>
+              <div class="column-cards" id="column-requests"></div>
+              <button class="column-add" type="button">
+                <span class="material-icons" aria-hidden="true">add</span>
+                Add task
+              </button>
+            </article>
 
-          <section class="panel" id="automation">
-            <header class="panel-header">
-              <div>
-                <h2>Automation Queue</h2>
-                <p>Review active jobs from CI/CD, backups, and compliance scripts.</p>
-              </div>
-            </header>
-            <div class="list-group" id="automationQueue" role="list"></div>
-          </section>
-        </div>
+            <article class="board-column column-progress" role="listitem">
+              <header>
+                <div>
+                  <p class="column-label">In Progress</p>
+                  <p class="column-meta">Active production and build work</p>
+                </div>
+                <span class="column-count" id="count-progress">0</span>
+              </header>
+              <div class="column-cards" id="column-progress"></div>
+              <button class="column-add" type="button">
+                <span class="material-icons" aria-hidden="true">add</span>
+                Add task
+              </button>
+            </article>
 
-        <div class="hosting-grid two-column">
-          <section class="panel" id="clients">
-            <header class="panel-header">
-              <div>
-                <h2>Client Portfolio</h2>
-                <p>Sites by plan tier and current health signals.</p>
-              </div>
-            </header>
-            <div class="list-group" id="clientList" role="list"></div>
-          </section>
-
-          <section class="panel" id="billing">
-            <header class="panel-header">
-              <div>
-                <h2>Billing &amp; Renewals</h2>
-                <p>Upcoming invoices and plan commitments.</p>
-              </div>
-            </header>
-            <div class="list-group" id="billingList" role="list"></div>
-          </section>
-        </div>
+            <article class="board-column column-approved" role="listitem">
+              <header>
+                <div>
+                  <p class="column-label">Approved</p>
+                  <p class="column-meta">Scheduled for delivery or launch</p>
+                </div>
+                <span class="column-count" id="count-approved">0</span>
+              </header>
+              <div class="column-cards" id="column-approved"></div>
+              <button class="column-add" type="button">
+                <span class="material-icons" aria-hidden="true">add</span>
+                Add task
+              </button>
+            </article>
+          </div>
+        </section>
       </div>
     </div>
   </div>
